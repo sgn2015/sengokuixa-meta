@@ -1,4 +1,4 @@
-よく見つけましたね。ここはgit,githubを使ってみたかったというだけで公開されています。あまり慣れていないのでおかしなことになるかもしれません・・・
+何か不具合があっても当方では一切の責任を負いません。
 
 sengokuixa-meta
 ===============
@@ -15,10 +15,25 @@ sengokuixa-meta
 ------------
 
 * このツールを使用するにはScriptishを事前にインストールしておく必要があります
-* 最新バージョンのインストールは[こちら](https://raw.github.com/metameta/sengokuixa-meta/master/sengokuixa-meta.user.js)
-* 過去バージョンのダウンロードは[こちら](https://github.com/metameta/sengokuixa-meta/releases)
+* 最新バージョンのインストールは[こちら](https://raw.github.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
 
 更新履歴
 --------
 
+### 1.3.2.0
+2014/04/23
+
+* スキルテーブル更新
+
+### 1.3.1.11
+2014/04/23
+
+* オリジナルからFork
+
+### オリジナルの更新履歴
 * [Version History](https://github.com/metameta/sengokuixa-meta/wiki/Version-History)
+
+
+オリジナルへのリンク
+------------------------
+[metameta氏](https://github.com/metameta)の[sengokuixa-meta](https://github.com/metameta/sengokuixa-meta)
