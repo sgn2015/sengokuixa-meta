@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.3.2.1
+// @version        1.4.0.0
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
-// @updateURL      https://raw.github.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
+// @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
 // ==/UserScript==
 
 /*
@@ -3899,7 +3899,7 @@ compass: [
 ],
 
 //. mapsize
-mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170 ][ Env.chapter ] || 150,
+mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170 ][ Env.chapter ] || 150,
 
 //. fortresses
 fortresses: (function() {
@@ -3919,7 +3919,7 @@ fortresses: (function() {
 		[108,108], [132, 84], [108,132], [132,108], [132,132]
 	]];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. countries
@@ -3940,6 +3940,8 @@ countries: (function() {
 		['dummy', '織田家', '黒田家', '武田家', '上杉家', '徳川家', '毛利家', '伊達家', '今川家', '長宗我部家', '島津家', '豊臣家', '石田家'],
 		//第７章
 		['dummy', '明智家', '真田家', '鈴木家', '上杉家', '徳川家', '毛利家', '伊達家', '北条家', '長宗我部家', '島津家', '豊臣家', '最上家'],
+		//第８章
+		['dummy', '黒田家', '真田家', '宇喜多家', '上杉家', '徳川家', '毛利家', '伊達家', '加藤家', '福島家', '島津家', '豊臣家', '石田家'],
 	][ Env.chapter ] || [];
 })(),
 
@@ -4056,7 +4058,7 @@ getNpcPower: function() {
 		'8-33310': [124800, 124800, 124800, 124800]
 	},
 	{
-		//５章、６章、７章
+		//５章、６章、７章、８章
 		//★１
 		'1-10000': [245, 185, 155, 203],
 		'1-01000': [155, 245, 185, 173],
@@ -4102,7 +4104,7 @@ getNpcPower: function() {
 		'8-33342': { '鬼': 905, '天狗': 455 }
 	}];
 
-	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2] ][ Env.chapter ] || {};
+	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
 
 	if ( Env.chapter <= 4 ) {
 		Data.npcPower = data;
@@ -9359,8 +9361,7 @@ assignCard: function( ano ) {
 			var $html = $(html),
 				text = $html.find('#ig_deck_unititle P').text(),
 				name = ( text.match(/\[(.+)\]/) || [,''] )[ 1 ],
-				href = $html.find('#ig_deck_unititle A').attr('href') || '',
-				unit_id = href.match(/unit_assign_id=(\d+)/),
+                unit_id = $html.find('#select_unit_assign_id').val(),
 				$li = $html.find('#ig_unitchoice LI'),
 				idx, newidx;
 
@@ -9382,7 +9383,7 @@ assignCard: function( ano ) {
 				return $.Deferred().reject( [ ol ] );
 			}
 
-			return unit_id[ 1 ];
+            return unit_id;
 		});
 	})
 	.pipe(function( unit_id ) {
@@ -9677,7 +9678,7 @@ analyzeLarge: function( element ) {
 	param = $param.get();
 	//職業
 	text = param[ 0 ].getAttribute('class').match(/jobtype_(\d)/)[ 1 ];
-	this.job = [ '', '将', '剣', '忍', '文', '姫' ][ text.toInt() ] || '';
+	this.job = [ '', '将', '剣', '忍', '文', '姫', '覇' ][ text.toInt() ] || '';
 	//経験値
 	this.exp = param[ 2 ].firstChild.nodeValue.toInt();
 	this.nextExp = param[ 3 ].firstChild.nodeValue;
@@ -14153,7 +14154,7 @@ autoPager: function( deck, edit ) {
 				ano = $('#assign_form INPUT[name="select_assign_no"]').val(),
 				dmo = $('#assign_form INPUT[name="deck_mode"]').val(),
 				num = $('#deck_file SELECT[name="show_num"]').val(),
-				groupclass = $('#btn_category').find('LI[class$="_on"]').attr('class') || '00',
+				groupclass = $('#btn_category_elite').find('LI[class$="_on"]').attr('class') || '00',
 				group = groupclass.match(/0(\d)/)[ 1 ];
 
 			return $.post( '/facility/set_unit_list.php', { show_num: num, p: page, select_card_group: group })
@@ -14244,7 +14245,7 @@ layouter: function() {
 
 	$('#imi_batch_selecter')
 	.on('click', '#imi_batch_0', function() {
-		var brigade = $('#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
+		var brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
 			batch = $('#imi_command_selecter LI.imc_selected').attr('batch').toInt(),
 			post_data;
 
@@ -14257,7 +14258,7 @@ layouter: function() {
 		$('#frmlumpsum').submit();
 	})
 	.on('click', '#imi_batch_1', function() {
-		var brigade = $('#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
+		var brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
 			batch = $('#imi_command_selecter LI.imc_selected').attr('batch').toInt(),
 			post_data;
 
@@ -14965,7 +14966,7 @@ autoPager: function() {
 			var page = nextPage,
 				ano = $('#assign_form INPUT[name="select_assign_no"]').val(),
 				dmo = $('#assign_form INPUT[name="deck_mode"]').val(),
-				groupclass = $('#btn_category').find('LI[class$="_on"]').attr('class') || '00',
+				groupclass = $('#btn_category_elite').find('LI[class$="_on"]').attr('class') || '00',
 				group = groupclass.match(/0(\d)/)[ 1 ];
 
 			return Page.post( '/card/deck.php', { myselect: '', ano: ano, dmo: dmo, select_card_group: group, p: page });
@@ -15066,7 +15067,7 @@ layouter: function() {
 	})
 	.on( 'click', '#imi_card_assign', function() {
 		var village_id = $('#imi_select_village').val() || '',
-			brigade = $('#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
+			brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
 			unit = Deck.currentUnit;
 
 		if ( village_id != '' ) {
@@ -15152,7 +15153,7 @@ deckSelecter: function() {
 
 		if ( $a.length == 0 ) { return; }
 
-		var brigade = $('#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ];
+		var brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ];
 		$a.attr('href', '/card/deck.php?ano=' + idx + '&select_card_group=' + brigade ).removeAttr('onClick');
 	});
 },

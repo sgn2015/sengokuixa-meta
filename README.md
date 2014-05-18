@@ -8,17 +8,22 @@ sengokuixa-meta
 動作確認
 --------
 
-* Firefox25 + Scriptish
+* Firefox24esr + Scriptish
 * （確か・・・Firefox9以上必須）
 
 インストール
 ------------
 
-* このツールを使用するにはScriptishを事前にインストールしておく必要があります
-* 最新バージョンのインストールは[こちら](https://raw.github.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
+* このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
+* 最新バージョンのインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js)
 
 更新履歴
 --------
+
+### 1.4.0.0
+2014/05/18
+
+* 8章対応(限界突破はまだ)
 
 ### 1.3.2.1
 2014/05/13
