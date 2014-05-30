@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.0.0
+// @version        1.4.0.0.m3
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -14395,20 +14395,20 @@ layouter2: function() {
 			$('#busho_info INPUT[type="text"]').val( 1 );
 		}
 		else if (text == '攻撃2%') {
-		    var cards = $('#busho_info input[id^=card_id_arr_]');
-		    for (var i = 0; i < cards.length; i++) {
-		        var card = new Card($('#cardWindow_' + $(cards[i]).val()));
-		        var mod = Soldier.modify(card.solName, card.commands);
-		        $('#busho_info INPUT[type="text"]:eq(' + i + ')').val(Math.min((card.atk * (mod / 100) * 0.02).toRound(), card.maxSolNum));
-		    }
+			var cards = $('#busho_info input[id^=card_id_arr_]');
+			for (var i = 0; i < cards.length; i++) {
+			    var card = new Card($('#cardWindow_' + $(cards[i]).val()));
+			    var mod = Soldier.modify(card.solName, card.commands);
+			    $('#busho_info INPUT[type="text"]:eq(' + i + ')').val(Math.min((card.atk * (mod / 100) * 0.02).toRound(), card.maxSolNum));
+			}
 		}
 		else if (text == '防御2%') {
-		    var cards = $('#busho_info input[id^=card_id_arr_]');
-		    for (var i = 0; i < cards.length; i++) {
-		        var card = new Card($('#cardWindow_' + $(cards[i]).val()));
-		        var mod = Soldier.modify(card.solName, card.commands);
-		        $('#busho_info INPUT[type="text"]:eq(' + i + ')').val(Math.min((card.def * (mod / 100) * 0.02).toRound(), card.maxSolNum));
-		    }
+			var cards = $('#busho_info input[id^=card_id_arr_]');
+			for (var i = 0; i < cards.length; i++) {
+			    var card = new Card($('#cardWindow_' + $(cards[i]).val()));
+			    var mod = Soldier.modify(card.solName, card.commands);
+			    $('#busho_info INPUT[type="text"]:eq(' + i + ')').val(Math.min((card.def * (mod / 100) * 0.02).toRound(), card.maxSolNum));
+			}
 		}
 
 		$('#imi_soldier_pool').trigger('update');
