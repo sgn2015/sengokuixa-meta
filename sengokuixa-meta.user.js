@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.0.0
+// @version        1.4.1.0
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -951,14 +951,14 @@ getBaseList: function( country ) {
 		$map.find('A[href^="/map.php"]').each(function( idx ) {
 			var $this = $(this),
 				point = $this.attr('href').match(/x=(-?\d+)&y=(-?\d+)/),
-				name = countrys[ (idx < 6) ? idx: Math.floor( (idx-5) / 10 ) ],
+				name = countrys[ (idx < 6) ? idx: Math.floor( (idx-5) / 9 ) ],
 				gage = ( $this.prev('img.btIconGauge').attr('src').match(/_gauge_(\d+).png/) || [,0] )[1].toInt(),
 				data;
 
 			data = { name: name, x: point[1].toInt(), y: point[2].toInt(), color: (idx < 6) ? '#f00': '#fff', gage: gage };
 
-			// 並べ替え(大殿城-各国砦1～各国砦10)
-			var a = (idx < 6) ? idx: (((idx-6)%10)+1)*6+Math.floor((idx-6)/10);
+			// 並べ替え(大殿城-各国砦1～各国砦8)
+			var a = (idx < 6) ? idx: (((idx-6)%8)+1)*6+Math.floor((idx-6)/8);
 			list[a] = data;
 		});
 
