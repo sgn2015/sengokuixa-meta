@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.0.1
+// @version        1.4.0.3
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -14383,7 +14383,7 @@ layouter2: function() {
 	$('#deck_file > A').wrapAll('<DIV id="imi_button_container" />').children('IMG').removeClass('mb5');
 
 	$('#imi_button_container')
-	.append('<span style="float: right; margin-right: 30px;"><button>同兵種</button><button>同兵数</button><button>全兵１</button></span>')
+    .append('<span style="float: right; margin-right: 30px;"><button>同兵種</button><button>同兵数</button><button>全兵１</button><button>攻撃2%</button><button>防御2%</button></span>')
 	.on('click', 'BUTTON', function() {
 		var text = $(this).text(),
 			type = $('#busho_info SELECT').first().val(),
@@ -14397,6 +14397,22 @@ layouter2: function() {
 		}
 		else if ( text == '全兵１' ) {
 			$('#busho_info INPUT[type="text"]').val( 1 );
+		}
+		else if (text == '攻撃2%') {
+			var cards = $('#busho_info input[id^=card_id_arr_]');
+			for (var i = 0; i < cards.length; i++) {
+			    var card = new Card($('#cardWindow_' + $(cards[i]).val()));
+			    var mod = Soldier.modify(card.solName, card.commands);
+			    $('#busho_info INPUT[type="text"]:eq(' + i + ')').val(Math.min((card.atk * (mod / 100) * 0.02).toRound(), card.maxSolNum));
+			}
+		}
+		else if (text == '防御2%') {
+			var cards = $('#busho_info input[id^=card_id_arr_]');
+			for (var i = 0; i < cards.length; i++) {
+			    var card = new Card($('#cardWindow_' + $(cards[i]).val()));
+			    var mod = Soldier.modify(card.solName, card.commands);
+			    $('#busho_info INPUT[type="text"]:eq(' + i + ')').val(Math.min((card.def * (mod / 100) * 0.02).toRound(), card.maxSolNum));
+			}
 		}
 
 		$('#imi_soldier_pool').trigger('update');
