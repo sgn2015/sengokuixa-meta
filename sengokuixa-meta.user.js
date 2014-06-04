@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.1.3
+// @version        1.4.2.0
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
+// @website        https://github.com/moonlit-g/sengokuixa-meta
 // @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
 // ==/UserScript==
 
@@ -6132,7 +6133,12 @@ filterList: [
 	{ title: 'HP99以下',   condition: [ 'hp', 99, 'lt' ] },
 	{ title: '討伐300',    condition: [ 'battleGage', 300 ] },
 	{ title: 'レベルUP',   condition: [ 'lvup', 1 ] },
-	{ title: 'ランクUP',    condition: [ 'rankup', 1 ] }
+	{ title: 'ランクUP',    condition: [ 'rankup', 1 ] },
+	{ title: '序',          condition: [ 'rarity', '序' ] },
+	{ title: '上',          condition: [ 'rarity', '上' ] },
+	{ title: '特',          condition: [ 'rarity', '特' ] },
+	{ title: '極',          condition: [ 'rarity', '極' ] },
+	{ title: '天',          condition: [ 'rarity', '天' ] },
 ],
 
 //.. sortList
@@ -6469,7 +6475,8 @@ filterMenu: function( container, up ) {
 		[ '★★★★★', '★★★★', '★★★', '★★', '★', '☆' ],
 		[ 'Lv20', 'Lv19以下', 'Lv1以上', 'Lv0' ],
 		[ '兵数最大', '最大以外', '兵数２以上', '兵数１以上', '兵数１' ],
-		[ 'HP最大', 'HP99以下', '討伐300', 'レベルUP', 'ランクUP' ]
+		[ 'HP最大', 'HP99以下', '討伐300', 'レベルUP', 'ランクUP' ],
+		[ '序', '上', '特', '極', '天' ]
 	];
 
 	Deck.createMenu( container, 'imc_filter', Deck.filterList, menulist, '指定無し', up );
@@ -9132,12 +9139,12 @@ unionLevelup: function( type, card_id, added_cid, material ) {
 			data['material_cid[]'] = material;
 		}
 
-		Page.form( '/union/union_levelup.php', data );
+		Page.form( '/union/union_levelup.php', data, true );
 	}
 	else {
 		//素材カードが指定されていない場合は、指定する画面へ飛ばす
 		data['selected_cid'] = card_id;
-		Page.form( '/union/levelup.php', data );
+		Page.form( '/union/levelup.php', data, true );
 	}
 },
 
@@ -9164,12 +9171,12 @@ skillRemove: function( card_id ) {
 	data.selected_cid = card_id;
 	data.union_type = 3;
 
-	Page.form( '/union/union_remove.php', data );
+	Page.form( '/union/union_remove.php', data, true );
 },
 
 //.. exhibit
 exhibit: function( card_id ) {
-	Page.form( '/card/exhibit_confirm.php', { exhibit_cid: card_id });
+	Page.form( '/card/exhibit_confirm.php', { exhibit_cid: card_id }, true);
 },
 
 //.. delete
@@ -11276,10 +11283,10 @@ createPulldownMenu: function() {
 		{ title: '出品', action: '/card/trade_card.php' },
 		{ title: '出品中', action: '/card/exhibit_list.php' },
 		{ title: '入札中', action: '/card/bid_list.php' },
-		{ title: 'ランクアップ', action: function() { Page.form( '/union/levelup.php', { union_type: 4 } ); } },
-		{ title: 'スキル強化', action: function() { Page.form( '/union/levelup.php', { union_type: 1 } ); } },
-		{ title: 'スキル追加', action: function() { Page.form( '/union/levelup.php', { union_type: 2 } ); } },
-		{ title: 'スキル削除', action: function() { Page.form( '/union/remove.php', { union_type: 3 } ); } },
+		{ title: 'ランクアップ', action: function() { Page.form( '/union/levelup.php', { union_type: 4 }, true ); } },
+		{ title: 'スキル強化', action: function() { Page.form( '/union/levelup.php', { union_type: 1 }, true ); } },
+		{ title: 'スキル追加', action: function() { Page.form( '/union/levelup.php', { union_type: 2 }, true ); } },
+		{ title: 'スキル削除', action: function() { Page.form( '/union/remove.php', { union_type: 3 }, true ); } },
 		{ title: '合成履歴', action: '/union/union_history.php' },
 		{ title: '合成表更新', action: function() { Data.skillTableUpdate(); } }
 	]);
