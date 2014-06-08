@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.2.0
+// @version        1.4.2.1
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -180,6 +180,20 @@ unique: function() {
 }
 
 });
+
+//
+// prototype.jsがVer1.7未満だとArray→JSON変換で期待した結果にならないため
+// 同ライブラリで定義されたArray.toJSON()を削除する。
+// (window.Arrayが拾えるかはFirefoxのバージョンによって異なるため、拾えてしまった場合のみ)
+// (Fx24は拾えず、Fx29では拾えるのを確認)
+//
+( function() {
+	if( window.Array ) {
+		if( window.Array.prototype.toJSON ) {
+			delete window.Array.prototype.toJSON;
+		}
+	}
+})();
 
 //■ jQueryプラグイン
 //. contextMenu
@@ -4180,11 +4194,10 @@ skillTableUpdate: function() {
 	
 	$.ajax( URL_CORS['skillTable'], {
 		type      : 'GET',
-		dataType  : 'json',
 		cache     : true,
 		ifModified: true,
 		headers: {
-			'Accept': 'application/vnd.github.VERSION.raw',
+			'Accept': 'application/vnd.github.v3.raw+json',
 		},
 	})
 	.done( function( data, textStatus, jqXHR ) {
