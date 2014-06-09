@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.2.1
+// @version        1.4.2.2
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -2148,6 +2148,86 @@ return function() {
 })()
 
 };
+
+//■ 機能追加
+var Append = {
+	// 兵士を空にする
+	clearSoldier: function() {
+		return $.post('/facility/set_unit_list.php', {
+			show_deck_card_count: '',
+			show_num: 100,
+			select_card_group: '',
+			p: '',
+			now_unit_type: 'all_unit',
+			now_group_type: 0,
+			edit_unit_type: 'not_unit',
+			edit_unit_count: 0,
+			btnlumpsum: true
+			});
+	},
+	
+	// 兵士退避
+	gatherSoldierAll: function( ol ) {
+		return Append.clearSoldier()
+		.pipe(function (html) {
+			var $html = $(html),
+				$unit = $html.find('#unit_id_select_0 option'),   // 兵種と兵数
+				$lead_unit = $html.find('span[id^="lead_unit"]'), // 編成可能数
+				$id = $html.find('div[id^="unit_group_type_"]'),  // カードID
+				unit = [], postData = [];
+			
+            $unit.each(function (idx, elm) {
+				var key = $(elm).val(),
+					cnt = $(elm).text().replace(/[^\d]/g, "");
+                if (key) {
+					unit.push([key, parseInt(cnt, 10)]);
+				}
+			});
+			$lead_unit.each(function (idx, elm) {
+				unit.sort(function (a, b) {
+					return b[1] - a[1]
+				});
+                if (unit[0][1] === 0) return false;
+				postData.push({
+					card_id: $id.eq(idx).prop('id').replace(/[^\d]/g, ""),
+					unit_type: unit[0][0],
+					unit_count: unit[0][1] < $(elm).text() ? unit[0][1] : $(elm).text()
+				});
+                unit[0][1] -= postData[idx].unit_count;
+			});
+
+			let tasks = [];
+			$.each(postData, function (idx, data) {
+				ol.message( Soldier.getNameByType( data.unit_type ) + ' : ' + data.unit_count );
+				tasks.push( $.post('/facility/set_unit_list_if.php', data) );
+			});
+
+			return $.when.apply( $, tasks );
+		})
+	},
+	
+	// 秘境へ行く
+	goDungeon: function( select ) {
+		// 部隊解散
+		// 部隊編成
+		// 秘境出発
+		$.get('/facility/dungeon.php')
+		.done( function(html) {
+			var postData = {
+				btn_send_all:true,
+				dungeon_select:select,
+				unit_select:[],
+			};
+			$(html).find('input[name^=unit_select]').each( function(idx,elm) {
+				postData.unit_select.push($(elm).val());
+			});
+			$.post('/facility/dungeon.php', postData).done( function() {
+				location.href = '/facility/unit_status.php?dmo=all';
+			});
+		});
+	},
+};
+
 
 //■ Display
 var Display = (function() {
@@ -11217,6 +11297,12 @@ createPulldownMenu: function() {
 	});
 
 	menu.push({ title: '【一括兵士訓練】', action: Display.dialogTraining });
+	// 訓練前に退避させるなら↓を有効に
+	//menu.push({ title: '【一括兵士訓練】', action: function() {
+	//	var ol = Display.dialog().message('兵士退避中...');
+	//	Append.gatherSoldierAll( ol )
+	//	.pipe( function() { ol.close(); Display.dialogTraining(); })
+	//	} });
 	for ( var baseid in data ) {
 		let facility_list = data[ baseid ],
 			village = Util.getVillageById( baseid ),
@@ -11242,6 +11328,10 @@ createPulldownMenu: function() {
 
 	//部隊用メニュー
 	createMenu($('#gnavi .gMenu02'), [
+		{ title: '【兵士退避】', action: function() {
+			var ol = Display.dialog().message('兵士退避中...');
+			Append.gatherSoldierAll( ol ).pipe( ol.close );
+		} },
 		{ title: '簡易兵士編成', action: '/facility/set_unit_list.php?show_num=100' },
 		{ title: '待機兵士一覧', action: '/facility/unit_list.php' },
 		{ title: '全部隊状況', action: '/facility/unit_status.php?dmo=all' },
@@ -11251,9 +11341,19 @@ createPulldownMenu: function() {
 		{ title: 'デッキ２', action: '/card/deck.php?ano=1' },
 		{ title: 'デッキ３', action: '/card/deck.php?ano=2' },
 		{ title: 'デッキ４', action: '/card/deck.php?ano=3' },
-		{ title: 'デッキ５', action: '/card/deck.php?ano=4' }
+		{ title: 'デッキ５', action: '/card/deck.php?ano=4' },
 	]);
 
+	//秘境用メニュー
+	createMenu($('#gnavi .gMenu04'), [
+		{ title: '修験渓谷(城:3h)', action: function() { Append.goDungeon( 1 ); } },
+		{ title: '修験樹海(城:6h)', action: function() { Append.goDungeon( 2 ); } },
+		{ title: '絶壁の祠(銅:3h)', action: function() { Append.goDungeon( 3 ); } },
+		{ title: '長寿の泉(銅:6h)', action: function() { Append.goDungeon( 4 ); } },
+		{ title: '風の霊峰(兵:3h)', action: function() { Append.goDungeon( 100 ); } },
+		{ title: '煉獄の島(兵:6h)', action: function() { Append.goDungeon( 200 ); } },
+	]);
+	
 	//合戦用メニュー
 	createMenu($('#gnavi .gMenu05'), [
 		{ title: '全国地図', action: '/country/all.php' },
