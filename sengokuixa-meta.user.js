@@ -15631,6 +15631,7 @@ layouterMapInfo: function() {
 			'<label><input type="checkbox" name="imn_type" value="|陣|" />陣</label>' +
 			'<label><input type="checkbox" name="imn_type" value="|陥落|" />陥落</label>' +
 			'<label><input type="checkbox" name="imn_type" value="|領地|" />領地</label>' +
+			'<label><input type="checkbox" name="imn_type" value="|開拓地|" />開拓地</label>' +
 			'<label><input type="checkbox" name="imn_type" value="|空き地|" />空き地</label>' +
 			'<select name="imn_rank">' +
 				'<option value="0">全て</option>' +
