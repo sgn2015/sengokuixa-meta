@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.2.2
+// @version        1.4.2.3
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -13877,7 +13877,7 @@ autoPager: function( deck, edit ) {
 				ano = $('#assign_form INPUT[name="select_assign_no"]').val(),
 				dmo = $('#assign_form INPUT[name="deck_mode"]').val(),
 				num = $('#deck_file SELECT[name="show_num"]').val(),
-				groupclass = $('#btn_category_elite').find('LI[class$="_on"]').attr('class') || '00',
+				groupclass = $('#btn_category_elite,#btn_category').find('LI[class$="_on"]').attr('class') || '00',
 				group = groupclass.match(/0(\d)/)[ 1 ];
 
 			return $.post( '/facility/set_unit_list.php', { show_num: num, p: page, select_card_group: group })
@@ -13968,7 +13968,7 @@ layouter: function() {
 
 	$('#imi_batch_selecter')
 	.on('click', '#imi_batch_0', function() {
-		var brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
+		var brigade = $('#btn_category_elite LI[class$="_on"],#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
 			batch = $('#imi_command_selecter LI.imc_selected').attr('batch').toInt(),
 			post_data;
 
@@ -13981,7 +13981,7 @@ layouter: function() {
 		$('#frmlumpsum').submit();
 	})
 	.on('click', '#imi_batch_1', function() {
-		var brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
+		var brigade = $('#btn_category_elite LI[class$="_on"],#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
 			batch = $('#imi_command_selecter LI.imc_selected').attr('batch').toInt(),
 			post_data;
 
@@ -14705,7 +14705,7 @@ autoPager: function() {
 			var page = nextPage,
 				ano = $('#assign_form INPUT[name="select_assign_no"]').val(),
 				dmo = $('#assign_form INPUT[name="deck_mode"]').val(),
-				groupclass = $('#btn_category_elite').find('LI[class$="_on"]').attr('class') || '00',
+				groupclass = $('#btn_category_elite,#btn_category').find('LI[class$="_on"]').attr('class') || '00',
 				group = groupclass.match(/0(\d)/)[ 1 ];
 
 			return Page.post( '/card/deck.php', { myselect: '', ano: ano, dmo: dmo, select_card_group: group, p: page });
@@ -14806,7 +14806,7 @@ layouter: function() {
 	})
 	.on( 'click', '#imi_card_assign', function() {
 		var village_id = $('#imi_select_village').val() || '',
-			brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
+			brigade = $('#btn_category_elite LI[class$="_on"],#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ],
 			unit = Deck.currentUnit;
 
 		if ( village_id != '' ) {
@@ -14892,7 +14892,7 @@ deckSelecter: function() {
 
 		if ( $a.length == 0 ) { return; }
 
-		var brigade = $('#btn_category_elite LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ];
+		var brigade = $('#btn_category_elite LI[class$="_on"],#btn_category LI[class$="_on"]').attr('class').match(/0(\d)/)[ 1 ];
 		$a.attr('href', '/card/deck.php?ano=' + idx + '&select_card_group=' + brigade ).removeAttr('onClick');
 	});
 },
