@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.2.3
+// @version        1.4.2.4
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -11328,10 +11328,6 @@ createPulldownMenu: function() {
 
 	//部隊用メニュー
 	createMenu($('#gnavi .gMenu02'), [
-		{ title: '【兵士退避】', action: function() {
-			var ol = Display.dialog().message('兵士退避中...');
-			Append.gatherSoldierAll( ol ).pipe( ol.close );
-		} },
 		{ title: '簡易兵士編成', action: '/facility/set_unit_list.php?show_num=100' },
 		{ title: '待機兵士一覧', action: '/facility/unit_list.php' },
 		{ title: '全部隊状況', action: '/facility/unit_status.php?dmo=all' },
@@ -11342,6 +11338,10 @@ createPulldownMenu: function() {
 		{ title: 'デッキ３', action: '/card/deck.php?ano=2' },
 		{ title: 'デッキ４', action: '/card/deck.php?ano=3' },
 		{ title: 'デッキ５', action: '/card/deck.php?ano=4' },
+		{ title: '【兵士退避】', action: function() {
+			var ol = Display.dialog().message('兵士退避中...');
+			Append.gatherSoldierAll( ol ).pipe( ol.close );
+		} },
 	]);
 
 	//秘境用メニュー
