@@ -9059,7 +9059,7 @@ assignCard: function( ano ) {
 			var $html = $(html),
 				text = $html.find('#ig_deck_unititle P').text(),
 				name = ( text.match(/\[(.+)\]/) || [,''] )[ 1 ],
-                unit_id = $html.find('#select_unit_assign_id').val(),
+				unit_id = $html.find('#set_assign_id').val(),
 				$li = $html.find('#ig_unitchoice LI'),
 				idx, newidx;
 
