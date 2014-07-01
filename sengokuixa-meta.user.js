@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.2.4
+// @version        1.4.3.0
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -1690,6 +1690,86 @@ keyBindCommon: function() {
 			else {
 				Deck.dialog( null, null, null, null, 4 );
 			}
+		}),
+
+		'u': Util.keyBindCallback(function() {
+			location.href = '/union/index.php';
+		}),
+
+		'l': Util.keyBindCallback(function() {
+			location.href = '/senkuji/senkuji.php';
+		}),
+		
+		'?': Util.keyBindCallback(function() {
+			if( $('#keyboardHelp').size() == 0 ) {
+				let style =
+					'div.kbdtitle { font-family:MeiryoKe_PGothic,"Helvetica Neue",Arial,Helvetica,"Lucida Grande","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ ProN W3",Meiryo,メイリオ,"Meiryo UI",sans-serif; font-size:16px; margin-bottom: 1em;}' +
+					'div.kbd { font-family:MeiryoKe_PGothic,"Helvetica Neue",Arial,Helvetica,"Lucida Grande","Hiragino Kaku Gothic ProN","ヒラギノ角ゴ ProN W3",Meiryo,メイリオ,"Meiryo UI",sans-serif; font-size:14px; float: left; width: 50%; }' +
+					'span.kbd { font-size: 1em; margin: 0; }' +
+					'dt.kbd { width: 6em; height: 0; text-align: right; margin-top: 0.5em; font: inherit; }' +
+					'dd.kbd { margin-left: 7em; }';
+				GM_addStyle( style );
+				
+				let html =
+					'<div class="kbdtitle">キーボードショートカット一覧</div>' +
+					'<div class="kbd">' +
+					'<span class="kbd">各画面共通</span>' +
+					'<dl>' +
+						'<dt class="kbd">n</dt>' + '<dd class="kbd">拠点画面へ移動</dd>' +
+						'<dt class="kbd">m</dt>' + '<dd class="kbd">地図画面へ移動</dd>' +
+						'<br/>' +
+						'<dt class="kbd">1</dt>' + '<dd class="kbd">部隊編成画面で１部隊目を開く</dd>' +
+						'<dt class="kbd">2</dt>' + '<dd class="kbd">部隊編成画面で２部隊目を開く</dd>' +
+						'<dt class="kbd">3</dt>' + '<dd class="kbd">部隊編成画面で３部隊目を開く</dd>' +
+						'<dt class="kbd">4</dt>' + '<dd class="kbd">部隊編成画面で４部隊目を開く</dd>' +
+						'<dt class="kbd">5</dt>' + '<dd class="kbd">部隊編成画面で５部隊目を開く</dd>' +
+						'<br/>' +
+						'<dt class="kbd">Alt-1</dt>' + '<dd class="kbd">部隊編成ダイアログで１部隊目を開く</dd>' +
+						'<dt class="kbd">Alt-2</dt>' + '<dd class="kbd">部隊編成ダイアログで２部隊目を開く</dd>' +
+						'<dt class="kbd">Alt-3</dt>' + '<dd class="kbd">部隊編成ダイアログで３部隊目を開く</dd>' +
+						'<dt class="kbd">Alt-4</dt>' + '<dd class="kbd">部隊編成ダイアログで４部隊目を開く</dd>' +
+						'<dt class="kbd">Alt-5</dt>' + '<dd class="kbd">部隊編成ダイアログで５部隊目を開く</dd>' +
+						'<br/>' +
+						'<dt class="kbd">t</dt>' + '<dd class="kbd">取引画面へ移動</dd>' +
+						'<dt class="kbd">u</dt>' + '<dd class="kbd">合成画面へ移動</dd>' +
+						'<dt class="kbd">l</dt>' + '<dd class="kbd">戦国くじ画面へ移動</dd>' +
+						'<dt class="kbd">?</dt>' + '<dd class="kbd">キーボードショートカット一覧(この画面)を開く</dd>' +
+					'</dl>' +
+					'</div>' +
+					'<div class="kbd">' +
+					'<span class="kbd">内政画面</span>' +
+					'<dl>' +
+						'<dt class="kbd">e</dt>' + '<dd class="kbd">次の拠点を選択する</dd>' +
+						'<dt class="kbd">q</dt>' + '<dd class="kbd">前の拠点を選択する</dd>' +
+					'</dl>' +
+					'<br/>' +
+					'<span class="kbd">地図画面</span>' +
+					'<dl>' +
+						'<dt class="kbd">w</dt>' + '<dd class="kbd">北に１画面分移動する</dd>' +
+						'<dt class="kbd">s</dt>' + '<dd class="kbd">南に１画面分移動する</dd>' +
+						'<dt class="kbd">a</dt>' + '<dd class="kbd">西に１画面分移動する</dd>' +
+						'<dt class="kbd">d</dt>' + '<dd class="kbd">東に１画面分移動する</dd>' +
+						'<dt class="kbd">e</dt>' + '<dd class="kbd">次の拠点を中心に表示する</dd>' +
+						'<dt class="kbd">q</dt>' + '<dd class="kbd">前の拠点を中心に表示する</dd>' +
+						'<dt class="kbd">z</dt>' + '<dd class="kbd">ミニマップを拡大表示する</dd>' +
+					'</dl>' +
+					'<br/>' +
+					'<span class="kbd">ページャー</span>' +
+					'<dl>' +
+						'<dt class="kbd">e</dt>' + '<dd class="kbd">前のページを表示する</dd>' +
+						'<dt class="kbd">q</dt>' + '<dd class="kbd">次のページを表示する</dd>' +
+					'</dl>' +
+					'<br/>' +
+					'<span class="kbd">件名選択</span>' +
+					'<dl>' +
+						'<dt class="kbd">w</dt>' + '<dd class="kbd">前の項目を表示する</dd>' +
+						'<dt class="kbd">s</dt>' + '<dd class="kbd">次の項目を選択する</dd>' +
+					'</dl>' +
+					'</div>';
+				$('<div id="keyboardHelp" class="keyboardHelp" style="display:none">' + html + '</div>').appendTo('body');
+				$('<a id="keyboardHelpAnchor" href="#TB_inline?inlineId=keyboardHelp&width=940&height=595&top=5" class="thickbox"></a>').appendTo('body');
+			}
+			$('#keyboardHelpAnchor').click();
 		})
 
 	});
@@ -2171,7 +2251,7 @@ var Append = {
 		return Append.clearSoldier()
 		.pipe(function (html) {
 			var $html = $(html),
-				$unit = $html.find('#unit_id_select_0 option'),   // 兵種と兵数
+				$unit = $html.find('select[id^=unit_id_select_]:first option'),   // 兵種と兵数
 				$lead_unit = $html.find('span[id^="lead_unit"]'), // 編成可能数
 				$id = $html.find('div[id^="unit_group_type_"]'),  // カードID
 				unit = [], postData = [];
@@ -2206,9 +2286,227 @@ var Append = {
 		})
 	},
 	
+	// 一括レベルアップ
+	togetherLevelup: function () {
+		var pageData = [],
+			cardlist, cache, ol;
+
+		$('#imi_info').show();
+		$('<div id="imi_temporary" style="display: none;" />').appendTo('BODY');
+
+		ol = Display.dialog({
+			title: '一括レベルアップ',
+			width: 500,
+			height: 340,
+			buttons: {
+				'閉じる': function() {
+					this.close();
+				},
+			},
+		});
+		ol.buttons.eq(0).attr('disabled', true);
+
+		ol.message('武将カード情報取得中...');
+
+		// 全頁読み込み
+		$.get('/card/deck.php')
+		.pipe(function (html) {
+			var $html = $(html),
+				$card_list = $html.find('#ig_deck_smallcardarea_out').find('.ig_deck_smallcardarea'),
+				$pager = $html.find('UL.pager.cardstock:first'),
+				source = $pager.find('LI.last A:eq(1)').attr('onClick') || '',
+				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
+				pool = {},
+				deck_cost, ano, lastPage;
+
+			$('#imi_temporary').append($html.find('#ig_boxInner > DIV[id^=cardWindow_]'));
+			pageData.push($card_list);
+
+			if (match) {
+				lastPage = match[1].toInt();
+			} else {
+				lastPage = 1;
+			}
+
+			return [2, lastPage];
+		})
+		.pipe(function (param) {
+			var self = arguments.callee,
+				[next, lastPage] = param,
+				tasks = new Array(5);
+
+			if (next > lastPage) {
+				return;
+			}
+
+			for (var i = 0; next <= lastPage && i < 3; next++, i++) {
+				tasks[i] = $.get('/card/deck.php', { p: next });
+			}
+
+			return $.when.apply($, tasks)
+			.pipe(function () {
+				for (var i = 0, len = arguments.length; i < len; i++) {
+					if (!arguments[i]) {
+						continue;
+					}
+
+					let jqXHR = arguments[i][2],
+						$html = $(jqXHR.responseText),
+						$card_list = $html.find('#ig_deck_smallcardarea_out').find('.ig_deck_smallcardarea');
+
+					$('#imi_temporary').append($html.find('#ig_boxInner > DIV[id^=cardWindow_]'));
+					pageData.push($card_list);
+				}
+
+				return self.call(self, [next, lastPage]);
+			});
+		})
+		.pipe(function () {
+			for (var i = 0, len = pageData.length; i < len; i++) {
+				MiniCard.setup(pageData[i]);
+			}
+
+			var cardlist = Deck.analyzedData;
+			let cardKeys = Object.keys(cardlist);
+
+			return [cardlist, cardKeys, []];
+			
+		})
+		// 再帰でレベルアップ対象カードの配分状況を取得
+		.pipe(function (param) {
+			let self = arguments.callee,
+				[cardlist, cardKeys, cardLvup] = param,
+				tasks = [];
+
+				if( cardKeys.length == 0 ) {
+				return cardLvup;  // 次のpipeへ
+				}
+
+			for( let i = 0; i < 3; i++ ) {
+				if( cardKeys.length > 0 ) {
+					let card_id = cardKeys.shift();
+					let card = cardlist[ card_id ];
+					if ( card.status == Card.EXHIBITED ) {
+					card.element.remove();
+					card.element = null;
+					}
+					else if( card.lvup ) {
+						tasks.push( $.get('/card/status_info.php', { cid: card.cardId }) );
+					}
+
+					delete cardlist[card.cardId];
+				}
+			}
+
+			return $.when.apply($, tasks)
+			.pipe( function() {
+				let jqXHR, $html = '';
+				// 登録されたタスクが1つの場合と2つ以上の場合で配列の構成が異なる
+				if( tasks.length == 1 ) {
+					jqXHR = arguments[ 2 ],
+					$html = $( jqXHR.responseText );
+					cardLvup.push( lvupParametar( $html ) );
+				}
+				else if( tasks.length > 1 ) {
+					for( let i = 0; i < arguments.length; i++ ) {
+						jqXHR = arguments[ i ][ 2 ],
+						$html = $( jqXHR.responseText );
+						cardLvup.push( lvupParametar( $html ) );
+					}
+				}
+				// 再帰
+				return self.call( self, [cardlist, cardKeys, cardLvup] );
+				
+				// レベルアップ用のオブジェクト作成
+				// ついでにメッセージ表示
+				function lvupParametar( $html ) {
+					let $name = $html.find('.lvup_parametar .common_table2:first th').text();
+					let $stRow = $html.find('#status_table tr');
+					let card = {
+						'cid'   : $html.find('input[name=cid]').val(),
+						'name'  : $name.replace(/\s/g, '').replace(/ランク/g, '　ランク'),
+						'remPt' : $html.find('#remain_point').text().toInt(),
+						'stAtk' : $stRow.eq(2).find('td:last').text().toInt(),
+						'stDef' : $stRow.eq(3).find('td:last').text().toInt(),
+						'stInt' : $stRow.eq(4).find('td:last').text().toInt(),
+					};
+
+					let msg = '';
+					msg += card.name + ' 未配分[<span style="font-weight: bold;">'+ card.remPt + '</span>]を';
+
+					if (card.stAtk > 0 && card.stDef == 0 && card.stInt == 0) {
+							msg += '<span style="color:red">攻撃力</span>に配分します。';
+					} else if (card.stAtk == 0 && card.stDef > 0 && card.stInt == 0) {
+							msg += '<span style="color:blue">防御力</span>に配分します。';
+					} else if (card.stAtk == 0 && card.stDef == 0 && card.stInt > 0) {
+							msg += '<span style="color:green">兵法</span>に配分します';
+					} else {
+							msg += '配分しません。';
+						}
+						ol.message(msg);
+
+					return card;
+				}
+			});
+		})
+		.pipe( function (param) {
+			let self = arguments.callee,
+				cardLvup = param,
+				tasks = [];
+
+			for( let i = 0; cardLvup.length > 0 && i < 3; i++ ) {
+				let card = cardLvup.shift();
+
+				let ptAtk = ptDef = ptInt = 0;
+				if (card.stAtk > 0 && card.stDef == 0 && card.stInt == 0) {
+					ptAtk = card.remPt;
+				} else if (card.stAtk == 0 && card.stDef > 0 && card.stInt == 0) {
+					ptDef = card.remPt;
+				} else if (card.stAtk == 0 && card.stDef == 0 && card.stInt > 0) {
+					ptInt = card.remPt;
+				}
+
+				if (ptAtk > 0 || ptDef > 0 || ptInt > 0) {
+					let pushData = {
+						attack_pt       : ptAtk,
+						defense_pt      : ptDef,
+						intellect_pt    : ptInt,
+						btn_update      : true,
+						cid             : card.cid,
+						hidden_remain_pt: card.remPt,
+						dmo             : 'normal',
+					};
+					tasks.push( $.post('/card/status_info.php', pushData ) );
+				}
+			}
+			return $.when.apply($, tasks)
+			.pipe( function() {
+				if( cardLvup.length == 0 && tasks.length == 0 ) {
+					return;
+				}
+				else {
+					return self.call( self, cardLvup );
+				}
+			});
+		})
+		.always(function () {
+			$('#imi_temporary').remove();
+			ol.buttons.eq(0).attr('disabled', false);
+		});
+
+		$('#imi_info').hide();
+	},
+	
 	// 秘境へ行く
 	goDungeon: function( select ) {
 		// 部隊解散
+		//Deck.breakUpAll()
+		//.always(function( ol ) {
+		//	Util.getUnitStatus();
+		//	if ( ol && ol.close ) {
+		//		window.setTimeout( ol.close, 500 );
+		//	}
+		//});
 		// 部隊編成
 		// 秘境出発
 		$.get('/facility/dungeon.php')
@@ -2226,6 +2524,48 @@ var Append = {
 			});
 		});
 	},
+
+	// GitHubリポジトリから合成表を取得する
+	getSkillTable: function() {
+		// Cross-Origin Resource Sharingについてはこのあたりを参考
+		// https://developer.mozilla.org/ja/docs/HTTP_access_control
+		
+		// 今後何か増えるかもしれないので
+		var URL_CORS = {
+			'skillTable': 'https://api.github.com/repos/moonlit-g/sengokuixa-meta/contents/skillUnion.json',
+		};
+
+		return $.ajax( URL_CORS['skillTable'], {
+			type      : 'GET',
+			cache     : true,
+			ifModified: true,
+			headers: {
+				'Accept': 'application/vnd.github.v3.raw+json',
+			},
+		});
+	},
+
+	// 精鋭部隊取得
+	//   同期なのでちょっと遅くなるかも
+	// @return [精鋭部隊の部隊長名, 精鋭部隊番号(セットできないときは-1)]の配列
+	getElite: function() {
+		var eliteArray = [];
+		$.ajax({ type: 'post', url: '/card/deck.php', async: false, data: { select_card_group: 6, select_assign_no: 4 } })
+		.then( function( html ) {
+			let $html = $(html);
+			let $elites = $html.find('.elite_busho_info');
+
+			$.each( $elites, function( idx, elm ) {
+				$elm = $(elm);
+				let uname = $elm.find('.elite_busho_info_tbl tr:eq(1) td:eq(2)').text().trim().match( /^(.*)\n/ )[1] || '';
+				let enable = $elm.find('.btn_set_elite img[src$="set_elite.png"]').size() > 0;
+				eliteArray.push( [ uname, enable ? idx+1: -1 ] );
+			});
+		});
+
+		return eliteArray;
+	},
+
 };
 
 
@@ -3469,6 +3809,130 @@ panelUnionSlot: function( $panel ) {
 		Card.rankup( slot1.id, slot2.id, cid_list );
 	})
 	.trigger('update');
+},
+
+//.. dialogUnionKeep
+dialogUnionKeep: function( cid, added_list ) {
+	var card = Deck.getCard( cid ),
+		html, $content;
+
+	html = '';
+	html += '<div style="float:left; width:240px; text-align:right; padding-right: 2px;">';
+	html += '<img src="' + Env.externalFilePath + '/img/card/deck/' + card.image + '" />';
+	html += '</div>';
+	html += '<div style="float:left; width:240px; text-align: left; padding-left: 2px; padding-top:28px;">';
+	html += '<table class="common_table1">';
+	html += '<tr><th>目標</th><th>スキル</th></tr>';
+	html += '<tr><td><input type=number id=skill0 max=10 size=2 min=' + card.skillList[0].lv + ' value=' + card.skillList[0].lv + '></td><td>' + card.skillList[0].originName + '</td></tr>';
+	if( card.skillList.length > 1 ) {
+	html += '<tr><td><input type=number id=skill1 max=10 size=2 min=' + card.skillList[1].lv + ' value=' + card.skillList[1].lv + '></td><td>' + card.skillList[1].originName + '</td></tr>';
+	}
+	else {
+	html += '<tr><td><input type=number id=skill1 max=10 size=2 disabled value=0></td><td>---</td></tr>';
+	}
+	if( card.skillList.length > 2 ) {
+	html += '<tr><td><input type=number id=skill2 max=10 size=2 min=' + card.skillList[2].lv + ' value=' + card.skillList[2].lv + '></td><td>' + card.skillList[2].originName + '</td></tr>';
+	}
+	else {
+	html += '<tr><td><input type=number id=skill2 max=10 size=2 disabled value=0></td><td>---</td></tr>';
+	}
+	html += '</table>';
+	html += '</div>';
+	html += '<div style="clear:both; text-align:center; padding:1em;">選択カード枚数：' + added_list.length + '</div>';
+
+	$content = $( html );
+
+	dialog = Display.dialog({
+		title: '連続強化合成',
+		content: $content,
+		width: 500,
+		height: 340,
+		//top: 5, width: 320, height: 'auto',
+		buttons: {
+		'銅銭': function() {
+			//let ol = Display.dialog();
+			skillUp( this, cid, added_list, [$('#skill0').val(), $('#skill1').val(), $('#skill2').val()], 0 )
+			.done( function() {
+				$.noop();
+			});
+		},
+		'金'  : function() {
+			skillUp( this, cid, added_list, [$('#skill0').val(), $('#skill1').val(), $('#skill2').val()], 1 )
+			.done( function() {
+				$.noop();
+			});
+		},
+		'閉じる': function() { this.close(); },
+		}
+	});
+
+	function skillUp( dlg, cid, added_list, tlv, cp_flg ) {
+		var d = $.Deferred();
+		
+		var card = Deck.getCard( cid );
+		// レベルアップ対象のスキルコードの取得
+		$.post( '/union/union_levelup.php', { base_cid: cid, added_cid: added_list[0], union_type: 1 } )
+        .done( function( html ) {
+			var $form = $(html).find('form#select_skill_form');
+
+			var skills = [
+				{level: 0, code: '', t: 0},
+				{level: 0, code: '', t: 0},
+				{level: 0, code: '', t: 0}
+				];
+
+			for( var s = 0; s < card.skillList.length; s++ ) {
+				let sobj = $form.find( 'tr:has(:contains("' + card.skillList[s].name + '"))' );
+				if( !$.isEmptyObject( sobj ) ) {
+					skills[s] = {level: sobj.html().match( /LV(\d+)/ )[1], code: sobj.find('input#selected_skill_radio').prop('value'), t: tlv[s] };
+				}
+				else {
+					dlg.message( card.skillList[s].name + 'が見つからない？' );
+					d.resolve(); //reject();
+				}
+			}
+
+			// 対象スキルの抽出
+			// 目標Lvより現Lvが低いこと
+			var selected = skills.filter( function( o ) {
+				return ( o.t.toInt() > o.level.toInt() );
+			} );
+
+			selected.sort( function( a, b ) {
+				return ( b.t - b.level ) - ( a.t - a.level );
+			} );
+
+			// 対象スキルがあったらレベルアップ処理
+			if( selected.length > 0 ) {
+				var postData = {
+					base_cid            : cid,
+					added_cid           : added_list[0],
+					selected_skill_radio: selected[0].code,
+					exec_btn:1,
+					sub_id:0,
+					union_type:1,
+					use_cp_flg: cp_flg,
+				};
+
+				$.post( '/union/union_levelup.php', postData )
+				.done( function( html ) {
+					dlg.message( $(html).find('p.mt10.mb10.fs16').html() );
+					added_list.shift();
+					if( added_list.length > 0 ) {
+						skillUp( dlg, cid, added_list, tlv, cp_flg ).done( d.resolve );
+					}
+					else {
+						d.resolve();
+					}
+				});
+			}
+			else {
+				d.resolve();
+			}
+		});
+
+		return d.promise();
+	};
 }
 
 });
@@ -4268,18 +4732,8 @@ skillTable: ( function() {
 
 skillTableUpdate: function() {
 	var storage = MetaStorage('UNION_TABLE');
-	var URL_CORS = {
-		'skillTable': 'https://api.github.com/repos/moonlit-g/sengokuixa-meta/contents/skillUnion.json',
-	};
 	
-	$.ajax( URL_CORS['skillTable'], {
-		type      : 'GET',
-		cache     : true,
-		ifModified: true,
-		headers: {
-			'Accept': 'application/vnd.github.v3.raw+json',
-		},
-	})
+	Append.getSkillTable()
 	.done( function( data, textStatus, jqXHR ) {
 		if( jqXHR.getResponseHeader('Etag') == MetaStorage('UNION_TABLE').get( 'Etag' ) ) {
 			Display.info('変更はありません。');
@@ -4432,7 +4886,7 @@ getMapSettings: function() {
 getFilterSettings: function() {
 	var settings = MetaStorage('SETTINGS').get('mapinfo');
 
-	settings = $.extend( { type: '|城||砦|村|支城||出城|', discriminant: '', alliance: '', user: '', rank: 0, mark: false }, settings );
+	settings = $.extend( { type: '|城||砦|村|支城||出城|', discriminant: '', alliance: '', user: '', rank: 0, mark: false, areg: false }, settings );
 
 	return settings;
 },
@@ -4446,6 +4900,8 @@ analyze: function() {
 	img_list = Map.analyzeImg( $img_list );
 	Map.analyzeArea( $area_list, img_list );
 	Map.analyzeReport();
+
+	Map.autoRegist();
 },
 
 //. analyzeImg
@@ -4634,11 +5090,12 @@ analyzeReport: function() {
 		user = $table.find('INPUT[name="imn_user"]').val(),
 		rank = $table.find('SELECT[name="imn_rank"]').val().toInt(),
 		mark = $('INPUT[name="imn_mark"]').attr('checked') ? true : false,
+		areg = $('INPUT[name="imn_areg"]').attr('checked') ? true : false,
 		type = '';
 
 	$table.find('INPUT[name="imn_type"]').filter(':checked').each(function() { type += $(this).val(); });
 
-	MetaStorage('SETTINGS').set('mapinfo', { type: type, discriminant: discriminant, alliance: alliance, user: user, rank: rank, mark: mark });
+	MetaStorage('SETTINGS').set('mapinfo', { type: type, discriminant: discriminant, alliance: alliance, user: user, rank: rank, mark: mark, areg: areg });
 
 	var list = Map.targetList(),
 		html;
@@ -5323,54 +5780,93 @@ contextmenu: function() {
 		menu  = {},
 		submenu;
 
+	// 精鋭部隊取得(同期)
+	var eliteArray = Append.getElite();
+	
 	menu[ title ] = $.contextMenu.title;
 	menu['ここを中心に表示'] = Map.contextmenu.center;
 	menu['ここへ部隊出陣'] = Map.contextmenu.send;
 
 	if ( data.user != load ) {
 		menu['最寄りの拠点'] = {
-			'部隊作成【第一組】': function() { Map.contextmenu.createUnitNearby( data, 1 ); },
-			'部隊作成【第二組】': function() { Map.contextmenu.createUnitNearby( data, 2 ); },
-			'部隊作成【第三組】': function() { Map.contextmenu.createUnitNearby( data, 3 ); },
-			'部隊作成【第四組】': function() { Map.contextmenu.createUnitNearby( data, 4 ); },
-			'部隊作成【未設定】': function() { Map.contextmenu.createUnitNearby( data, 5 ); },
-			'セパレーター1': $.contextMenu.separator,
-			'部隊作成【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
+			'部隊作成': {
+				'【第一組】': function() { Map.contextmenu.createUnitNearby( data, 1 ); },
+				'【第二組】': function() { Map.contextmenu.createUnitNearby( data, 2 ); },
+				'【第三組】': function() { Map.contextmenu.createUnitNearby( data, 3 ); },
+				'【第四組】': function() { Map.contextmenu.createUnitNearby( data, 4 ); },
+				'【未設定】': function() { Map.contextmenu.createUnitNearby( data, 5 ); },
+				'セパレーター1': $.contextMenu.separator,
+				'【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
+			},
+			'精鋭部隊': {
+			},
 			'セパレーター2': $.contextMenu.separator,
 			'ここへ部隊出陣': Map.contextmenu.send2,
 			'拠点選択': Map.contextmenu.nearbyVillage
 		};
+		// 精鋭部隊追加
+		for( let i = 0; i < eliteArray.length; i++ ) {
+			let key = '【' + eliteArray[i][0] + '】部隊';
+			let val = eliteArray[i][1];
+			menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
+				function() { Map.contextmenu.assignEliteNearby( data, val ); } :
+				$.contextMenu.nothing;
+		}
 	}
 	else if ( data.type == '領地' ) {
 		menu['最寄りの拠点'] = {
-			'部隊作成【第一組】': function() { Map.contextmenu.createUnitNearby( data, 1 ); },
-			'部隊作成【第二組】': function() { Map.contextmenu.createUnitNearby( data, 2 ); },
-			'部隊作成【第三組】': function() { Map.contextmenu.createUnitNearby( data, 3 ); },
-			'部隊作成【第四組】': function() { Map.contextmenu.createUnitNearby( data, 4 ); },
-			'部隊作成【未設定】': function() { Map.contextmenu.createUnitNearby( data, 5 ); },
+			'部隊作成': {
+				'【第一組】': function() { Map.contextmenu.createUnitNearby( data, 1 ); },
+				'【第二組】': function() { Map.contextmenu.createUnitNearby( data, 2 ); },
+				'【第三組】': function() { Map.contextmenu.createUnitNearby( data, 3 ); },
+				'【第四組】': function() { Map.contextmenu.createUnitNearby( data, 4 ); },
+				'【未設定】': function() { Map.contextmenu.createUnitNearby( data, 5 ); },
 			'セパレーター1': $.contextMenu.separator,
-			'部隊作成【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
+				'【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
+			},
+			'精鋭部隊': {
+			},
 			'セパレーター2': $.contextMenu.separator,
 			'ここへ部隊出陣': Map.contextmenu.send2,
 			'拠点選択': Map.contextmenu.nearbyVillage
 		};
 		menu['この領地を陣にする'] = Map.contextmenu.toCamp;
+		// 精鋭部隊追加
+		for( let i = 0; i < eliteArray.length; i++ ) {
+			let key = '【' + eliteArray[i][0] + '】部隊';
+			let val = eliteArray[i][1];
+			menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
+				function() { Map.contextmenu.assignEliteNearby( data, val ); } :
+				$.contextMenu.nothing;
+		}
 	}
 	else {
 		menu['この拠点'] = {
-			'部隊作成【第一組】': function() { Map.contextmenu.createUnit( data, 1 ); },
-			'部隊作成【第二組】': function() { Map.contextmenu.createUnit( data, 2 ); },
-			'部隊作成【第三組】': function() { Map.contextmenu.createUnit( data, 3 ); },
-			'部隊作成【第四組】': function() { Map.contextmenu.createUnit( data, 4 ); },
-			'部隊作成【未設定】': function() { Map.contextmenu.createUnit( data, 5 ); },
+			'部隊作成': {
+				'【第一組】': function() { Map.contextmenu.createUnit( data, 1 ); },
+				'【第二組】': function() { Map.contextmenu.createUnit( data, 2 ); },
+				'【第三組】': function() { Map.contextmenu.createUnit( data, 3 ); },
+				'【第四組】': function() { Map.contextmenu.createUnit( data, 4 ); },
+				'【未設定】': function() { Map.contextmenu.createUnit( data, 5 ); },
 			'セパレーター1': $.contextMenu.separator,
-			'部隊作成【全武将】': function() { Map.contextmenu.createUnit( data, 0 ); },
+				'【全武将】': function() { Map.contextmenu.createUnit( data, 0 ); },
+			},
+			'精鋭部隊': {
+			},
 			'セパレーター2': $.contextMenu.separator,
 			'拠点部隊解散': function() { Map.contextmenu.breakUp( data ); },
 			'セパレーター3': $.contextMenu.separator,
 			'拠点選択': Map.contextmenu.changeVillage,
 			'拠点名変更': Map.contextmenu.renameVillage
 		};
+		// 精鋭部隊追加
+		for( let i = 0; i < eliteArray.length; i++ ) {
+			let key = '【' + eliteArray[i][0] + '】部隊';
+			let val = eliteArray[i][1];
+			menu['この拠点']['精鋭部隊'][key] = val > 0 ?
+				function() { Map.contextmenu.assignElite( data, val ); } :
+				$.contextMenu.nothing;
+		}
 	}
 
 	if ( enemy > 0 ) {
@@ -5401,7 +5897,19 @@ contextmenu: function() {
 	}
 
 	return menu;
-}
+},
+
+//. autoRegist
+autoRegist: function() {
+	var settings = Map.getFilterSettings(),
+		base = Map.targetList();
+	if ( settings.areg ) {
+		for ( var i = 0, len = base.length; i < len; i++ ) {
+			Map.coordRegister( base[i].x, base[i].y, base[i].country,
+							   { user: base[i].user, castle: base[i].castle, type: base[i].type } );
+		}
+	}
+},
 
 };
 
@@ -5591,6 +6099,57 @@ createUnitNearby: function( data, brigade ) {
 	}
 	else if ( village ) {
 		Deck.dialog( village, territory, brigade, coord );
+	}
+	else {
+		Display.alert( '最寄りの拠点は見つかりませんでした。' );
+	}
+},
+
+//.. assignElite
+assignElite: function( data, elite ) {
+	var village = Util.getVillageByCoord( data.x, data.y, data.country );
+
+	if ( village ) {
+		$.post( '/card/deck.php', {
+			mode: 'assign_elite',
+			select_assign_no: 4,
+			select_card_group: 6,
+			set_elite_unit_assign_sort: elite,
+			set_village_id: village.id,
+		});
+	}
+	else {
+		Display.alert( '拠点は見つかりませんでした。' );
+	}
+},
+
+//.. assignEliteNearby
+assignEliteNearby: function( data, elite ) {
+	var near = Util.getVillageNearby( data.x, data.y, data.country ),
+		village = near.village,
+		territory = near.territory,
+		coord = data.x + ',' + data.y;
+
+	if ( !village && territory ) {
+		Display.dialogNearbyTerritory( village, territory, coord )
+		.done(function( newVillage ) {
+			$.post( '/card/deck.php', {
+				mode: 'assign_elite',
+				select_assign_no: 4,
+				select_card_group: 6,
+				set_elite_unit_assign_sort: elite,
+				set_village_id: newVillage.id,
+			});
+		});
+	}
+	else if ( village ) {
+		$.post( '/card/deck.php', {
+			mode: 'assign_elite',
+			select_assign_no: 4,
+			select_card_group: 6,
+			set_elite_unit_assign_sort: elite,
+			set_village_id: village.id,
+		});
 	}
 	else {
 		Display.alert( '最寄りの拠点は見つかりませんでした。' );
@@ -6150,6 +6709,11 @@ currentUnit: null,
 union: {
 	added: null,
 	materials: [],
+},
+
+//.. unionKeep
+unionKeep: {
+	added: [],
 },
 
 //.. maxCost
@@ -6763,6 +7327,7 @@ editCard: function( editlist ) {
 //.. addCard
 addCard: function( e ) {
 	var $target = $(e.target),
+		union_mode = $('#imi_mode').hasClass('imc_union_mode'),
 		deck_mode = $('#imi_mode').hasClass('imc_deck_mode');
 
 	if ( $target.is('A') || $target.parent().is('A') ) { return; }
@@ -6770,8 +7335,11 @@ addCard: function( e ) {
 	if ( deck_mode ) {
 		Deck.addCardDeck.call( this );
 	}
-	else {
+	else if( union_mode ) {
 		Deck.addCardUnion.call( this );
+	}
+	else {
+		Deck.addCardUnionKeep.call( this );
 	}
 },
 
@@ -6855,6 +7423,35 @@ addCardUnion: function() {
 		Display.info('これ以上選択できません。');
 	}
 
+	return;
+},
+
+//.. addCardUnionKeep
+addCardUnionKeep: function() {
+	var $this = $(this),
+		card_id = $this.attr('card_id'),
+		card = Deck.getCard( card_id );
+	
+	//選択武将削除
+	if ( $this.hasClass('imc_selected') ) {
+		Deck.unionKeep.added = Deck.unionKeep.added.filter(function( elem, idx, array ) {
+			return ( elem != card_id );
+		});
+
+		$('#ig_deck_smallcardarea_out').children('.ig_deck_smallcardarea, TR').filter('[card_id="' + card_id + '"]').removeClass('imc_selected imc_added');
+		$('#imi_card_container1').find('DIV[card_id="' + card_id + '"]').remove();
+	}
+	else if ( !card.useSlot2() ) {
+		Display.info('このカードは合成【スロット２】に使用できません。');
+	}
+	else {
+		Deck.unionKeep.added.push( card_id );
+		
+		//選択武将追加
+		$this.addClass('imc_selected imc_added');
+		$('#imi_card_container3').append( card.clone() );
+	}
+	
 	return;
 },
 
@@ -7061,6 +7658,10 @@ contextmenu: function() {
 		material_cid = Deck.union.materials,
 		added_card;
 
+	var union_keep_mode = $('#imi_mode').hasClass('imc_union_keep_mode'),
+		selected = $this.hasClass('imc_selected'),
+		added_list = Deck.unionKeep.added;
+
 	//行動中
 	if ( card.status == Card.ACTION ) {
 		menu['行動中です'] = $.contextMenu.nothing;
@@ -7209,6 +7810,13 @@ contextmenu: function() {
 		}
 		else {
 			submenu['スキル強化'] = $.contextMenu.nothing;
+		}
+
+		if ( card.canSkillLvup() && added_list.length > 0 ) {
+			submenu['スキル連続強化'] = function() { Display.dialogUnionKeep( card_id, added_list ); };
+		}
+		else {
+			submenu['スキル連続強化'] = $.contextMenu.nothing;
 		}
 
 		if ( card.canSkillAdd() && ( !added_card || added_card.useSkillSlot2() ) ) {
@@ -10656,18 +11264,39 @@ contextmenu: function() {
 	menu['セパレーター１'] = $.contextMenu.separator;
 
 	if ( location.pathname != '/card/deck.php' ) {
+		// 精鋭部隊取得(同期)
+		var eliteArray = Append.getElite();
+
 		menu['部隊作成'] = {
-			'部隊作成【第一組】': function() { Deck.dialog( village, null, 1 ); },
-			'部隊作成【第二組】': function() { Deck.dialog( village, null, 2 ); },
-			'部隊作成【第三組】': function() { Deck.dialog( village, null, 3 ); },
-			'部隊作成【第四組】': function() { Deck.dialog( village, null, 4 ); },
-			'部隊作成【未設定】': function() { Deck.dialog( village, null, 5 ); },
+			'【第一組】': function() { Deck.dialog( village, null, 1 ); },
+			'【第二組】': function() { Deck.dialog( village, null, 2 ); },
+			'【第三組】': function() { Deck.dialog( village, null, 3 ); },
+			'【第四組】': function() { Deck.dialog( village, null, 4 ); },
+			'【未設定】': function() { Deck.dialog( village, null, 5 ); },
  			'セパレーター': $.contextMenu.separator,
-			'部隊作成【全武将】': function() { Deck.dialog( village, null, 0 ); }
+			'【全武将】': function() { Deck.dialog( village, null, 0 ); }
 		};
+		menu['精鋭部隊'] = {
+		};
+		// 精鋭部隊追加
+		for( let i = 0; i < eliteArray.length; i++ ) {
+			let key = '【' + eliteArray[i][0] + '】部隊';
+			let val = eliteArray[i][1];
+			menu['精鋭部隊'][key] = val > 0 ?
+				function() {
+					$.post( '/card/deck.php', {
+						mode: 'assign_elite',
+						select_assign_no: 4,
+						select_card_group: 6,
+						set_elite_unit_assign_sort: val,
+						set_village_id: village.id,
+					});
+				} : $.contextMenu.nothing;
+		}
 	}
 	else {
 		menu['部隊作成【使用不可】'] = $.contextMenu.nothing;
+		menu['精鋭部隊【使用不可】'] = $.contextMenu.nothing;
 	}
 
 	if ( $units.has('.imc_wait').length > 0 ) {
@@ -11338,10 +11967,12 @@ createPulldownMenu: function() {
 		{ title: 'デッキ３', action: '/card/deck.php?ano=2' },
 		{ title: 'デッキ４', action: '/card/deck.php?ano=3' },
 		{ title: 'デッキ５', action: '/card/deck.php?ano=4' },
+		{ title: '【精鋭部隊】', action: '/card/deck.php?select_card_group=6&select_assign_no=4' },
 		{ title: '【兵士退避】', action: function() {
 			var ol = Display.dialog().message('兵士退避中...');
 			Append.gatherSoldierAll( ol ).pipe( ol.close );
 		} },
+		{ title: '【一括レベルアップ】', action: function() { Append.togetherLevelup(); } },
 	]);
 
 	//秘境用メニュー
@@ -11456,10 +12087,27 @@ Page.registerAction( 'world', 'select_world', {
 //. main
 main: function() {
 	$('A[href^="/world/"]').click( this.serverSelected );
+	// 告知画面の非表示
 	$(document).on('click','img[alt="告知"]',function() {
 		$('.information_main').toggle();
 	});
 	$('.information_main').hide();
+	
+	// 合成表の更新確認(長めに表示)
+	Append.getSkillTable()
+	.done( function( data, textStatus, jqXHR ) {
+		var storage = MetaStorage('UNION_TABLE');
+		if( jqXHR.getResponseHeader('Etag') != MetaStorage('UNION_TABLE').get( 'Etag' ) ) {
+			data['Etag'] = jqXHR.getResponseHeader('Etag');
+			storage.begin();
+			storage.data = data;
+			storage.commit();
+			Display.info('合成表が更新されています。', true, 6000 );
+		}
+	})
+	.fail( function( jqXHR, textStatus, textErr ) {
+		Display.alert('合成表の更新確認でエラーが発生しました。', true, 6000 );
+	});
 },
 
 serverSelected: function() {
@@ -14575,6 +15223,7 @@ style: '' +
 /* カード選択時の枠色 */
 '.imc_deck_mode .imc_selected { border: solid 2px #f80 !important; background: -moz-linear-gradient(top left, #654, #000) !important; }' +
 '.imc_union_mode .imc_selected { border: solid 2px #09c !important; background: -moz-linear-gradient(top left, #456, #000) !important; }' +
+'.imc_union_keep_mode .imc_selected { border: solid 2px #4f0 !important; background: -moz-linear-gradient(top left, #456, #000) !important; }' +
 
 /* 下部表示欄 */
 '.imc_contents { position: relative; width: 916px; padding: 0px 14px 0px 14px; margin: 7px auto; }' +
@@ -14597,6 +15246,8 @@ style: '' +
 '#imi_deck_info #imi_mode.imc_deck_mode:after { content: "デッキモード"; color: #f80; }' +
 '#imi_deck_info #imi_mode.imc_union_mode { border: solid 1px #09c; }' +
 '#imi_deck_info #imi_mode.imc_union_mode:after { content: "合成モード"; color: #09c; }' +
+'#imi_deck_info #imi_mode.imc_union_keep_mode { border: solid 1px #4f0; }' +
+'#imi_deck_info #imi_mode.imc_union_keep_mode:after { content: "連続強化"; color: #4f0; }' +
 '#imi_deck_info #imi_mode:hover { color: #fff; border-color: #fff; background-color: #666; }' +
 
 '#imi_new_deck { float: right; margin-right: 16px; }' +
@@ -14681,6 +15332,14 @@ main: function() {
 
 	if ( unit_num != cache_num ) {
 		Util.getUnitStatusCD();
+	}
+
+	// 精鋭部隊の省スペース表示
+	if( $('#bar_card_elite').size() > 0 ) {
+		$('.elite_busho_info .elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').hide();
+		$(document).on('click', '.elite_info_action_area', function() {
+			$(this).parent().find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
+		});
 	}
 },
 
@@ -14784,7 +15443,10 @@ layouter: function() {
 		var $this = $(this);
 
 		if ( $this.hasClass('imc_union_mode') ) {
-			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_union_mode').addClass('imc_deck_mode');
+			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_union_mode').addClass('imc_union_keep_mode');
+		}
+		else if ( $this.hasClass('imc_union_keep_mode') ) {
+			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_union_keep_mode').addClass('imc_deck_mode');
 		}
 		else {
 			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_deck_mode').addClass('imc_union_mode');
@@ -15054,13 +15716,76 @@ Page.registerAction( 'card', 'trade', {
 
 //.. main
 main: function() {
+	//$('.common_menu1 .form1').css('width', '80px');
+	//$('.ig_decksection_mid .common_menu1:first').find('br').remove();
+	//$('.ig_decksection_mid .common_menu1:first').after('<div id="imi_trade_menu" class="common_menu1 mb20 clearfix"/>');
+	//$('#imi_trade_menu').text('拡張メニュー用領域予約');
+
 	var $tr = $('TABLE.common_table1 > TBODY > TR');
 
+	this.autoPager();
 	this.layouter( $tr );
 
 	$('TABLE.common_table1 > TBODY > TR.fs12')
 	.live('mouseenter', Util.enter )
 	.live('mouseleave', Util.leave );
+},
+
+//.. autoPager
+autoPager: function() {
+	var self = this;
+	
+	$.autoPager({
+		container: '.ig_decksection_innerbottom',
+		next: function( html ) {
+			var $html = $(html),
+				$pager = $html.find('UL.pager'),
+				source = $pager.find('LI.last A:first').attr('href') || '',
+				match = source.match(/p=(\d+)/),
+				nextPage;
+
+			if ( match ) {
+				nextPage = match[1].toInt();
+			}
+			return nextPage;
+		},
+		load: function( nextPage ) {
+			var page = nextPage,
+			 t = $('SELECT#t').val(),
+			 k = $('INPUT#k').val(),
+			 s = $('SELECT#s').val(),
+			 o = $('SELECT#o').val();
+			
+			return Page.get( '/card/trade.php', { t: t, k: k, s: s, o: o, p: page });
+		},
+		loaded: function( html ) {
+			var $html = $(html),
+				$card_list = $html.find('table.common_table1.center.mt10 tr.fs12'),
+				loadedPage = $html.find('UL.pager LI :not("A")').text();  // 読み込んだページ
+			
+			$card_list.each( function( idx, elm ) {
+				// cardWindowのリンクを置換
+				let href = $(elm).find('a.thickbox').attr('href');
+				let newHref = href.replace(/cardWindow_(\d+)/, function( str, m1 ) {
+					return 'cardWindow_' + loadedPage + '_' + m1;
+				});
+				$(elm).find('a.thickbox').attr('href', newHref);
+				
+				let cwid = $(elm).find('div[id^=cardWindow_]').attr('id');
+				let newId = cwid.replace(/cardWindow_(\d+)/, function( str, m1 ) {
+					return 'cardWindow_' + loadedPage + '_' + m1;
+				});
+				$(elm).find('div[id^=cardWindow_]').attr('id', newId);
+			});
+			$card_list.appendTo('table.common_table1.center.mt10 > tbody');
+
+			//self.changeFilter();
+			self.layouter2( $card_list );
+		},
+		ended: function() {
+			Display.info('全ページ読み込み完了');
+		}
+	});
 },
 
 //.. layouter
@@ -15088,18 +15813,300 @@ layouter: function( $tr ) {
 	$tr.slice( 1 )
 	.hover( Util.enter, Util.leave )
 	.each(function() {
+		let $self = $(this);
 		var $td = $(this).find('TD'),
-			expires = $td.eq( 6 ).text();
+			expires = $td.eq( 6 ).text(),
+			bid = $td.eq( 7 ).text();
 
-		if ( expires == '---' )   { return; } //即決
-		if ( expires == datestr ) { return; } //直近
+		//即決
+		if ( expires == '---' )   {
+			let bidText = $td.eq( 7 ).text();
+			if( bidText == '入札する' ) {
+				let $contents = $td.eq( 7 ).contents(),
+					$href = $td.eq( 7 ).find('a').attr('href'),
+					html = '<a href="javascript:void(0)" data-href="' + $href + '">落札する</a>';
+				$contents.replaceWith( html );
 
-		$td.eq( 6 ).css('backgroundColor', '#ccc');
-		$td.eq( 7 ).append('<div>期限チェック</div>');
+				$td.eq( 7 ).find('a').click( function() {
+					$.get( $(this).data('href') )
+					.done( function( html ) {
+						let postData = {
+							exhibit_cid: $(html).find('form.trade input[name="exhibit_cid"]').val(),
+							exhibit_id : $(html).find('form.trade input[name="exhibit_id"]').val(),
+							buy_btn    : '落札する',
+						};
+						$.post( '/card/trade_bid.php', postData )
+						.done( function( html ) {
+							if( $(html).find('.ig_decksection_innermid > p.red').text() != '' ) {
+								// たぶん落札失敗
+								//   「入札に所持銅銭を超える値が入力されました」とか
+								Display.alert( $(html).find('.ig_decksection_innermid > p.red').text() );
+							}
+							else {
+								$self.remove();
+							}
 	});
-}
+					});
+				});
+			}
+		}
+		else if ( expires != datestr ) {
+			$tr.css('backgroundColor', 'lightgray');
+			$td.eq( 6 ).css('color', '#f00');
+			//$td.eq( 6 ).css('backgroundColor', '#ccc');
+			//$td.eq( 7 ).append('<div>期限チェック</div>');
+		}
+	});
+},
+
+//.. layouter2
+layouter2: function( $tr ) {
+	var date = new Date(),
+		datestr;
+
+	//8:00:00をセットする
+	date.setHours( 8 );
+	date.setMinutes( 0 );
+	date.setSeconds( 0 );
+	//過去時刻の場合、１日進める
+	if ( date <= new Date() ) {
+		date.setDate( date.getDate() + 1 );
+	}
+
+	datestr = date.toFormatDate();
+
+	$tr.slice( 0 )
+	.hover( Util.enter, Util.leave )
+	.each(function() {
+		let $self = $(this);
+		var $td = $(this).find('TD'),
+			expires = $td.eq( 6 ).text(),
+			bid = $td.eq( 7 ).text();
+
+		//即決
+		if ( expires == '---' )   {
+			let bidText = $td.eq( 7 ).text();
+			if( bidText == '入札する' ) {
+				let $contents = $td.eq( 7 ).contents(),
+					$href = $td.eq( 7 ).find('a').attr('href'),
+					html = '<a href="javascript:void(0)" data-href="' + $href + '">落札する</a>';
+				$contents.replaceWith( html );
+
+				$td.eq( 7 ).find('a').click( function() {
+					$.get( $(this).data('href') )
+					.done( function( html ) {
+						let postData = {
+							exhibit_cid: $(html).find('form.trade input[name="exhibit_cid"]').val(),
+							exhibit_id : $(html).find('form.trade input[name="exhibit_id"]').val(),
+							buy_btn    : '落札する',
+						};
+						$.post( '/card/trade_bid.php', postData )
+						.done( function( html ) {
+							if( $(html).find('.ig_decksection_innermid > p.red').text() != '' ) {
+								// たぶん落札失敗
+								//   「入札に所持銅銭を超える値が入力されました」とか
+								Display.alert( $(html).find('.ig_decksection_innermid > p.red').text() );
+							}
+							else {
+								$self.remove();
+							}
+						});
+					});
+				});
+			}
+		}
+		else if ( expires != datestr ) {
+			$self.css('backgroundColor', 'lightgray');
+			$td.eq( 6 ).css('color', '#f00');
+			//$td.eq( 6 ).css('backgroundColor', '#ccc');
+			//$td.eq( 7 ).append('<div>期限チェック</div>');
+		}
+	});
+},
+
+//changeFilter: function( $tr ) {
+changeFilter: function() {
+	//$('#imi_trade_menu').text('拡張メニュー用領域予約');
+
+	let $tr = $('TABLE.common_table1 > TBODY > TR.fs12');
+	
+	$tr.each(function( idx, elm ) {
+		let $td = $(this).find('td');
+		let cardno  = $td.eq(0).text();
+		let rarity  = $td.eq(1).find('img').attr('alt');
+		let name    = $td.eq(1).find('strong:first').text();
+		let rank    = $td.eq(2).text().match(/([★☆]+)/)[1] || '';
+		let level   = $td.eq(2).text().match(/(\d+)/)[1] || '';
+		let skills  = $td.eq(3).html();//<br>でsplit
+		let price   = $td.eq(4).text();
+		let bid     = $td.eq(5).text();
+		let expires = $td.eq(6).text();
+		let able    = $td.eq(7).text();
+
+		//if( rarity == '序' ) {
+		//	$(this).hide();
+		//}
+		//else if( bid > 0 ) {
+		//	$(this).hide();
+		//}
+		//else if( expires != '---' ) {
+		//	$(this).hide();
+		//}
+		//else {
+		//	console.log( cardno, rarity, name, rank, level, skills, price, bid, expires, able );
+		//}
+	});
+},
+
+//.. changeTitle
+changeTitle: function() {
+	if ( Env.world ) {
+		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '取引') );
+	}
+},
 
 });
+
+//■ /card/trade_card
+Page.registerAction( 'card', 'trade_card', {
+
+//. style
+style: '' +
+'INPUT { ime-mode: disabled; }' +
+'.tradecmd { position:relative; top:320px; left: 6px; width:212px; }' +
+'.price { float:right; height:18px; margin:2px; text-align:right; }' +
+'',
+
+//.. main
+main: function() {
+	var $cards = $('.ig_deck_subcardarea');
+	
+	this.autoPager();
+	this.layouter( $cards );
+},
+
+//.. autoPager
+autoPager: function() {
+	var self = this;
+	
+	$.autoPager({
+		container: '.common_box3bottom DIV.tradelist',
+		next: 'UL.pager LI.last A:first',
+		loaded: function( html ) {
+			var $html = $(html),
+				$trade_list = $html.find('.common_box3bottom DIV.tradelist' ),
+				loadedPage = $html.find('UL.pager LI :not("A")').text();  // 読み込んだページ
+
+			// flip用にidを変更
+			$trade_list.html( $trade_list.html().replace(/id_deck_card(\d+)/g, function( str, m1 ) {
+				return 'id_deck_card' + loadedPage + '_' + m1;
+			}) );
+			
+			let $cards = $trade_list.find('div[id^=id_deck_card].ig_deck_subcardarea');
+			$('.common_box3bottom DIV.tradelist').append( $cards );
+
+			// 個別にレイアウタを適用
+			self.layouter( $cards );
+		},
+		ended: function() {
+			Display.info('全ページ読み込み完了');
+		}
+	});
+},
+
+//.. layouter
+layouter: function( $cards ) {
+	var self = this;
+	
+	$cards.each( function( idx, elm ) {
+		let $elm = $(elm),
+			cardno = $elm.find('.ig_card_cardno').text(),
+			cid = $elm.find('.tradebtn a').attr('onclick').match(/go_exhibit_confirm\(\'(.*)\'\);/)[1] || '';
+		
+		let html =
+			'<div class="tradecmd">' +
+			'<input type=button name="find"  value="取引"   style="float:left;"  title="出品中の同カードを検索します">'+
+			'<input type=button name="net"   value="手取り" style="float:right;" title="出品価格に手数料を上乗せして出品します">' +
+			'<input type=button name="gross" value="出品"   style="float:right;" title="手数料込みの価格として出品します">' +
+			'<input type=number name="price" value=10 size=10 class="price">' +
+			'</div>';
+		$elm.find('.tradebtn').before( html ).hide();
+		
+		// 取引
+		$elm.on('click', 'input[name=find]', { cno: cardno }, function( eo ) {
+			Util.searchTradeCardNo( eo.data.cno )
+		});
+		
+		// 出品
+		$elm.on('click', 'input[name=gross]', { cid: cid }, function( eo ) {
+			let price = $(this).parent().find('input[name=price]').val();
+
+			self.exhibit( eo.data.cid, price )
+			.done( function() {
+				$elm.remove();
+			})
+			.fail( function( msg ) {
+				Display.alert( msg );
+			});
+		});
+		
+		// 手取り
+		$elm.on('click', 'input[name=net]', { cid: cid }, function( eo ) {
+			let bp = $(this).parent().find('input[name=price]').val();
+			let price = Math.floor(bp / 0.9);
+			if (price >=  500) price = Math.floor((bp - 50) / 0.8);
+			if (price >= 1000) price = Math.floor((bp - 150) / 0.7);
+
+			self.exhibit( eo.data.cid, price )
+			.done( function() {
+				$elm.remove();
+			})
+			.fail( function( msg ) {
+				Display.alert( msg );
+			});
+		});
+	});
+},
+
+//.. exhibit
+//  出品エラーのときはrejectしつつエラーメッセージを返す
+//
+exhibit: function( cid, price ) {
+	var d = $.Deferred();
+	
+	let postData = {
+		exhibit_btn  : '出品する',
+		exhibit_cid  : cid,
+		exhibit_price: price,
+	};
+	
+	$.post( '/card/exhibit_confirm.php', postData )
+	.then( function( html ) {
+		let $html = $(html),
+			$notice = $html.find('form[name="exec_exhibit_form"] .notice:first');
+		// 出品ミス
+		if( $notice.length ) {
+			d.reject( $notice.text() );
+		}
+		// 出品成功
+		else {
+			d.resolve();
+		}
+	});
+	
+	return d.promise();
+},
+
+
+////.. changeTitle
+//changeTitle: function() {
+//	if ( Env.world ) {
+//		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '出品') );
+//	}
+//},
+
+});
+
 
 //■ /card/trade_bid
 Page.registerAction( 'card', 'trade_bid', {
@@ -15107,7 +16114,14 @@ Page.registerAction( 'card', 'trade_bid', {
 //. style
 style: '' +
 'INPUT { ime-mode: disabled; }' +
-''
+'',
+
+//.. changeTitle
+changeTitle: function() {
+	if ( Env.world ) {
+		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '入札') );
+	}
+},
 
 });
 
@@ -15123,7 +16137,14 @@ style: '' +
 //. main
 main: function() {
 	$('.inputprice').focus();
-}
+},
+
+//.. changeTitle
+changeTitle: function() {
+	if ( Env.world ) {
+		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '出品確認') );
+	}
+},
 
 });
 
@@ -15172,7 +16193,15 @@ showPayment: function( $td ) {
 	price = price - fee;
 
 	$td.append('<br/>(' + price.toFormatNumber() + ')');
-}
+},
+
+
+//.. changeTitle
+changeTitle: function() {
+	if ( Env.world ) {
+		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '出品中') );
+	}
+},
 
 });
 
@@ -15672,6 +16701,7 @@ layouterMapInfo: function() {
 	'</table>' +
 	'<table class="imc_table">' +
 	'<tr><td colspan="2"><label><input type="checkbox" name="imn_mark">地図にマーク表示</label></td></tr>' +
+	'<tr><td colspan="2"><label><input type="checkbox" name="imn_areg">拠点情報を自動登録</label></td></tr>' +
 	'</table>' +
 	'<table class="imc_table" style="margin-bottom: 20px; clear: both;">' +
 	'<thead><tr>' +
@@ -15705,7 +16735,8 @@ layouterMapInfo: function() {
 	.find('INPUT[value="' + settings.discriminant + '"]').attr('checked', true).end()
 	.find('INPUT[name="imn_alliance"]').val( settings.alliance ).end()
 	.find('INPUT[name="imn_user"]').val( settings.user ).end()
-	.find('INPUT[name="imn_mark"]').attr('checked', settings.mark).end();
+	.find('INPUT[name="imn_mark"]').attr('checked', settings.mark).end()
+	.find('INPUT[name="imn_areg"]').attr('checked', settings.areg).end();
 
 	$('#imi_base_list')
 	.on('click', 'TD', function() {
@@ -17247,8 +18278,12 @@ Page.registerAction( 'union', 'union_remove', {
 
 //. main
 main: function() {
+	this.autoPager();
 	this.layouter();
 },
+
+//. autoPager
+//autoPager: Page.getAction( 'union', 'levelup', 'autoPager' )
 
 //. layouter
 layouter: Page.getAction( 'union', 'union_levelup', 'layouter' )
@@ -17308,6 +18343,212 @@ rankup: function( cid ) {
 }
 
 });
+
+//■ /union/levelup
+Page.registerAction( 'union', 'levelup', {
+
+//. main
+main: function() {
+	// 確認画面スキップ
+	let $unionCheck = $('IMG[src$="btn_union_check.png"]');
+	if( $unionCheck.length > 0 ) {
+		$unionCheck.click();
+	}
+	else {
+		this.autoPager();
+		this.layouter();
+	}
+},
+
+//. autoPager
+autoPager: function() {
+	// 強化合成と追加合成で書式が違う…
+	$.autoPager({
+		container: '.ig_imgtop:last,.float_clear:last',
+		next: function( html ) {
+			var $html = $(html),
+				$pager = $html.find('UL.pager.cardstock:first'),
+				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
+				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
+				nextPage;
+
+			if ( match ) {
+				nextPage = match[1].toInt();
+			}
+
+			return nextPage;
+		},
+		load: function( nextPage ) {
+			var page = nextPage,
+				scid = $('#deck_file INPUT#base_cid').val(),
+				utype = $('#deck_file INPUT#union_type').val();
+			
+			return Page.post( '/union/levelup.php', { selected_cid: scid, union_type: utype, p: page });
+		},
+		loaded: function( html ) {
+			var $html = $(html),
+				$card_list = $html.find('#ig_deck_smallcardarea_out .ig_deck_smallcardarea,#busho_info > tbody > tr:not(#busho_info tr:eq(0))');
+
+			//ポップアップ用
+			$('#deck_file').append( $html.find('#ig_boxInner DIV[id^=cardWindow_]') );
+
+			if( $('#busho_info').size() > 0 ) {
+				$card_list.appendTo('#busho_info');
+			}
+			else {
+				$card_list.appendTo('#ig_deck_smallcardarea_out');
+			}
+		},
+		ended: function() {
+			Display.info('全ページ読み込み完了');
+		}
+	});
+},
+
+//. layouter
+layouter: function() {
+},
+
+});
+
+// スキル強化追加スロット
+//■ /union/additional
+Page.registerAction( 'union', 'additional', {
+
+//. main
+main: function() {
+	this.autoPager();
+	this.layouter();
+},
+
+//. autoPager
+autoPager: function() {
+	$.autoPager({
+		container: '.ig_imgtop:last,.float_clear:last',
+		next: function( html ) {
+			var $html = $(html),
+				$pager = $html.find('UL.pager.cardstock:first'),
+				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
+				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
+				nextPage;
+
+			if ( match ) {
+				nextPage = match[1].toInt();
+			}
+
+			return nextPage;
+		},
+		load: function( nextPage ) {
+			var page = nextPage,
+				bcid = $('#deck_file INPUT#base_cid').val(),
+				acid = $('#deck_file INPUT#added_cid').val(),
+				utype = $('#deck_file INPUT#union_type').val();
+			
+			return Page.post( '/union/additional.php', { base_cid: bcid, added_cid: acid, union_type: utype, p: page });
+		},
+		loaded: function( html ) {
+			var $html = $(html),
+				$card_list = $html.find('#ig_deck_smallcardarea_out .ig_deck_smallcardarea,#busho_info > tbody > tr:not(#busho_info tr:eq(0))');
+
+			//ポップアップ用
+			$('#deck_file').append( $html.find('#ig_boxInner DIV[id^=cardWindow_]') );
+
+			if( $('#busho_info').size() > 0 ) {
+				$card_list.appendTo('#busho_info');
+			}
+			else {
+				$card_list.appendTo('#ig_deck_smallcardarea_out');
+			}
+		},
+		ended: function() {
+			Display.info('全ページ読み込み完了');
+		}
+	});
+},
+
+//. layouter
+layouter: function() {
+},
+
+});
+
+//■ /union/remove
+Page.registerAction( 'union', 'remove', {
+
+//. main
+main: function() {
+	this.autoPager();
+	this.layouter();
+},
+
+//. autoPager
+autoPager: function() {
+	$.autoPager({
+		container: '.ig_imgtop:last,.float_clear:last',
+		next: function( html ) {
+			var $html = $(html),
+				$pager = $html.find('UL.pager.cardstock:first'),
+				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
+				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
+				nextPage;
+
+			if ( match ) {
+				nextPage = match[1].toInt();
+			}
+
+			return nextPage;
+		},
+		load: function( nextPage ) {
+			var page = nextPage,
+				utype = $('#deck_file INPUT#union_type').val();
+	
+			return Page.post( '/union/remove.php', { union_type: utype, p: page });
+		},
+		loaded: function( html ) {
+			var $html = $(html),
+				$card_list = $html.find('#ig_deck_smallcardarea_out .ig_deck_smallcardarea,#busho_info > tbody > tr:not(#busho_info tr:eq(0))');
+
+			//ポップアップ用
+			$('#deck_file').append( $html.find('#ig_boxInner DIV[id^=cardWindow_]') );
+
+			if( $('#busho_info').size() > 0 ) {
+				$card_list.appendTo('#busho_info');
+			}
+			else {
+				$card_list.appendTo('#ig_deck_smallcardarea_out');
+			}
+		},
+		ended: function() {
+			Display.info('全ページ読み込み完了');
+		}
+	});
+},
+
+//. layouter
+layouter: function() {
+},
+
+});
+
+//■ /union/union_history
+Page.registerAction( 'union', 'union_history', {
+
+//. main
+main: function() {
+	this.autoPager();
+	this.layouter();
+},
+
+//. autoPager
+autoPager: function() {
+},
+
+//. layouter
+layouter: function() {
+},
+
+});
+
 
 //■ /senkuji/senkuji
 Page.registerAction( 'senkuji', 'senkuji', {
