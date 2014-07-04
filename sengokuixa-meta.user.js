@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.3.0
+// @version        1.4.3.1
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -2499,6 +2499,17 @@ var Append = {
 	
 	// 秘境へ行く
 	goDungeon: function( select ) {
+		var dungeon = {
+			  1: '修験の山：渓谷(城:3h)',
+			  2: '修験の山：樹海(城:6h)',
+			  3: '絶壁の祠(銅:3h)',
+			  4: '長寿の泉(銅:6h)',
+			100: '風の霊峰(兵:3h)',
+			200: '煉獄の島(兵:6h)',
+		};
+		
+		// 確認ダイアログ
+		if( window.confirm( dungeon[select] + 'に出発します。\nよろしいですか？') ) {
 		// 部隊解散
 		//Deck.breakUpAll()
 		//.always(function( ol ) {
@@ -2523,6 +2534,7 @@ var Append = {
 				location.href = '/facility/unit_status.php?dmo=all';
 			});
 		});
+		}
 	},
 
 	// GitHubリポジトリから合成表を取得する
@@ -7465,7 +7477,8 @@ breakUp: function( ano, name ) {
 	.pipe(function( html ) {
 		var $html = $(html),
 			found = $html.find('#ig_unitchoice .now:contains("' + name + '")').length,
-			$a = $html.find('.deck_navi A').first(),
+			//$a = $html.find('.deck_navi A').first(),
+			$a = $html.find('#btn_area A').last(),
 			source, args, postdata;
 
 		if ( !found ) { return $.Deferred().reject( ol ); }
@@ -7516,8 +7529,10 @@ breakUpAll: function( villageName ) {
 
 			let jqXHR = arguments[ i ][ 2 ],
 				$html = $( jqXHR.responseText ),
-				name  = $html.find('.ig_deck_unitdata_assign').text().trim(),
-				$a    = $html.find('.deck_navi A').first(),
+				//name  = $html.find('.ig_deck_unitdata_assign').text().trim(),
+				//$a    = $html.find('.deck_navi A').first(),
+				name  = $html.find('#deck_info #unit_assign+td').text().trim(),
+				$a    = $html.find('#btn_area A').last(),
 				source, args, postdata, unitname;
 
 			if ( villageName && villageName != name ) { continue; }
@@ -9074,7 +9089,8 @@ loadUnit: function( ano ) {
 
 		//デッキ関係の情報保存
 		unit = new Unit( $html.find('#assign_form') );
-		array = $html.find('#ig_deckcost SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+		//array = $html.find('#ig_deckcost SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+		array = $html.find('.deckcost SPAN').text().match(/(\d+\.?\d?)\/(\d+)/);
 		newano = 5 - $html.find('#ig_unitchoice LI:contains("[---新規部隊を作成---]")').length;
 
 		Deck.tabList = $html.find('#ig_unitchoice LI').map(function() {
@@ -9135,7 +9151,8 @@ loadCard: function( brigade ) {
 			pool = {}, deck_cost, ano, lastPage;
 
 		//デッキ関係の情報保存
-		deck_cost = $html.find('#ig_deckcost SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+		//deck_cost = $html.find('#ig_deckcost SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+		deck_cost = $html.find('.deckcost SPAN').text().match(/(\d+\.?\d?)\/(\d+)/);
 		Deck.maxCost = deck_cost[ 2 ].toFloat();
 		Deck.useCost = deck_cost[ 1 ].toFloat();
 		Deck.newano = 5 - $html.find('#ig_unitchoice LI:contains("[---新規部隊を作成---]")').length;
@@ -9428,9 +9445,12 @@ var Unit = function( $form, type ) {
 	type = ( type ) ? type : 'Mini';
 
 	if ( $form && $form.find('#howto_butai_hensei').length == 0 ) {
-		var villagename = $form.find('.ig_deck_unitdata_assign').text().trim(),
-			condition = $form.find('.ig_deck_unitdata_condition').text().replace('帰還する', '').trim(),
-			source = $form.find('.deck_navi A').first().attr('onClick') || '',
+		//var villagename = $form.find('.ig_deck_unitdata_assign').text().trim(),
+		//	condition = $form.find('.ig_deck_unitdata_condition').text().replace('帰還する', '').trim(),
+		//	source = $form.find('.deck_navi A').first().attr('onClick') || '',
+		var villagename = $form.find('#deck_info #unit_assign+td').text().trim(),
+			condition = $form.find('#deck_info #unit_status+td').text().replace('帰還する', '').trim(),
+			source = $form.find('#btn_area A').last().attr('onClick') || '',
 			$li, args;
 
 		$li = $form.find('#ig_unitchoice .now');
@@ -9665,9 +9685,13 @@ assignCard: function( ano ) {
 		return $.post( '/card/deck.php', postData )
 		.pipe(function( html ) {
 			var $html = $(html),
-				text = $html.find('#ig_deck_unititle P').text(),
+				//text = $html.find('#ig_deck_unititle P').text(),
+				text = $html.find('#us_name').text(),
 				name = ( text.match(/\[(.+)\]/) || [,''] )[ 1 ],
-				unit_id = $html.find('#set_assign_id').val(),
+				//unit_id = $html.find('#set_assign_id').val(),
+				source = $html.find('#btn_area A').last().attr('onClick') || '',
+				args = source.match(/confirmUnregist\('(\d+)', '(\d+)'/) || [],
+				unit_id = args[ 1 ],
 				$li = $html.find('#ig_unitchoice LI'),
 				idx, newidx;
 
@@ -15294,12 +15318,14 @@ style: '' +
 main: function() {
 	//デッキ関係の情報保存
 	var unit_list = $('#ig_unitchoice LI'),
-		pool = {}, ano, condition, array;
+	//	pool = {}, ano, condition, array;
+		pool = {}, ano, array;
 
 	//追加の場合、現在選択されているano
 	ano = unit_list.index( unit_list.filter('.now').first() );
-	condition = $('.ig_deck_unitdata_condition').text().trim();
-	array = $('#ig_deckcost').find('SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+	//condition = $('.ig_deck_unitdata_condition').text().trim();
+	//array = $('#ig_deckcost').find('SPAN.ig_deckcostdata').text().match(/(\d+\.?\d?)\/(\d+)/);
+	array = $('#normal_unit_state_head .deckcost').find('SPAN').text().match(/(\d+\.?\d?)\/(\d+)/);
 
 	var unit = new Unit( $('#assign_form'), 'UnitSmall' );
 	Deck.setup( array[ 2 ].toFloat(), array[ 1 ].toFloat(), ano, unit );
@@ -15335,7 +15361,7 @@ main: function() {
 	}
 
 	// 精鋭部隊の省スペース表示
-	if( $('#bar_card_elite').size() > 0 ) {
+	if( $('#bar_card_elite').length > 0 ) {
 		$('.elite_busho_info .elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').hide();
 		$(document).on('click', '.elite_info_action_area', function() {
 			$(this).parent().find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
@@ -15401,6 +15427,12 @@ layouter: function() {
 		.appendTo('#ig_deckheadmenubox')
 		.click( this.unregistAll );
 	}
+
+	// デッキのボタン配置変更
+	var $btn_area = $('#btn_area');
+	// 国移動非表示
+	$btn_area.find('a[href*="country_move.php"]').hide();
+	// 兵編成、解散、精鋭登録の順に右詰
 
 	//仮想デッキ用
 	var html = '' +
@@ -15568,7 +15600,8 @@ villageSelecter: function() {
 	}
 
 	if ( $('#select_village').length == 0 ) {
-		$('.ig_deck_unitdata_assign').clone().appendTo('#imi_village_info');
+		//$('.ig_deck_unitdata_assign').clone().appendTo('#imi_village_info');
+		$('#deck_info #unit_assign+td').clone().appendTo('#imi_village_info');
 	}
 	else {
 		$('#select_village').clone().attr('id', 'imi_select_village')
@@ -15851,7 +15884,7 @@ layouter: function( $tr ) {
 			}
 		}
 		else if ( expires != datestr ) {
-			$tr.css('backgroundColor', 'lightgray');
+			$self.css('backgroundColor', 'lightgray');
 			$td.eq( 6 ).css('color', '#f00');
 			//$td.eq( 6 ).css('backgroundColor', '#ccc');
 			//$td.eq( 7 ).append('<div>期限チェック</div>');
@@ -18278,7 +18311,7 @@ Page.registerAction( 'union', 'union_remove', {
 
 //. main
 main: function() {
-	this.autoPager();
+//	this.autoPager();
 	this.layouter();
 },
 
