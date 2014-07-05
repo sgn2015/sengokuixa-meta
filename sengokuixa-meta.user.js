@@ -2288,6 +2288,8 @@ var Append = {
 	
 	// 一括レベルアップ
 	togetherLevelup: function () {
+		if( !window.confirm('極振りになるように未使用ステータスポイントを分配します\n(未配分の武将はそのままです)') ) { return; }
+		
 		var pageData = [],
 			cardlist, cache, ol;
 
@@ -12126,7 +12128,7 @@ main: function() {
 			storage.begin();
 			storage.data = data;
 			storage.commit();
-			Display.info('合成表が更新されています。', true, 6000 );
+			Display.info('合成表が更新されています。<br>「クエスト」メニューより「合成表更新」を各サーバーで実行してください。', true, 6000 );
 		}
 	})
 	.fail( function( jqXHR, textStatus, textErr ) {
@@ -15861,6 +15863,13 @@ layouter: function( $tr ) {
 				$contents.replaceWith( html );
 
 				$td.eq( 7 ).find('a').click( function() {
+					let rarity = $td.eq(1).find('img').attr('alt').trim(),
+						name   = $td.eq(1).find('strong').text().trim(),
+						ranklv = $td.eq(2).html().replace(/<br>/, '/Lv' ).trim(),
+						price  = $td.eq(4).find('strong').text().trim();
+					let confirm_msg = '【'+rarity+'】 ' + name + '('+ ranklv +') を\n銅銭' + price +'で落札します';
+					if( !window.confirm(confirm_msg) ) { return; }
+					
 					$.get( $(this).data('href') )
 					.done( function( html ) {
 						let postData = {
@@ -15870,10 +15879,9 @@ layouter: function( $tr ) {
 						};
 						$.post( '/card/trade_bid.php', postData )
 						.done( function( html ) {
-							if( $(html).find('.ig_decksection_innermid > p.red').text() != '' ) {
-								// たぶん落札失敗
-								//   「入札に所持銅銭を超える値が入力されました」とか
-								Display.alert( $(html).find('.ig_decksection_innermid > p.red').text() );
+							let exhibid_text = $(html).find('.ig_decksection_innermid > p.red').text().trim();
+							if( exhibid_text != '' ) {
+								Display.alert( exhibid_text );
 							}
 							else {
 								$self.remove();
@@ -15926,6 +15934,13 @@ layouter2: function( $tr ) {
 				$contents.replaceWith( html );
 
 				$td.eq( 7 ).find('a').click( function() {
+					let rarity = $td.eq(1).find('img').attr('alt').trim(),
+						name   = $td.eq(1).find('strong').text().trim(),
+						ranklv = $td.eq(2).html().replace(/<br>/, '/Lv' ).trim(),
+						price  = $td.eq(4).find('strong').text().trim();
+					let confirm_msg = '【'+rarity+'】 ' + name + '('+ ranklv +') を\n銅銭' + price +'で落札します';
+					if( !window.confirm(confirm_msg) ) { return; }
+					
 					$.get( $(this).data('href') )
 					.done( function( html ) {
 						let postData = {
@@ -15935,10 +15950,9 @@ layouter2: function( $tr ) {
 						};
 						$.post( '/card/trade_bid.php', postData )
 						.done( function( html ) {
-							if( $(html).find('.ig_decksection_innermid > p.red').text() != '' ) {
-								// たぶん落札失敗
-								//   「入札に所持銅銭を超える値が入力されました」とか
-								Display.alert( $(html).find('.ig_decksection_innermid > p.red').text() );
+							let exhibid_text = $(html).find('.ig_decksection_innermid > p.red').text().trim();
+							if( exhibid_text != '' ) {
+								Display.alert( exhibid_text );
 							}
 							else {
 								$self.remove();
