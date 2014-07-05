@@ -16,9 +16,17 @@ sengokuixa-meta
 
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
 * 最新バージョンのインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
+* ハンゲの方は[Ver1.4.3.0](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/c948e9d9b544cc3e33644c4709f4c9baa14af2e0/sengokuixa-meta.user.js)で更新を止めておいてください。
 
 更新履歴
 --------
+
+### 1.4.3.2
+2014/07/05
+
+* 一括レベルアップ、即落札で確認ダイアログを表示
+* 部隊編成ダイアログや部隊編成画面のデッキモードで小隊長を表示するように
+* 加勢専用部隊に暫定対処(運営のテスト期間中用)
 
 ### 1.4.3.1
 2014/07/05
