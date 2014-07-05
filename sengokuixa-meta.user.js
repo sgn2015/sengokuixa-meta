@@ -9465,7 +9465,7 @@ var Unit = function( $form, type ) {
 		unit_id = args[ 1 ];
 		leader_id = args[ 2 ];
 
-		$form.find('#id_deck_card1, #id_deck_card2, #id_deck_card3, #id_deck_card4').each(function() {
+		$form.parent().parent().find('#id_deck_card1, #id_deck_card2, #id_deck_card3, #id_deck_card4').each(function() {
 			var $this = $(this),
 				card;
 
