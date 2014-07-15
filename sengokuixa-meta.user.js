@@ -13849,19 +13849,40 @@ commandButton: function() {
 		$('.select_act').find('INPUT[value=' + type + ']').attr('checked', 'true');
 
 		if ( $target.hasClass('imc_quick') ) {
-			Page.post( href, {
+			// 共通POSTパラメータ
+			let postData = {
+				btn_send: true,
+				card_id: 204,
+				radio_move_type: type,
+				show_beat_bandit_flg: '',
+				unit_assign_card_id: '',
+				unit_select: unit,
 				village_name: '',
 				village_x_value: x_value,
 				village_y_value: y_value,
-				unit_assign_card_id: '',
-				radio_move_type: type,
-				show_beat_bandit_flg: '',
-				unit_select: unit,
 				x: '',
 				y: '',
-				card_id: 204,
-				btn_send: 'true'
-			})
+			};
+			// 加勢専用部隊の追加パラメータ
+			if( $this.parent().parent().find('.waitingunittitle_reinforce').length > 0 ) {
+				postData['country_id'] = $('INPUT[name="country_id"]').val();
+				postData['target_country_id'] = $('INPUT[name="target_country_id"]').val();
+			}
+
+			// Page.post( href, {
+			// 	village_name: '',
+			// 	village_x_value: x_value,
+			// 	village_y_value: y_value,
+			// 	unit_assign_card_id: '',
+			// 	radio_move_type: type,
+			// 	show_beat_bandit_flg: '',
+			// 	unit_select: unit,
+			// 	x: '',
+			// 	y: '',
+			// 	card_id: 204,
+			// 	btn_send: 'true'
+			// })
+			Page.post( href, postData )
 			.pipe(function( html ) {
 				var $html = $(html),
 					text;
