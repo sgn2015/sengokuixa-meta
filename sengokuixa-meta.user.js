@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name           sengokuixa-meta
+// @name           sengokuixa-meta4hangame
 // @description    戦国IXAを変態させるツール
-// @version        1.4.3.0
+// @version        1.4.3.2
 // @namespace      sengokuixa-meta
-// @include        http://*.sengokuixa.jp/*
+// @include        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @website        https://github.com/moonlit-g/sengokuixa-meta
 // @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
@@ -2288,6 +2288,8 @@ var Append = {
 	
 	// 一括レベルアップ
 	togetherLevelup: function () {
+		if( !window.confirm('極振りになるように未使用ステータスポイントを分配します\n(未配分の武将はそのままです)') ) { return; }
+		
 		var pageData = [],
 			cardlist, cache, ol;
 
@@ -2499,6 +2501,17 @@ var Append = {
 	
 	// 秘境へ行く
 	goDungeon: function( select ) {
+		var dungeon = {
+			  1: '修験の山：渓谷(城:3h)',
+			  2: '修験の山：樹海(城:6h)',
+			  3: '絶壁の祠(銅:3h)',
+			  4: '長寿の泉(銅:6h)',
+			100: '風の霊峰(兵:3h)',
+			200: '煉獄の島(兵:6h)',
+		};
+		
+		// 確認ダイアログ
+		if( window.confirm( dungeon[select] + 'に出発します。\nよろしいですか？') ) {
 		// 部隊解散
 		//Deck.breakUpAll()
 		//.always(function( ol ) {
@@ -2523,6 +2536,7 @@ var Append = {
 				location.href = '/facility/unit_status.php?dmo=all';
 			});
 		});
+		}
 	},
 
 	// GitHubリポジトリから合成表を取得する
@@ -2545,26 +2559,26 @@ var Append = {
 		});
 	},
 
-	// 精鋭部隊取得
-	//   同期なのでちょっと遅くなるかも
-	// @return [精鋭部隊の部隊長名, 精鋭部隊番号(セットできないときは-1)]の配列
-	getElite: function() {
-		var eliteArray = [];
-		$.ajax({ type: 'post', url: '/card/deck.php', async: false, data: { select_card_group: 6, select_assign_no: 4 } })
-		.then( function( html ) {
-			let $html = $(html);
-			let $elites = $html.find('.elite_busho_info');
+	// // 精鋭部隊取得
+	// //   同期なのでちょっと遅くなるかも
+	// // @return [精鋭部隊の部隊長名, 精鋭部隊番号(セットできないときは-1)]の配列
+	// getElite: function() {
+	// 	var eliteArray = [];
+	// 	$.ajax({ type: 'post', url: '/card/deck.php', async: false, data: { select_card_group: 6, select_assign_no: 4 } })
+	// 	.then( function( html ) {
+	// 		let $html = $(html);
+	// 		let $elites = $html.find('.elite_busho_info');
 
-			$.each( $elites, function( idx, elm ) {
-				$elm = $(elm);
-				let uname = $elm.find('.elite_busho_info_tbl tr:eq(1) td:eq(2)').text().trim().match( /^(.*)\n/ )[1] || '';
-				let enable = $elm.find('.btn_set_elite img[src$="set_elite.png"]').size() > 0;
-				eliteArray.push( [ uname, enable ? idx+1: -1 ] );
-			});
-		});
+	// 		$.each( $elites, function( idx, elm ) {
+	// 			$elm = $(elm);
+	// 			let uname = $elm.find('.elite_busho_info_tbl tr:eq(1) td:eq(2)').text().trim().match( /^(.*)\n/ )[1] || '';
+	// 			let enable = $elm.find('.btn_set_elite img[src$="set_elite.png"]').size() > 0;
+	// 			eliteArray.push( [ uname, enable ? idx+1: -1 ] );
+	// 		});
+	// 	});
 
-		return eliteArray;
-	},
+	// 	return eliteArray;
+	// },
 
 };
 
@@ -5781,7 +5795,7 @@ contextmenu: function() {
 		submenu;
 
 	// 精鋭部隊取得(同期)
-	var eliteArray = Append.getElite();
+	//var eliteArray = Append.getElite();
 	
 	menu[ title ] = $.contextMenu.title;
 	menu['ここを中心に表示'] = Map.contextmenu.center;
@@ -5798,20 +5812,20 @@ contextmenu: function() {
 				'セパレーター1': $.contextMenu.separator,
 				'【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
 			},
-			'精鋭部隊': {
-			},
+			// '精鋭部隊': {
+			// },
 			'セパレーター2': $.contextMenu.separator,
 			'ここへ部隊出陣': Map.contextmenu.send2,
 			'拠点選択': Map.contextmenu.nearbyVillage
 		};
-		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
-				function() { Map.contextmenu.assignEliteNearby( data, val ); } :
-				$.contextMenu.nothing;
-		}
+		// // 精鋭部隊追加
+		// for( let i = 0; i < eliteArray.length; i++ ) {
+		// 	let key = '【' + eliteArray[i][0] + '】部隊';
+		// 	let val = eliteArray[i][1];
+		// 	menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
+		// 		function() { Map.contextmenu.assignEliteNearby( data, val ); } :
+		// 		$.contextMenu.nothing;
+		// }
 	}
 	else if ( data.type == '領地' ) {
 		menu['最寄りの拠点'] = {
@@ -5824,21 +5838,21 @@ contextmenu: function() {
 			'セパレーター1': $.contextMenu.separator,
 				'【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
 			},
-			'精鋭部隊': {
-			},
+			// '精鋭部隊': {
+			// },
 			'セパレーター2': $.contextMenu.separator,
 			'ここへ部隊出陣': Map.contextmenu.send2,
 			'拠点選択': Map.contextmenu.nearbyVillage
 		};
 		menu['この領地を陣にする'] = Map.contextmenu.toCamp;
-		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
-				function() { Map.contextmenu.assignEliteNearby( data, val ); } :
-				$.contextMenu.nothing;
-		}
+		// // 精鋭部隊追加
+		// for( let i = 0; i < eliteArray.length; i++ ) {
+		// 	let key = '【' + eliteArray[i][0] + '】部隊';
+		// 	let val = eliteArray[i][1];
+		// 	menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
+		// 		function() { Map.contextmenu.assignEliteNearby( data, val ); } :
+		// 		$.contextMenu.nothing;
+		// }
 	}
 	else {
 		menu['この拠点'] = {
@@ -5851,22 +5865,22 @@ contextmenu: function() {
 			'セパレーター1': $.contextMenu.separator,
 				'【全武将】': function() { Map.contextmenu.createUnit( data, 0 ); },
 			},
-			'精鋭部隊': {
-			},
+			// '精鋭部隊': {
+			// },
 			'セパレーター2': $.contextMenu.separator,
 			'拠点部隊解散': function() { Map.contextmenu.breakUp( data ); },
 			'セパレーター3': $.contextMenu.separator,
 			'拠点選択': Map.contextmenu.changeVillage,
 			'拠点名変更': Map.contextmenu.renameVillage
 		};
-		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['この拠点']['精鋭部隊'][key] = val > 0 ?
-				function() { Map.contextmenu.assignElite( data, val ); } :
-				$.contextMenu.nothing;
-		}
+		// // 精鋭部隊追加
+		// for( let i = 0; i < eliteArray.length; i++ ) {
+		// 	let key = '【' + eliteArray[i][0] + '】部隊';
+		// 	let val = eliteArray[i][1];
+		// 	menu['この拠点']['精鋭部隊'][key] = val > 0 ?
+		// 		function() { Map.contextmenu.assignElite( data, val ); } :
+		// 		$.contextMenu.nothing;
+		// }
 	}
 
 	if ( enemy > 0 ) {
@@ -11264,8 +11278,8 @@ contextmenu: function() {
 	menu['セパレーター１'] = $.contextMenu.separator;
 
 	if ( location.pathname != '/card/deck.php' ) {
-		// 精鋭部隊取得(同期)
-		var eliteArray = Append.getElite();
+		// // 精鋭部隊取得(同期)
+		// var eliteArray = Append.getElite();
 
 		menu['部隊作成'] = {
 			'【第一組】': function() { Deck.dialog( village, null, 1 ); },
@@ -11276,27 +11290,27 @@ contextmenu: function() {
  			'セパレーター': $.contextMenu.separator,
 			'【全武将】': function() { Deck.dialog( village, null, 0 ); }
 		};
-		menu['精鋭部隊'] = {
-		};
-		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['精鋭部隊'][key] = val > 0 ?
-				function() {
-					$.post( '/card/deck.php', {
-						mode: 'assign_elite',
-						select_assign_no: 4,
-						select_card_group: 6,
-						set_elite_unit_assign_sort: val,
-						set_village_id: village.id,
-					});
-				} : $.contextMenu.nothing;
-		}
+		// menu['精鋭部隊'] = {
+		// };
+		// // 精鋭部隊追加
+		// for( let i = 0; i < eliteArray.length; i++ ) {
+		// 	let key = '【' + eliteArray[i][0] + '】部隊';
+		// 	let val = eliteArray[i][1];
+		// 	menu['精鋭部隊'][key] = val > 0 ?
+		// 		function() {
+		// 			$.post( '/card/deck.php', {
+		// 				mode: 'assign_elite',
+		// 				select_assign_no: 4,
+		// 				select_card_group: 6,
+		// 				set_elite_unit_assign_sort: val,
+		// 				set_village_id: village.id,
+		// 			});
+		// 		} : $.contextMenu.nothing;
+		// }
 	}
 	else {
 		menu['部隊作成【使用不可】'] = $.contextMenu.nothing;
-		menu['精鋭部隊【使用不可】'] = $.contextMenu.nothing;
+		// menu['精鋭部隊【使用不可】'] = $.contextMenu.nothing;
 	}
 
 	if ( $units.has('.imc_wait').length > 0 ) {
@@ -11967,7 +11981,7 @@ createPulldownMenu: function() {
 		{ title: 'デッキ３', action: '/card/deck.php?ano=2' },
 		{ title: 'デッキ４', action: '/card/deck.php?ano=3' },
 		{ title: 'デッキ５', action: '/card/deck.php?ano=4' },
-		{ title: '【精鋭部隊】', action: '/card/deck.php?select_card_group=6&select_assign_no=4' },
+		// { title: '【精鋭部隊】', action: '/card/deck.php?select_card_group=6&select_assign_no=4' },
 		{ title: '【兵士退避】', action: function() {
 			var ol = Display.dialog().message('兵士退避中...');
 			Append.gatherSoldierAll( ol ).pipe( ol.close );
@@ -12102,7 +12116,7 @@ main: function() {
 			storage.begin();
 			storage.data = data;
 			storage.commit();
-			Display.info('合成表が更新されています。', true, 6000 );
+			Display.info('合成表が更新されています。<br>「クエスト」メニューより「合成表更新」を各サーバーで実行してください。', true, 6000 );
 		}
 	})
 	.fail( function( jqXHR, textStatus, textErr ) {
@@ -15334,13 +15348,13 @@ main: function() {
 		Util.getUnitStatusCD();
 	}
 
-	// 精鋭部隊の省スペース表示
-	if( $('#bar_card_elite').size() > 0 ) {
-		$('.elite_busho_info .elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').hide();
-		$(document).on('click', '.elite_info_action_area', function() {
-			$(this).parent().find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
-		});
-	}
+	// // 精鋭部隊の省スペース表示
+	// if( $('#bar_card_elite').length > 0 ) {
+	// 	$('.elite_busho_info .elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').hide();
+	// 	$(document).on('click', '.elite_info_action_area', function() {
+	// 		$(this).parent().find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
+	// 	});
+	// }
 },
 
 //. autoPager
@@ -15828,6 +15842,13 @@ layouter: function( $tr ) {
 				$contents.replaceWith( html );
 
 				$td.eq( 7 ).find('a').click( function() {
+					let rarity = $td.eq(1).find('img').attr('alt').trim(),
+						name   = $td.eq(1).find('strong').text().trim(),
+						ranklv = $td.eq(2).html().replace(/<br>/, '/Lv' ).trim(),
+						price  = $td.eq(4).find('strong').text().trim();
+					let confirm_msg = '【'+rarity+'】 ' + name + '('+ ranklv +') を\n銅銭' + price +'で落札します';
+					if( !window.confirm(confirm_msg) ) { return; }
+					
 					$.get( $(this).data('href') )
 					.done( function( html ) {
 						let postData = {
@@ -15837,10 +15858,9 @@ layouter: function( $tr ) {
 						};
 						$.post( '/card/trade_bid.php', postData )
 						.done( function( html ) {
-							if( $(html).find('.ig_decksection_innermid > p.red').text() != '' ) {
-								// たぶん落札失敗
-								//   「入札に所持銅銭を超える値が入力されました」とか
-								Display.alert( $(html).find('.ig_decksection_innermid > p.red').text() );
+							let exhibid_text = $(html).find('.ig_decksection_innermid > p.red').text().trim();
+							if( exhibid_text != '' ) {
+								Display.alert( exhibid_text );
 							}
 							else {
 								$self.remove();
@@ -15851,7 +15871,7 @@ layouter: function( $tr ) {
 			}
 		}
 		else if ( expires != datestr ) {
-			$tr.css('backgroundColor', 'lightgray');
+			$self.css('backgroundColor', 'lightgray');
 			$td.eq( 6 ).css('color', '#f00');
 			//$td.eq( 6 ).css('backgroundColor', '#ccc');
 			//$td.eq( 7 ).append('<div>期限チェック</div>');
@@ -15893,6 +15913,13 @@ layouter2: function( $tr ) {
 				$contents.replaceWith( html );
 
 				$td.eq( 7 ).find('a').click( function() {
+					let rarity = $td.eq(1).find('img').attr('alt').trim(),
+						name   = $td.eq(1).find('strong').text().trim(),
+						ranklv = $td.eq(2).html().replace(/<br>/, '/Lv' ).trim(),
+						price  = $td.eq(4).find('strong').text().trim();
+					let confirm_msg = '【'+rarity+'】 ' + name + '('+ ranklv +') を\n銅銭' + price +'で落札します';
+					if( !window.confirm(confirm_msg) ) { return; }
+					
 					$.get( $(this).data('href') )
 					.done( function( html ) {
 						let postData = {
@@ -15902,10 +15929,9 @@ layouter2: function( $tr ) {
 						};
 						$.post( '/card/trade_bid.php', postData )
 						.done( function( html ) {
-							if( $(html).find('.ig_decksection_innermid > p.red').text() != '' ) {
-								// たぶん落札失敗
-								//   「入札に所持銅銭を超える値が入力されました」とか
-								Display.alert( $(html).find('.ig_decksection_innermid > p.red').text() );
+							let exhibid_text = $(html).find('.ig_decksection_innermid > p.red').text().trim();
+							if( exhibid_text != '' ) {
+								Display.alert( exhibid_text );
 							}
 							else {
 								$self.remove();
@@ -18278,7 +18304,7 @@ Page.registerAction( 'union', 'union_remove', {
 
 //. main
 main: function() {
-	this.autoPager();
+//	this.autoPager();
 	this.layouter();
 },
 
