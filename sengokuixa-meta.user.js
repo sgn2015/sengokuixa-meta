@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name           sengokuixa-meta4hangame
+// @name           sengokuixa-meta-hg
 // @description    戦国IXAを変態させるツール
-// @version        1.4.3.2
+// @version        1.4.3.3
 // @namespace      sengokuixa-meta
 // @include        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -9681,7 +9681,9 @@ assignCard: function( ano ) {
 			var $html = $(html),
 				text = $html.find('#ig_deck_unititle P').text(),
 				name = ( text.match(/\[(.+)\]/) || [,''] )[ 1 ],
-				unit_id = $html.find('#set_assign_id').val(),
+				//unit_id = $html.find('#set_assign_id').val(),
+				href = $html.find('#ig_deck_unititle A').attr('href') || '',
+				unit_id = href.match(/unit_assign_id=(\d+)/)[1],
 				$li = $html.find('#ig_unitchoice LI'),
 				idx, newidx;
 
@@ -9833,7 +9835,8 @@ getRarityByClassName: function( className ) {
 		'5': '天',
 		'iwai': '祝',
 		'miyabi': '雅',
-		'bake': '化'
+		'bake': '化',
+		'warabe': '童',
 	}[ className ];
 },
 
@@ -9948,58 +9951,76 @@ analyzeLarge: function( element ) {
 		throw new Error('武将カード情報を取得できませんでした。');
 	}
 
+	// 限界突破の際はランク以降のparamの添え字を-1する必要あり
+	//   <span class="ig_card_level"/>が存在しないため
+	var fsub = 0; //front_subscript
 	param = $param.get();
 	//レア
-	text = param[ 0 ].getAttribute('class');
+	text = param[ fsub++ ].getAttribute('class');
 	this.rarity = Card.getRarityByClassName( text );
-	this.secret = /_new/.test( text );
+	this.secret = /_secret/.test( text );
 	//コスト ig_card_cost_overは大殿の饗宴用
-	this.cost = param[ 1 ].firstChild.nodeValue.toFloat();
-	//ランク・レベル
-	text = param[ 2 ].firstChild.getAttribute('width') || '0';
+	this.cost = param[ fsub++ ].firstChild.nodeValue.toFloat();
+	//ランク・レベル level_starとig_card_level
+	//限界突破の場合はrank_over_limit
+	if( param[ fsub ].getAttribute('class') == 'level_star' ) {
+	text = param[ fsub++ ].firstChild.getAttribute('width') || '0';
 	this.rank = Math.round( text.match(/\d+/)[ 0 ].toInt() / 20 );
-	this.lv = param[ 3 ].firstChild.nodeValue.toInt();
+	this.lv = param[ fsub++ ].firstChild.nodeValue.toInt();
+	}
+	else if( param[ fsub ].getAttribute('class') == 'rank_over_limit' ) {
+	fsub++;
+	this.rank = 6;
+	this.lv = 20;
+	}
+
 	//名前
 	text = '';
-	for ( let i = 0, len = param[ 4 ].childNodes.length; i < len; i++ ) {
-		let node = param[ 4 ].childNodes[ i ];
+	for ( let i = 0, len = param[ fsub ].childNodes.length; i < len; i++ ) {
+		let node = param[ fsub ].childNodes[ i ];
 		if ( node.nodeType == 3 ) { text += node.nodeValue; }
 	}
+	fsub++;
 	this.name = text;
 	//統率
 	this.commands = {};
-	this.commands['槍'] = param[ 5 ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
-	this.commands['弓'] = param[ 7 ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
-	this.commands['馬'] = param[ 6 ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
-	this.commands['器'] = param[ 8 ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
+	this.commands['槍'] = param[ fsub++ ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
+	this.commands['馬'] = param[ fsub++ ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
+	this.commands['弓'] = param[ fsub++ ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
+	this.commands['器'] = param[ fsub++ ].getAttribute('class').match(/lv_(\w+)/)[ 1 ].toUpperCase();
 	//HP
-	array = param[ 9 ].firstChild.nodeValue.split('/');
+	array = param[ fsub++ ].firstChild.nodeValue.split('/');
 	this.hp = array[ 0 ].toInt(),
 	this.maxHp = array[ 1 ].toInt();
+
+	fsub++; // ig_card_status_hp_barの分
+
 	//攻撃力・防御力
-	this.atk = param[ 11 ].firstChild.nodeValue.toInt();
-	this.def = param[ 12 ].firstChild.nodeValue.toInt();
-	this.int = param[ 13 ].firstChild.nodeValue.toFloat();
+	this.atk = param[ fsub++ ].firstChild.nodeValue.toInt();
+	this.def = param[ fsub++ ].firstChild.nodeValue.toInt();
+	this.int = param[ fsub++ ].firstChild.nodeValue.toFloat();
+
 	//card_no
-	this.cardNo = param[ 14 ].firstChild.nodeValue.toInt();
+	this.cardNo = param[ fsub++ ].firstChild.nodeValue.toInt();
 	//card_id
-	text = param[ 15 ].getAttribute('id');
+	text = param[ fsub ].getAttribute('id');
 	array = text.match(/(\d+)/);
 	if ( array != null ) { this.cardId = array[ 1 ]; }
 	//スタイルシート名から兵種を求める
-	text = param[ 15 ].getAttribute('class');
+	text = param[ fsub++ ].getAttribute('class');
 	this.solName = Soldier.getNameByClass( text );
 	this.solType = Soldier.getType( this.solName );
 	//指揮数 commandsol_no_overは大殿の饗宴用
-	this.solNum = param[ 16 ].firstChild.firstChild.nodeValue.toInt();
-	this.maxSolNum = param[ 16 ].childNodes[ 1 ].nodeValue.replace('/', '').toInt();
+	this.solNum = param[ fsub ].firstChild.firstChild.nodeValue.toInt();
+	this.maxSolNum = param[ fsub ].childNodes[ 1 ].nodeValue.replace('/', '').toInt();
+	//... 表ここまで
 
 	$param = $elem.find('.parameta_area_back').children('SPAN');
 	param = $param.get();
 	//職業
 	text = param[ 0 ].getAttribute('class').match(/jobtype_(\d)/)[ 1 ];
 	this.job = [ '', '将', '剣', '忍', '文', '姫', '覇' ][ text.toInt() ] || '';
-	//経験値
+	//経験値 ※限界突破の場合はexp==NaNになる
 	this.exp = param[ 2 ].firstChild.nodeValue.toInt();
 	this.nextExp = param[ 3 ].firstChild.nodeValue;
 
@@ -12046,7 +12067,7 @@ createPulldownMenu: function() {
 		{ title: 'スキル追加', action: function() { Page.form( '/union/levelup.php', { union_type: 2 }, true ); } },
 		{ title: 'スキル削除', action: function() { Page.form( '/union/remove.php', { union_type: 3 }, true ); } },
 		{ title: '合成履歴', action: '/union/union_history.php' },
-		{ title: '合成表更新', action: function() { Data.skillTableUpdate(); } }
+		{ title: '【合成表更新】', action: function() { Data.skillTableUpdate(); } }
 	]);
 
 	function createMenu( target, menu ) {
