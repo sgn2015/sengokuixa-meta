@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.3.3
+// @version        1.4.3.4
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @exclude        http://h*.sengokuixa.jp/*
@@ -1125,7 +1125,7 @@ getSpeed: function( cards, unitskill ) {
 		min_speed = min_speed * ( 100 + unitskill ) / 100;
 	}
 
-	return min_speed;
+	return ( Env.war == 2) ? min_speed * 2: min_speed;
 },
 
 //. getNpcPower
@@ -11842,7 +11842,7 @@ changeSideBar: function() {
 	$('.situationWorldTable').has('A[href="/country/all.php"]').remove();
 	//占いボタン削除
 	$('.situationBtnTable').has('A[href="/user/uranai/uranai.php"]').remove();
-
+	// 状態タイトルの消去
 	$joutai_div.children('.sideBoxHead').css({ height: '25px' }).empty().append( $('.stateTable') );
 },
 
@@ -15420,8 +15420,8 @@ main: function() {
 	// 精鋭部隊の省スペース表示
 	if( $('#bar_card_elite').length > 0 ) {
 		$('.elite_busho_info .elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').hide();
-		$(document).on('click', '.elite_info_action_area', function() {
-			$(this).parent().find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
+		$(document).on('click', '.elite_info_action_area .lbl_elite_num', function() {
+			$(this).closest('.elite_busho_info').find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
 		});
 	}
 },
@@ -16221,7 +16221,6 @@ exhibit: function( cid, price ) {
 //},
 
 });
-
 
 //■ /card/trade_bid
 Page.registerAction( 'card', 'trade_bid', {
@@ -18663,7 +18662,6 @@ layouter: function() {
 },
 
 });
-
 
 //■ /senkuji/senkuji
 Page.registerAction( 'senkuji', 'senkuji', {
