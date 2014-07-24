@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name           sengokuixa-meta-hg
-// @description    戦国IXAを変態させるツール
+// @description    戦国IXAを変態させるツール for ハンゲーム
 // @version        1.4.3.3
 // @namespace      sengokuixa-meta
 // @include        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @website        https://github.com/moonlit-g/sengokuixa-meta
-// @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
+// @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/hangame/sengokuixa-meta.meta.js
 // ==/UserScript==
 
 /*
