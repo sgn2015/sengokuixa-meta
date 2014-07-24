@@ -16,7 +16,8 @@ sengokuixa-meta
 
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
 * 最新バージョンのインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
-* ハンゲの方は[Ver1.4.3.0](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/c948e9d9b544cc3e33644c4709f4c9baa14af2e0/sengokuixa-meta.user.js)で更新を止めておいてください。
+* ハンゲの方は[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/hangame/sengokuixa-meta.user.js)
+ - 動作が被ってしまいますので、本家版も最新に更新してください。
 
 更新履歴
 --------
