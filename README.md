@@ -16,9 +16,17 @@ sengokuixa-meta
 
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
 * 最新バージョンのインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
+* ハンゲの方は[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/hangame/sengokuixa-meta.user.js)
+ - 動作が被ってしまいますので、本家版も最新に更新してください。
 
 更新履歴
 --------
+
+### 1.4.3.5
+2014/08/05
+
+* 部隊編成の仕様変更に対応
+* カードレアリティのクラス名変更に対応
 
 ### 1.4.3.0
 2014/07/02
