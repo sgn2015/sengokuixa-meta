@@ -9682,7 +9682,8 @@ assignCard: function( ano ) {
 				text = $html.find('#ig_deck_unititle P').text(),
 				name = ( text.match(/\[(.+)\]/) || [,''] )[ 1 ],
 				//unit_id = $html.find('#set_assign_id').val(),
-				href = $html.find('#ig_deck_unititle A').attr('href') || '',
+				// href = $html.find('#ig_deck_unititle A').attr('href') || '',
+				href = $html.find('#ig_deckunitdetail A[href*="unit_assign_id"]').attr('href') || '',
 				unit_id = href.match(/unit_assign_id=(\d+)/)[1],
 				$li = $html.find('#ig_unitchoice LI'),
 				idx, newidx;
@@ -9760,7 +9761,7 @@ assignCard: function( ano ) {
 			set_card_id: card.cardId,
 //			set_squad_id: card.squadId,
 			set_squad_id: '',
-			deck_mode: 'nomal',
+//			deck_mode: 'nomal',
 			p: 1,
 			myselect_2: ''
 		};
