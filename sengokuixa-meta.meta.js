@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name           sengokuixa-meta
+// @name           sengokuixa-meta-hg
 // @description    戦国IXAを変態させるツール for ハンゲーム
 // @version        1.4.3.5
 // @namespace      sengokuixa-meta
