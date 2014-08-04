@@ -9829,11 +9829,11 @@ getRarityByClassName: function( className ) {
 	className = className.split('_')[ 1 ] || '';
 
 	return {
-		'1': '序',
-		'2': '上',
-		'3': '特',
-		'4': '極',
-		'5': '天',
+		'jo': '序',
+		'jou': '上',
+		'toku': '特',
+		'goku': '極',
+		'ten': '天',
 		'iwai': '祝',
 		'miyabi': '雅',
 		'bake': '化',
