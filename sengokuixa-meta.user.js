@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta-hg
 // @description    戦国IXAを変態させるツール for ハンゲーム
-// @version        1.4.3.5
+// @version        1.4.3.6
 // @namespace      sengokuixa-meta
 // @include        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
