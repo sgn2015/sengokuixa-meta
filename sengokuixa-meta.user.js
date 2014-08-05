@@ -15905,6 +15905,7 @@ layouter: function( $tr ) {
 			//$td.eq( 7 ).append('<div>期限チェック</div>');
 		}
 	});
+	$('.pager').clone(true).css({ margin: 0, padding: 0 }).insertBefore('.ig_decksection_innertop');
 },
 
 //.. layouter2
