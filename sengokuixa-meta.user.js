@@ -18444,9 +18444,10 @@ autoPager: function() {
 		load: function( nextPage ) {
 			var page = nextPage,
 				scid = $('#deck_file INPUT#base_cid').val(),
-				utype = $('#deck_file INPUT#union_type').val();
+				utype = $('#deck_file INPUT#union_type').val(),
+				group =  $('#deck_file INPUT#select_card_group').val();
 			
-			return Page.post( '/union/levelup.php', { selected_cid: scid, union_type: utype, p: page });
+			return Page.post( '/union/levelup.php', { select_card_group: group, selected_cid: scid, union_type: utype, p: page });
 		},
 		loaded: function( html ) {
 			var $html = $(html),
