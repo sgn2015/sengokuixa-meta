@@ -12245,6 +12245,12 @@ layouter: function() {
 
 		$('#imi_checkfall').click( this.checkFall );
 	}
+
+	// 占いデフォ非表示
+	$('.ig_decksection_mid:last').hide();
+	$(document).on('click', '.ig_decksection_top:last', function() {
+		$('.ig_decksection_mid:last').toggle();
+	});
 },
 
 //. baseMap
@@ -18259,7 +18265,10 @@ main: function() {
 
 //. layouter
 layouter: function() {
-	$('.addslot').appendTo('.common_box3bottom');
+	// formパラメータが行方不明になるので修正
+	// $('.addslot').appendTo('.common_box3bottom');
+	$('.addslot input').appendTo('#select_skill_form:first');
+	$('.addslot').appendTo('.common_box3bottom').find('input').remove();
 
 	$('TABLE.common_table1 TR')
 	.hover( Util.enter, Util.leave )
