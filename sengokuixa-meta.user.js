@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.3.6
+// @version        1.4.3.7
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @exclude        http://h*.sengokuixa.jp/*
@@ -18341,15 +18341,23 @@ Page.registerAction( 'union', 'union_remove', {
 
 //. main
 main: function() {
-//	this.autoPager();
 	this.layouter();
 },
 
-//. autoPager
-//autoPager: Page.getAction( 'union', 'levelup', 'autoPager' )
-
 //. layouter
-layouter: Page.getAction( 'union', 'union_levelup', 'layouter' )
+layouter: function() {
+	$('.addslot').appendTo('.common_box3bottom');
+
+	$('TABLE.common_table1 TR')
+	.hover( Util.enter, Util.leave )
+	.click(function( e ) {
+		var tagName = e.target.tagName.toUpperCase();
+
+		if ( tagName == 'INPUT' ) { return; }
+
+		$(this).find('INPUT').attr('checked', true);
+	});
+},
 
 });
 
