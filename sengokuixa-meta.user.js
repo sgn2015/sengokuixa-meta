@@ -11762,7 +11762,15 @@ changeStatusBar: function() {
 	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_ingot.gif" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron"><span class="imc_bar_contents"><span id="iron">' + resource[ 2 ] + '</span><span>&nbsp;/&nbsp;</span><span id="iron_max">' + max + '</span></span></span></span></li>' +
 	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_grain.gif" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice"><span class="imc_bar_contents"><span id="rice">' + resource[ 3 ] + '</span><span>&nbsp;/&nbsp;</span><span id="rice_max">' + max + '</span></span></span></span></li>' +
 	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_fame.gif" alt="名声" title="名声"><span>' + fame + '</span></li>' +
-	'<li class="sep"><span class="money_b">' + money_b + '</span><span class="money_c">' + money_c + '</span></li>' +
+	'<li class="sep">' +
+		'<span class="money_b">' + money_b + '</span>' +
+		'<span class="money_c" style="position: relative;">' + money_c +
+		'<ul class="imc_pulldown">' +
+		'<li class="imc_pulldown_item"><a href="/cp/purchase_cp.php">金を購入</a></li>' +
+		'<li class="imc_pulldown_item"><a href="/cp/item_list.php">便利機能一覧</a></li>' +
+		'</span>' +
+		'</ul>' +
+	'</li>' +
 	'<li class="sep">' +
 	'<a href="/facility/unit_status.php?dmo=all">全部隊</a>' +
 	'<span>&nbsp;</span>' +
@@ -11823,6 +11831,9 @@ changeSideBar: function() {
 	$('.situationBtnTable').has('A[href="/user/uranai/uranai.php"]').remove();
 	// 状態タイトルの消去
 	$joutai_div.children('.sideBoxHead').css({ height: '25px' }).empty().append( $('.stateTable') );
+
+	// 銅銭、金、購入、便利機能の削除 → ステータスバーで表示
+	$kin_div.remove();
 },
 
 //.. changeChatLink
@@ -18739,6 +18750,49 @@ Page.registerAction( 'quest', 'index', {
 style: '' +
 'INPUT { ime-mode: disabled; }' +
 ''
+
+});
+
+//. /cp/item_list
+Page.registerAction( 'cp', 'item_list', {
+
+//. main
+main: function() {
+	this.layouter();
+},
+
+//. layouter
+layouter: function() {
+	// 経験値獲得アップ用にformを埋め込む
+	var htmlExpBonus = '' +
+		'<form action="/card/deck.php" method="post" name="form_exp_bonus">' +
+		'<input type="hidden" value="" name="buy_exp_bonus_days" id="buy_exp_bonus_days">' +
+		'<input type="hidden" value="" name="sub_id" id="sub_id">' +
+		'</form>'
+	$('body').append( htmlExpBonus );
+
+	// jQueryでhead要素にscriptを挿入するとすぐに実行(eval)されて削除されるため、jQueryは使わない
+	var script = document.createElement("script");
+	script.setAttribute("type", "text/javascript");
+	script.setAttribute("src", Env.externalFilePath + '/js/ql_deck.js');
+	document.getElementsByTagName("head")[0].appendChild(script);
+
+	// 経験値アップ用にレイアウト変更
+	var $tr = $('form[name="purchaseform"] table:last TR'),
+		$trExp07 = $tr.eq(3),
+		$trExp30 = $tr.eq(4),
+		$trSkill = $tr.eq(5),
+		money = $('.money_c').text().match(/\d+/)[0],
+		js07 = 'javascript:confirmBuyExp(' + money +',  400,  7, 30, 0);',
+		js30 = 'javascript:confirmBuyExp(' + money +', 1200, 30, 30, 0);';
+
+	$trExp07.find('td:last').attr('rowspan', 4).appendTo($trSkill);
+	$trExp07.append('<td class="center"><p class="buy"><a href="javascript:void(0);" onclick="'+js07+'">利用する</a></p></td>');
+	$trExp30.append('<td class="center"><p class="buy"><a href="javascript:void(0);" onclick="'+js30+'">利用する</a></p></td>');
+
+	// スキル関係のリンクを変更
+	$tr.find('a[href="/card/deck.php"]').attr('href','/union/index.php').text('カード合成へ');
+},
 
 });
 
