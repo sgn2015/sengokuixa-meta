@@ -14353,7 +14353,36 @@ analyzeRaid: function() {
 	}
 
 	var timer = window.setTimeout(function() { window.clearTimeout(timer); location.reload(); }, 20 * 1000);
-}
+},
+
+//.. changeTitle
+changeTitle: function() {
+	if ( Env.world ) {
+		var dmo = (location.search.match(/dmo=(.+)/) || [,''])[1];
+	
+		let subtitle = '';
+	
+		if ( dmo == '' || dmo == 'all' ) {
+			subtitle = '';
+		}
+		else if ( dmo == 'sortie' ) {
+			subtitle = '出陣：';
+		}
+		else if ( dmo == 'wait' ) {
+			subtitle = '待機：';
+		}
+		else if ( dmo == 'return' ) {
+			subtitle = '帰還：';
+		}
+		else if ( dmo == 'enemy' ) {
+			subtitle = '敵襲：';
+		}
+		else if ( dmo == 'help' ) {
+			subtitle = '友軍：';
+		}
+		$('TITLE').text( '【' + Env.world + '】' + subtitle + $('TITLE').text() );
+	}
+},
 
 });
 
