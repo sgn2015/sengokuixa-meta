@@ -2562,6 +2562,21 @@ var Append = {
 			},
 		});
 	},
+
+	// 資源の更新(カンマ区切り)
+	resorcesChange: unsafeWindow.resorcesChange = function(b, a) {
+		var id = '#' + a;
+		calc = parseInt( $(id).text().toInt() ) + b;
+		if (parseInt($(id + "_max").text()) < calc) {
+			calc = parseInt($(id + "_max").text())
+		} else {
+			if (0 > calc) {
+				calc = 0
+			}
+		}
+		$(id).text( calc.toFormatNumber() );
+	},
+
 };
 
 // 精鋭部隊
@@ -4481,7 +4496,14 @@ images: {
 	panel_icon_sortie: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6%2FNlyAAAABGdBTUEAALGPC%2FxhBQAAAAlwSFlzAAAOwQAADsEBuJFr7QAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAAB0ElEQVRoQ%2B2YYW6DMAyFOcX2lwPsDr0ZXI2bZRj1VU9RQhjuiF1cKSJtMfHnZ5vAkFIa7jRuBSvCBvCnp3coHAp%2FWBePlI6UjpT2vTOLGo4ajhqOGnbVB1w5%2B47%2BEsDviKLla6gUHp6feZ7TkTFNU8KQ83nessdactQEVGe8Li6OLsvy70PWAXQ34KtgEVBAmwGWV2Rwrjav%2Fb%2B9XiP7UtYI8DiOK%2B%2F5vYAqpXOFxeH58dig9%2BaA46PYsQ2uweAugTkYAMwDwFmAAMpvJoFL6pWUw3msLM4rZYlJ4M2pNTUZAt8ZoqQo6pcVzQNlSuG84ezVY64qbPPGZQ5YNg61eisB5%2BqVlEZGvG5FzyZoIqXPANdqnH%2FnIHLmyHpmbktHQKAw1zU3qrzeuSeYUDi%2FD7PDtXlxQ0Fpu7dNNdW0rtpPd01p2cxftZ%2BGut2BAd16vMP%2FrZStXUdAZXR%2FPMQjGxxqHUvALRuGNQPMD%2Bh78xz46%2Bc7yThq7xr4DKxb4LOwLoE1sO6AxeG%2F1mxe393eeGgW7mWresXTy2nNugGsiZ4H21DYg0oaH0NhTfQ82IbCHlTS%2BBgKa6LnwTYU9qCSxsdQWBM9D7ahsAeVND7eTuFffOCKYCMXyakAAAAASUVORK5CYII%3D",
 	panel_icon_bmcoord: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6%2FNlyAAAABGdBTUEAALGOfPtRkwAAACBjSFJNAAB6JQAAgIMAAPn%2FAACA6QAAdTAAAOpgAAA6mAAAF2%2BSX8VGAAAACXBIWXMAAAsSAAALEgHS3X78AAAAGnRFWHRTb2Z0d2FyZQBQYWludC5ORVQgdjMuNS4xMDD0cqEAAAKPSURBVGhD7ZhNTxNRFIZfweDGlWs3snXhzsRfoIl%2FipV%2FQaExfoAhVqWICC0YhlYliBqxpihiQ7BYUWxgpNSWfhzf27mDlRDapdecJm9uZzpN7vOcmTN3BtCPGlADakANqAE1oAbUgBpQA2pADagBNaAG1IAaUANqQA2oATWgBtSAGlAD7hpIRXBhth8VZjkTRY%2B7JB3OnKBLjCwOQr6NoZyLobfDv7p3mHcV5wxskilNQ2QW4k9iWzwcb6WRPnS5R3fIjAm7YICXhgNYSQVjbgQ73J9jiky9KWUAwyI45iw4AXoNiEkxQdAk4zPzAXQ2Clm%2BC1l7ANkYg2xNQjYfIecsMEE9A%2Fvujq1uhqMwO38q3ax6S3YTKDkJTNCbYXX9uIUyoAbYxFR6lckzBeZlcEw%2Bhj6ngJMRnCXo1xA2e9%2FCpltgQ%2Bhw3LTNLI7vTsF6%2FbgSNqD567wmJyzsM3saHwQ123XmBaTB6q6P4KIzwGE3NpX9wI5c8yzsW47lI6q7Fhz3YxyvnIE1EyXoXmqAXXa85fazfgRoWO2nkOoM6l9Gcdop4OQ1XOJKqrHfcbc6gDXQrG5xCr5TsOFk5yI4n39ooc29ttQBNK%2Fv0hR%2BOQlsJs3FxhkuJIJKP2eKbaDnIJUnqDoLbK%2Fn3ew9ey2%2FbwPMDl2bQcN14MrCjUOAN7jvjc0iR9PB2bSaZ4PLa2h27NrrWxbkI8cG88luH1hKGtjtOFZdB26YZ99m5QywWWXxe3kae59juCxRdEsGPdx30k%2FgFGG7nT2lWd2uvx4YbEV%2FxlHIjf6nD%2F4EXtl%2F%2FiVw4THSKxM44WwV203cvL1ID%2BE2T%2BEqX%2BkMtTtef1cDakANqAE1oAbUgBr4Fwz8BnE4nhkujsJnAAAAAElFTkSuQmCC",
 	panel_icon_arrow1: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6%2FNlyAAAABGdBTUEAALGPC%2FxhBQAAAAlwSFlzAAAOwQAADsEBuJFr7QAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAAB0ElEQVRoQ%2B1avUoDQRC%2BSp%2FDB%2FAJ8giKj5BOOw9BRF8jESsrK1EUIQ8QSxWuURuxCIJaBESQKAYLx%2Fn0IsuZNSHcsJm9ORg4dn52v%2Flm5q7YhHaXkipJpcCCWAMce3kbw8ZwZFPcStpK2kpa95%2BZ9bD1sPWw9bCqOaDqsGXMFwNcRhanOYYxPM3slHG2CjJMlJCQJPnD8Wdf%2B7SX3VHvokN9V7AGHWwce7kzSYFFXAdAut0mWj0YLtDxk8YEuLF54ge8cfwNuBET4OYYgJvqATNrMywrLNkYgLPcFj46e7j3Tvs7p0RbXM6pp3%2FR19DBBrbwUQuYJ%2FCHb1D51uGjFnD3hc7%2BK%2BUiaNjCRy1gPvjcbZce14%2F8E3oAGjawhY9awJi6fPj5q3t6Xjv0g4YONrDNfXQOLeczUzvv0NuwwYU16BhsTf1n6fdX64fpxfbN3yGGNdYtFGx1M%2BwwV29d0uegb%2FHOYOsu2ChK2gXECJevH%2BgJgvciWNWAJaftpLHFemXSA0n7GWDpDIeObwyHZkB6f2NYOsOh4xvDoRmQ3t8Yls5w6PjGcGgGpPc3hqUzHDq%2BMRyaAen9jWHpDIeOX8ErD5HdpRx18cUYHpUh7fovrhoJnWeN1FkAAAAASUVORK5CYII%3D",
-	panel_icon_arrow2: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6%2FNlyAAAABGdBTUEAALGPC%2FxhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAACH0lEQVRoQ%2B1YsU4CQRAlsSC2foI%2FwV%2BoRCt7ewobemNiZ7AxQSisbEzoLbTTVhoLG9QEsEEBCUo8nzNwmHPDCZjdZIcbkkku3MzLvHkzc3uXQnEtlSRLFFkWVgkvenurwqrwgm1xbWltaW1p2ScznWGdYZ1hnWFRe0BUsjb2SwIJAylYtlTkR9hLZHt47zTQbvQmGt9jH%2FI1Yu3nZpss4xlJ51GtAKUsqCUnG99jHyAvn%2FDnoIryVjzZcRHKmwD5yif88VaLVdZUvN%2BuKWHb%2B8X5DCdBYSriMtkRbeY6Xp6CmVu69RAMYzh2hCFjS1Oix7gpAyfr05eVOcccw7GMIYZwp9mdWdW4RxVjiCHcfW6j%2BA91f8hTLGOIIQwc4ro0fzuPCXMsYwginMZXcIWL%2FflJcwzHAmkxhPnwQMmuYNC%2FQ2V3dtLsyzEUG2LI2NLj0xIlvopeq4mznemk2Yd9KSYSL4twqFIGrcceTrfjSfM99gEy4o%2BWIeks6tUA%2FIJgPob4P74HZH%2B9Zo3GwrpZBzRfDyPtmcP9JRGOPq7omv8DciZZkTM8oT0LuD2nE9jGyPgaKPxRJOuCWAeMSz5UjL9%2BHNByeh0aXxtfOUTOsIvZs4XpRGFbybnAUcIuquoTpirskxouclGFXVTVJ0xV2Cc1XOSiCruoqk%2BYqrBParjIRRV2UVWfMFVhn9RwkYsq7KKqPmGqwj6p4SKXxCn8DcqUjt6BBK0FAAAAAElFTkSuQmCC"
+	panel_icon_arrow2: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAYAAAA6%2FNlyAAAABGdBTUEAALGPC%2FxhBQAAAAlwSFlzAAAOwgAADsIBFShKgAAAABp0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuMTAw9HKhAAACH0lEQVRoQ%2B1YsU4CQRAlsSC2foI%2FwV%2BoRCt7ewobemNiZ7AxQSisbEzoLbTTVhoLG9QEsEEBCUo8nzNwmHPDCZjdZIcbkkku3MzLvHkzc3uXQnEtlSRLFFkWVgkvenurwqrwgm1xbWltaW1p2ScznWGdYZ1hnWFRe0BUsjb2SwIJAylYtlTkR9hLZHt47zTQbvQmGt9jH%2FI1Yu3nZpss4xlJ51GtAKUsqCUnG99jHyAvn%2FDnoIryVjzZcRHKmwD5yif88VaLVdZUvN%2BuKWHb%2B8X5DCdBYSriMtkRbeY6Xp6CmVu69RAMYzh2hCFjS1Oix7gpAyfr05eVOcccw7GMIYZwp9mdWdW4RxVjiCHcfW6j%2BA91f8hTLGOIIQwc4ro0fzuPCXMsYwginMZXcIWL%2FflJcwzHAmkxhPnwQMmuYNC%2FQ2V3dtLsyzEUG2LI2NLj0xIlvopeq4mznemk2Yd9KSYSL4twqFIGrcceTrfjSfM99gEy4o%2BWIeks6tUA%2FIJgPob4P74HZH%2B9Zo3GwrpZBzRfDyPtmcP9JRGOPq7omv8DciZZkTM8oT0LuD2nE9jGyPgaKPxRJOuCWAeMSz5UjL9%2BHNByeh0aXxtfOUTOsIvZs4XpRGFbybnAUcIuquoTpirskxouclGFXVTVJ0xV2Cc1XOSiCruoqk%2BYqrBParjIRRV2UVWfMFVhn9RwkYsq7KKqPmGqwj6p4SKXxCn8DcqUjt6BBK0FAAAAAElFTkSuQmCC",
+
+	icon_wood: Env.externalFilePath + '/img/common/ico_wood.gif',
+	icon_wool: Env.externalFilePath + '/img/common/ico_wool.gif',
+	icon_iron: Env.externalFilePath + '/img/common/ico_ingot.gif',
+	icon_rice: Env.externalFilePath + '/img/common/ico_grain.gif',
+	icon_gran: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAATCAYAAACQjC21AAAFDUlEQVR42n2TS2xUVRzGj7Ax8QURoWApfdPOTGfmzsyde2fu3Dszd97v96tl2jIt1OlMp4WW0hZNeci7ykOUIBrEhRIkLDCYkIgoIVHZ4EajISQukOjClS6Mbe/nYRJNXOjiyzk5yf93vv93/ocwnJX8LQNVt85I2jUMMdhcpFPHki6GI4wgE0coQ1dX2R7JXTFJPpid/s850d7gD0WeCCeiRMwKhM+bCPkf4EoKXNNt4Euc0/8BK3n+MAgOZbOORQ8rwOoJK0ZRvsVLDkMoEV3x30C96YUuPVtl7b6LWk78zWSTF7VmKzRGDloTv6TjJYURnBDdwWV/sqBYZN+3oleWpYy40pa1/htIC3Jqo+Ubg03+U2O0KGojp/SYOEVtMCtallc0Jouis0iwugMw293LFod32RmIK4LL/6PBwQWkmGPFP7BOnfGw1e1frEOMvMJwgsLwoqLnbYqKnqkMZuh5AVqzBazNDt7poq3TCzgBgisALSf82qbWzNVhHVrDQqxQXMwODMMTTYKzuyE4vZD9EfAONxjeRot5CrSCsUrQspY62ChIUBnNSpfehE6GReNmNR7DTiV6B5Yzxa0oDJZQ3DYCbywFQfbDHYojmMgpFqcbBqsIHS9Cw1qht9pBowDtCpu6NGjs6MLGto7FDS3tIII3iDSFDWwvwxVJg3cFYZU9iOb6YJZcsLn8SiCeUUyik7qzK90Mh1a1Hi3dGrSpVNAY9ODtAhjBfFdj11vIULnKHVlYOH7yrXOY3XsQLC20uX2Ymd+PUKZAs/JSsKx09DBoVWmhMbE0AjOcAS88kQDy/TlE03GwMl9hAgZCAJCHj36p3P76Hq7duIULH17Fm+cv4NSZ0zi48Dqi+S0wig5YnA7YfW5EsmnkBovYVqtgbNcExqnK42U4onLVHOMI+fmnH8j9B/crZ995D5NzezFUncCZc+fx8Sc3cPP2lzhN9/5YEMlsFIMjJVSndmBsaoKuNdR2jde1tVyCK8xXUv1qQl6dbiInjvZWbC4f9BY7BE8Y6f5t2H/4GG5+cacOHakMUSfjdTfj0zswsXuSgiZQemkIqUIKktcDX7hj9JXdzxFydOZZUhvpqMZTGbS0t6ONhv04cKfXi8tXPsLVa9dRmxrH1OwkdszsRGVnDX2lfvr6cUQyabiCYfjjCSQKnZX9B9cQ8tqhZ8jcpKYyOlqFkTXBZNJCx2jpHLqQzecwVitjeHQ7dTOMVG8B4UwG7kgM8XwBQWoi1dcHyeNHKLG5smffOkKOn11DZvaoKmM0ZNnthNfOQOB1CMbi2FoqQfZ56L/1IJBMIT84SMcpj0yxWIeGUtRhKAKLwwEx0F7JD2wg5MCJtWSk1qnpL2YfmswsvJIBLpFBIp3FntndqFQrCCcTdViMwpK9vRQWrbuyOOywStalrKB/cKl5teZS5ypC9i00k4VIExnujV6eP3AMk9OzCAT9cPhCmJ6axPh4jc5ZCp5wBDbZBatDgt1jR8At/p7ndd+927q2eFb7PBmTG0kk0UrI/jfWkeuRp8jdoFg++fL8o/zAyLJHrX+wxaC9Fwx6l7K5GHSmHpopB4eTXxrhNF9dbF2/64K6Yf0C20DC6TYSTbaSWLKFJFPNhBx6ex058v6LZO7kRnLdsD4xJ3Z9+v2qJ8mdhqfJfFvTRcllRTxthEXS47Sq8cxnm1aTaLqHRNJqEk51klimhaSzzSST3URy2SbyFw80aFpxijsPAAAAAElFTkSuQmCC",
+	icon_fame: Env.externalFilePath + '/img/common/ico_fame.gif',
 },
 
 //. sounds
@@ -11757,17 +11779,18 @@ changeStatusBar: function() {
 
 	html = '' +
 	'<ul>' +
-	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_wood.gif" alt="木" title="木">&nbsp;<span class="imc_outer_bar ' + period[ 0 ] + '"><span style="width: ' + rate[ 0 ] + '" class="imc_inner_bar imc_wood"><span class="imc_bar_contents"><span id="wood">' + resource[ 0 ] + '</span><span>&nbsp;/&nbsp;</span><span id="wood_max">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_wool.gif" alt="綿" title="綿">&nbsp;<span class="imc_outer_bar ' + period[ 1 ] + '"><span style="width: ' + rate[ 1 ] + '" class="imc_inner_bar imc_stone"><span class="imc_bar_contents"><span id="stone">' + resource[ 1 ] + '</span><span>&nbsp;/&nbsp;</span><span id="stone_max">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_ingot.gif" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron"><span class="imc_bar_contents"><span id="iron">' + resource[ 2 ] + '</span><span>&nbsp;/&nbsp;</span><span id="iron_max">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_grain.gif" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice"><span class="imc_bar_contents"><span id="rice">' + resource[ 3 ] + '</span><span>&nbsp;/&nbsp;</span><span id="rice_max">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Env.externalFilePath + '/img/common/ico_fame.gif" alt="名声" title="名声"><span>' + fame + '</span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_wood +'" alt="木" title="木">&nbsp;<span class="imc_outer_bar ' + period[ 0 ] + '"><span style="width: ' + rate[ 0 ] + '" class="imc_inner_bar imc_wood"><span class="imc_bar_contents"><span id="wood">' + resource[ 0 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="wood_max" style="display:none;">' + max + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_wool +'" alt="綿" title="綿">&nbsp;<span class="imc_outer_bar ' + period[ 1 ] + '"><span style="width: ' + rate[ 1 ] + '" class="imc_inner_bar imc_stone"><span class="imc_bar_contents"><span id="stone">' + resource[ 1 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="stone_max" style="display:none;">' + max + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_iron +'" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron"><span class="imc_bar_contents"><span id="iron">' + resource[ 2 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="iron_max" style="display:none;">' + max + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_rice +'" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice"><span class="imc_bar_contents"><span id="rice">' + resource[ 3 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="rice_max" style="display:none;">' + max + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_gran +'" alt="蔵" title="蔵"><span id="wood_max">' + max.toFormatNumber() + '</span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_fame +'" alt="名声" title="名声"><span>' + fame + '</span></li>' +
 	'<li class="sep">' +
 		'<span class="money_b">' + money_b + '</span>' +
 		'<span class="money_c" style="position: relative;">' + money_c +
 		'<ul class="imc_pulldown">' +
 		'<li class="imc_pulldown_item"><a href="/cp/purchase_cp.php">金を購入</a></li>' +
-		'<li class="imc_pulldown_item"><a href="/cp/item_list.php">便利機能一覧</a></li>' +
+		'<li class="imc_pulldown_item"><a href="/cp/item_list.php">便利機能</a></li>' +
 		'</span>' +
 		'</ul>' +
 	'</li>' +
