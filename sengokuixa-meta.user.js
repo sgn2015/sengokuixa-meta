@@ -1704,6 +1704,30 @@ keyBindCommon: function() {
 			location.href = '/senkuji/senkuji.php';
 		}),
 		
+		'c': Util.keyBindCallback(function() {
+			location.href = '/alliance/chat_view.php?pager_select=100';
+		}),
+
+		'b': Util.keyBindCallback(function() {
+			location.href = '/bbs/topic_view.php';
+		}),
+
+		'r': Util.keyBindCallback(function() {
+			location.href = '/report/list.php';
+		}),
+
+		'i': Util.keyBindCallback(function() {
+			location.href = '/message/inbox.php';
+		}),
+
+		'f': Util.keyBindCallback(function() {
+			location.href = '/facility/set_unit_list.php?show_num=100';
+		}),
+
+		':': Util.keyBindCallback(function() {
+			$.noop();
+		}),
+
 		'?': Util.keyBindCallback(function() {
 			if( $('#keyboardHelp').size() == 0 ) {
 				let style =
@@ -1737,6 +1761,11 @@ keyBindCommon: function() {
 						'<dt class="kbd">t</dt>' + '<dd class="kbd">取引画面へ移動</dd>' +
 						'<dt class="kbd">u</dt>' + '<dd class="kbd">合成画面へ移動</dd>' +
 						'<dt class="kbd">l</dt>' + '<dd class="kbd">戦国くじ画面へ移動</dd>' +
+						'<dt class="kbd">c</dt>' + '<dd class="kbd">同盟チャットへ移動</dd>' +
+						'<dt class="kbd">b</dt>' + '<dd class="kbd">同盟掲示板へ移動</dd>' +
+						'<dt class="kbd">r</dt>' + '<dd class="kbd">報告書一覧へ移動</dd>' +
+						'<dt class="kbd">i</dt>' + '<dd class="kbd">受信箱へ移動</dd>' +
+						'<dt class="kbd">f</dt>' + '<dd class="kbd">兵士編成画面へ移動</dd>' +
 						'<dt class="kbd">?</dt>' + '<dd class="kbd">キーボードショートカット一覧(この画面)を開く</dd>' +
 					'</dl>' +
 					'</div>' +
@@ -1774,8 +1803,7 @@ keyBindCommon: function() {
 				$('<a id="keyboardHelpAnchor" href="#TB_inline?inlineId=keyboardHelp&width=940&height=595&top=5" class="thickbox"></a>').appendTo('body');
 			}
 			$('#keyboardHelpAnchor').click();
-		})
-
+		}),
 	});
 },
 
