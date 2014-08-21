@@ -220,6 +220,9 @@ var MetaStorage=(function(){var storageList={},storagePrefix='IM.',eventListener
 'UNION_TABLE'.split(' ').forEach(function( value ) {
 	MetaStorage.registerStorageName( value );
 });
+'ELITE'.split(' ').forEach(function( value ) {
+	MetaStorage.registerStorageName( value );
+});
 
 MetaStorage.change( 'UNIT_STATUS', function( event, storageEvent ) {
 	$('#imi_unitstatus').trigger('update');
@@ -2559,30 +2562,50 @@ var Append = {
 			},
 		});
 	},
-
-	// 精鋭部隊取得
-	//   同期なのでちょっと遅くなるかも
-	// @return [精鋭部隊の部隊長名, 精鋭部隊番号(セットできないときは-1)]の配列
-	getElite: function() {
-		var eliteArray = [];
-		$.ajax({ type: 'post', url: '/card/deck.php', async: false, data: { select_card_group: 6, select_assign_no: 4 } })
-		.then( function( html ) {
-			let $html = $(html);
-			let $elites = $html.find('.elite_busho_info');
-
-			$.each( $elites, function( idx, elm ) {
-				$elm = $(elm);
-				let uname = $elm.find('.elite_busho_info_tbl tr:eq(1) td:eq(2)').text().trim().match( /^(.*)\n/ )[1] || '';
-				let enable = $elm.find('.btn_set_elite img[src$="set_elite.png"]').size() > 0;
-				eliteArray.push( [ uname, enable ? idx+1: -1 ] );
-			});
-		});
-
-		return eliteArray;
-	},
-
 };
 
+// 精鋭部隊
+var Elite = ( function() {
+
+var storage = MetaStorage('ELITE');
+
+return {
+	// 登録情報更新
+	//  @param 部隊名配列
+	update: function( list ) {
+		storage.clear();
+		storage.begin();
+		storage.data = list;
+		storage.commit();
+	},
+	// 部隊名
+	list: function() {
+		return storage.data;
+	},
+	// 登録処理
+	//  @param idx 精鋭部隊番号(1～)
+	//  @param vid 配置拠点番号
+	post: function( idx, vid ) {
+		$.post( '/card/deck.php', {
+			mode: 'assign_elite',
+			select_assign_no: 4,
+			select_card_group: 6,
+			set_elite_unit_assign_sort: idx,
+			set_village_id: vid,
+		})
+		.done( function( html ) {
+			var $html = $(html);
+			if( $html.find('.common_box1 p.red').length > 0 ) {
+				Display.alert( $html.find('.common_box1 p.red').text() );
+			}
+			else {
+				Util.getUnitStatusCD();
+			}
+		});
+	}
+}
+
+})();
 
 //■ Display
 var Display = (function() {
@@ -5795,8 +5818,8 @@ contextmenu: function() {
 		menu  = {},
 		submenu;
 
-	// 精鋭部隊取得(同期)
-	var eliteArray = Append.getElite();
+	// 精鋭部隊取得
+	var elites = Elite.list();
 	
 	menu[ title ] = $.contextMenu.title;
 	menu['ここを中心に表示'] = Map.contextmenu.center;
@@ -5820,12 +5843,12 @@ contextmenu: function() {
 			'拠点選択': Map.contextmenu.nearbyVillage
 		};
 		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
-				function() { Map.contextmenu.assignEliteNearby( data, val ); } :
-				$.contextMenu.nothing;
+		for( let i = 0; i < elites.length; i++ ) {
+			let key = '【' + elites[i] + '】部隊',
+				val = i + 1;
+			menu['最寄りの拠点']['精鋭部隊'][key] = function() {
+				Map.contextmenu.assignEliteNearby( data, val );
+			};
 		}
 	}
 	else if ( data.type == '領地' ) {
@@ -5847,12 +5870,12 @@ contextmenu: function() {
 		};
 		menu['この領地を陣にする'] = Map.contextmenu.toCamp;
 		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['最寄りの拠点']['精鋭部隊'][key] = val > 0 ?
-				function() { Map.contextmenu.assignEliteNearby( data, val ); } :
-				$.contextMenu.nothing;
+		for( let i = 0; i < elites.length; i++ ) {
+			let key = '【' + elites[i] + '】部隊',
+				val = i + 1;
+			menu['最寄りの拠点']['精鋭部隊'][key] = function() {
+				Map.contextmenu.assignEliteNearby( data, val );
+			}
 		}
 	}
 	else {
@@ -5875,12 +5898,12 @@ contextmenu: function() {
 			'拠点名変更': Map.contextmenu.renameVillage
 		};
 		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['この拠点']['精鋭部隊'][key] = val > 0 ?
-				function() { Map.contextmenu.assignElite( data, val ); } :
-				$.contextMenu.nothing;
+		for( let i = 0; i < elites.length; i++ ) {
+			let key = '【' + elites[i] + '】部隊',
+				val = i + 1;
+			menu['この拠点']['精鋭部隊'][key] = function() {
+				Map.contextmenu.assignElite( data, val );
+			}
 		}
 	}
 
@@ -6125,13 +6148,7 @@ assignElite: function( data, elite ) {
 	var village = Util.getVillageByCoord( data.x, data.y, data.country );
 
 	if ( village ) {
-		$.post( '/card/deck.php', {
-			mode: 'assign_elite',
-			select_assign_no: 4,
-			select_card_group: 6,
-			set_elite_unit_assign_sort: elite,
-			set_village_id: village.id,
-		});
+		Elite.post( elite, village.id );
 	}
 	else {
 		Display.alert( '拠点は見つかりませんでした。' );
@@ -6148,23 +6165,11 @@ assignEliteNearby: function( data, elite ) {
 	if ( !village && territory ) {
 		Display.dialogNearbyTerritory( village, territory, coord )
 		.done(function( newVillage ) {
-			$.post( '/card/deck.php', {
-				mode: 'assign_elite',
-				select_assign_no: 4,
-				select_card_group: 6,
-				set_elite_unit_assign_sort: elite,
-				set_village_id: newVillage.id,
-			});
+			Elite.post( elite, newVillage.id );
 		});
 	}
 	else if ( village ) {
-		$.post( '/card/deck.php', {
-			mode: 'assign_elite',
-			select_assign_no: 4,
-			select_card_group: 6,
-			set_elite_unit_assign_sort: elite,
-			set_village_id: village.id,
-		});
+		Elite.post( elite, village.id );
 	}
 	else {
 		Display.alert( '最寄りの拠点は見つかりませんでした。' );
@@ -11301,8 +11306,8 @@ contextmenu: function() {
 	menu['セパレーター１'] = $.contextMenu.separator;
 
 	if ( location.pathname != '/card/deck.php' ) {
-		// 精鋭部隊取得(同期)
-		var eliteArray = Append.getElite();
+		// 精鋭部隊取得
+		var elites = Elite.list();
 
 		menu['部隊作成'] = {
 			'【第一組】': function() { Deck.dialog( village, null, 1 ); },
@@ -11316,19 +11321,12 @@ contextmenu: function() {
 		menu['精鋭部隊'] = {
 		};
 		// 精鋭部隊追加
-		for( let i = 0; i < eliteArray.length; i++ ) {
-			let key = '【' + eliteArray[i][0] + '】部隊';
-			let val = eliteArray[i][1];
-			menu['精鋭部隊'][key] = val > 0 ?
-				function() {
-					$.post( '/card/deck.php', {
-						mode: 'assign_elite',
-						select_assign_no: 4,
-						select_card_group: 6,
-						set_elite_unit_assign_sort: val,
-						set_village_id: village.id,
-					});
-				} : $.contextMenu.nothing;
+		for( let i = 0; i < elites.length; i++ ) {
+			let key = '【' + elites[i] + '】部隊',
+				val = i + 1;
+			menu['精鋭部隊'][key] = function() {
+				Elite.post( val, village.id );
+			};
 		}
 	}
 	else {
@@ -15377,12 +15375,20 @@ main: function() {
 		Util.getUnitStatusCD();
 	}
 
-	// 精鋭部隊の省スペース表示
+	// 精鋭部隊ページ
 	if( $('#bar_card_elite').length > 0 ) {
+		// 省スペース表示
 		$('.elite_busho_info .elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').hide();
 		$(document).on('click', '.elite_info_action_area .lbl_elite_num', function() {
 			$(this).closest('.elite_busho_info').find('.elite_busho_info_tbl').find('tr.tr_gradient:gt(1)').toggle();
 		});
+		// Storage更新
+		let list = [];
+		$.each( $('.elite_busho_info'), function( idx, elm ) {
+			list.push( $(elm).find('.elite_busho_info_tbl tr:eq(1) td:eq(2)').text().trim().match( /^(.*)\n/ )[1] || '' );
+		});
+
+		Elite.update( list );
 	}
 },
 
