@@ -4252,7 +4252,7 @@ style: '' +
 '.imc_inner_bar.imc_rice  { background-color: #662; }' +
 '.imc_bar_contents { margin: 2px 4px; display: inline-block; }' +
 
-'#status .imc_pulldown { position: absolute; left: 0px; top: 100%; margin-top: -1px; width: 70px; z-index: 120; background-color: #000; border: solid 1px #b8860b; display: none; }' +
+'#status .imc_pulldown { position: absolute; left: 0px; top: 100%; margin-top: -1px; width: 90px; z-index: 120; background-color: #000; border: solid 1px #b8860b; display: none; }' +
 '#status SPAN:hover .imc_pulldown { display: block; }' +
 '#status .imc_pulldown_item { margin: 5px; height: 15px;}' +
 
@@ -10266,9 +10266,18 @@ layouterSmall: function( unit ) {
 	html = '' +
 	'<span class="imc_cardname">' + this.name + '</span>' +
 	'<span class="imc_card_header">' +
-		'<span>' + this.cost + '｜</span>' +
+		'<span>' + this.cost + '｜</span>';
+		// 限界突破
+		if( this.rank > 5 ) {
+			html +=
+			'<img src="' + Env.externalFilePath + '/img/card/icon/icon_rank6_pattern1.png">';
+		}
+		else {
+			html +=
 		'<span style="color: red; font-weight: bold;">' + '★'.repeat( this.rank ) + '</span>' +
-		'<span title="Lv20まで：' + next20 + '" >' + '☆'.repeat( 5 - this.rank ) + '｜Lv　</span><span class="' + lvClass + '">' + this.lv + '</span>' +
+			'<span title="Lv20まで：' + next20 + '" >' + '☆'.repeat( 5 - this.rank ) + '｜Lv　</span><span class="' + lvClass + '">' + this.lv + '</span>';
+		}
+	html+=
 	'</span>';
 
 	$div.eq( 0 ).html( html );
@@ -18611,9 +18620,9 @@ autoPager: function() {
 			var page = nextPage,
 				bcid = $('#deck_file INPUT#base_cid').val(),
 				acid = $('#deck_file INPUT#added_cid').val(),
-				utype = $('#deck_file INPUT#union_type').val();
-			
-			return Page.post( '/union/additional.php', { base_cid: bcid, added_cid: acid, union_type: utype, p: page });
+				utype = $('#deck_file INPUT#union_type').val(),
+				group = $('#deck_file INPUT#select_card_group').val();
+			return Page.post( '/union/additional.php', { select_card_group: group, base_cid: bcid, added_cid: acid, union_type: utype, p: page });
 		},
 		loaded: function( html ) {
 			var $html = $(html),
