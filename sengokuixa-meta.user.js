@@ -3834,7 +3834,7 @@ panelUnionSlot: function( $panel ) {
 		});
 
 		html += '<tr><td colspan="3">';
-		if ( slot1.rank < 5 && slot2.rank >= slot1.rank && slot1.lv == 20 && slot2.lv == 20 && slot2.rankupslot2 ) {
+		if ( slot1.rank < 6 && slot2.rank >= slot1.rank && slot1.lv == 20 && slot2.lv == 20 && slot2.rankupslot2 ) {
 			html += '<button class="imc_rankup">ランクアップ</button>';
 		}
 		if ( slot1.skilllvup && slot2.skillslot2 ) {
@@ -10907,7 +10907,7 @@ useMaterial: function() {
 
 //.. canRankup
 canRankup: function() {
-	return ( this.lv === 20 && this.rank < 5 );
+	return ( this.lv === 20 && this.rank < 6 );
 },
 
 //.. canSkillLvup
