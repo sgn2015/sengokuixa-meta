@@ -6841,6 +6841,7 @@ filterList: [
 	{ title: 'Cost 2',   condition: [ 'cost', 2 ] },
 	{ title: 'Cost 1.5', condition: [ 'cost', 1.5 ] },
 	{ title: 'Cost 1',   condition: [ 'cost', 1 ] },
+	{ title: '限界突破',   condition: [ 'rank', 6 ] },
 	{ title: '★★★★★', condition: [ 'rank', 5 ] },
 	{ title: '★★★★',   condition: [ 'rank', 4 ] },
 	{ title: '★★★',     condition: [ 'rank', 3 ] },
@@ -6859,13 +6860,14 @@ filterList: [
 	{ title: 'HP最大',     condition: [ 'hp', 'max' ] },
 	{ title: 'HP99以下',   condition: [ 'hp', 99, 'lt' ] },
 	{ title: '討伐300',    condition: [ 'battleGage', 300 ] },
+	{ title: '討伐100上',  condition: [ 'battleGage', 100, 'gt' ] },
 	{ title: 'レベルUP',   condition: [ 'lvup', 1 ] },
 	{ title: 'ランクUP',    condition: [ 'rankup', 1 ] },
-	{ title: '序',          condition: [ 'rarity', '序' ] },
-	{ title: '上',          condition: [ 'rarity', '上' ] },
-	{ title: '特',          condition: [ 'rarity', '特' ] },
-	{ title: '極',          condition: [ 'rarity', '極' ] },
 	{ title: '天',          condition: [ 'rarity', '天' ] },
+	{ title: '極',          condition: [ 'rarity', '極' ] },
+	{ title: '特',          condition: [ 'rarity', '特' ] },
+	{ title: '上',          condition: [ 'rarity', '上' ] },
+	{ title: '序',          condition: [ 'rarity', '序' ] },
 ],
 
 //.. sortList
@@ -6885,6 +6887,12 @@ sortList: [
 	{ title: '兵法：昇',    condition: [ 'int', 'asc' ] },
 	{ title: '兵数：降',    condition: [ 'solNum', 'desc' ] },
 	{ title: '兵数：昇',    condition: [ 'solNum', 'asc' ] },
+	{ title: '現兵攻：降',  condition: [ 'tmpAtk', 'desc' ] },
+	{ title: '現兵攻：昇',  condition: [ 'tmpAtk', 'asc' ] },
+	{ title: '現兵防：降',  condition: [ 'tmpDef', 'desc' ] },
+	{ title: '現兵防：昇',  condition: [ 'tmpDef', 'asc' ] },
+	{ title: '防/C：降',  condition: [ 'tmpDefCost', 'desc' ] },
+	{ title: '防/C：昇',  condition: [ 'tmpDefCost', 'asc' ] },
 	{ title: '指揮力：降',  condition: [ 'maxSolNum', 'desc' ] },
 	{ title: '指揮力：昇',  condition: [ 'maxSolNum', 'asc' ] },
 	{ title: '破壊力：降',  condition: [ 'totalDes', 'desc' ] },
@@ -7200,11 +7208,11 @@ filterMenu: function( container, up ) {
 		[ '指定無し', '配置可' ],
  		[ '第一組', '第二組', '第三組', '第四組', '未設定' ],
 		[ 'Cost 4', 'Cost 3.5', 'Cost 3', 'Cost 2.5', 'Cost 2', 'Cost 1.5', 'Cost 1' ],
-		[ '★★★★★', '★★★★', '★★★', '★★', '★', '☆' ],
+		[ '限界突破', '★★★★★', '★★★★', '★★★', '★★', '★', '☆' ],
 		[ 'Lv20', 'Lv19以下', 'Lv1以上', 'Lv0' ],
 		[ '兵数最大', '最大以外', '兵数２以上', '兵数１以上', '兵数１' ],
-		[ 'HP最大', 'HP99以下', '討伐300', 'レベルUP', 'ランクUP' ],
-		[ '序', '上', '特', '極', '天' ]
+		[ 'HP最大', 'HP99以下', '討伐300', '討伐100上', 'レベルUP', 'ランクUP' ],
+		[ '天', '極', '特', '上', '序' ]
 	];
 
 	Deck.createMenu( container, 'imc_filter', Deck.filterList, menulist, '指定無し', up );
@@ -7223,6 +7231,7 @@ sortMenu: function( container, up ) {
 		[ '指定無し' ],
 		[ '総攻：降', '総攻：昇', '総防：降', '総防：昇', '速度：降', '速度：昇' ],
 		[ '攻撃力：降', '攻撃力：昇', '防御力：降', '防御力：昇', '兵法：降', '兵法：昇' ],
+		[ '現兵攻：降', '現兵攻：昇', '現兵防：降', '現兵防：昇', '防/C：降', '防/C：昇', ],
 		[ '兵数：降', '兵数：昇', '指揮力：降', '指揮力：昇', '破壊力：降', '破壊力：昇' ],
 		[ 'コスト：降', 'コスト：昇', 'レア度：降', 'レア度：昇' ],
 		[ '経験値：降', '経験値：昇', 'ランク：降', 'ランク：昇', 'レベル：降', 'レベル：昇' ],
@@ -9991,6 +10000,7 @@ solName: '', solType: null, atk: 0, def: 0, int: 0, commands: {}, skillList: [],
 command: '', totalAtk: 0, totalDef: 0, totalDes: 0,
 job: '', exp: 0, gounit: '0', recoveryTime: 0,
 sex: 'm', slot2: '', slot3: '',
+tmpAtk: 0, tmpDef: 0, tmpDefCost: 0,
 
 //.. analyze
 analyze: function( element ) {
@@ -10244,6 +10254,13 @@ power: function() {
 	this.totalDef = ( data.defend * this.solNum + this.def ) * mod / 100;
 	//破壊力
 	this.totalDes = ( data.destroy * this.solNum );
+
+	//現兵種による最大攻撃力
+	this.tmpAtk = ( data.attack * this.maxSolNum + this.atk ) * mod / 100;
+	//現兵種による最大防御力
+	this.tmpDef = ( data.defend * this.maxSolNum + this.def ) * mod / 100;
+	//現兵種によるコス比防御力
+	this.tmpDefCost = this.tmpDef / this.cost;
 },
 
 //.. layouter
@@ -11409,6 +11426,8 @@ contextmenu: function() {
 			.always(function( ol ) {
 				Util.getUnitStatus();
 				if ( ol && ol.close ) { ol.close(); }
+				if ( location.pathname == '/facility/unit_status.php' ||
+					 location.pathname == '/card/deck.php' ) { location.reload(); }
 			});
 		};
 	}
