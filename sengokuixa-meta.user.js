@@ -16656,7 +16656,7 @@ style: '' +
 '#imi_country_selecter SELECT { margin: 0px 5px; }' +
 
 /* 部隊状況 */
-'#imi_unitstatus { position: absolute; top: 105px; left: 5px; width: 250px; font-size: 11px; height: 80px; background-color: #F1F0DC; z-index: 2; }' +
+'#imi_unitstatus { position: absolute; top: 105px; left: 5px; width: 250px; font-size: 11px; height: 96px; background-color: #F1F0DC; z-index: 2; }' +
 '#imi_unitstatus TABLE { width: 100%; height: 100%; }' +
 '#imi_unitstatus TR { height: 16px; }' +
 '#imi_unitstatus TD { padding: 0px; }' +
@@ -17740,7 +17740,7 @@ layouterWarReport: function() {
 
 //. layouterUnitStatus
 layouterUnitStatus: function() {
-	var html = '<div id="imi_unitstatus"><table class="imc_table">' + '<tr><td/></tr>'.repeat( 5 ) + '</table></div>';
+	var html = '<div id="imi_unitstatus"><table class="imc_table">' + '<tr><td/></tr>'.repeat( 6 ) + '</table></div>';
 
 	$( html ).appendTo('#ig_mapbox');
 
@@ -17762,6 +17762,10 @@ layouterUnitStatus: function() {
 
 			if ( mode == '探索' || mode == '討伐' ) {
 				html = target;
+			}
+			// 加勢専用部隊が待機中
+			else if( target == undefined ) {
+				html = '(加勢専用)';
 			}
 			else {
 				html = '<span class="ime_coord imc_coord" x="' + ex + '" y="' + ey + '" c="' + ec + '">' +
@@ -17794,7 +17798,7 @@ layouterUnitStatus: function() {
 			$table.append( $tr );
 		}
 
-		for ( var i = list.length; i < 5; i++ ) {
+		for ( var i = list.length; i < 6; i++ ) {
 			html = '' +
 			'<td><div style="width: 67px;"><a href="/card/deck.php?ano=' + i + '">[部隊作成]</a></div></td>' +
 			'<td><div style="width: 86px;"></div></td>' +
