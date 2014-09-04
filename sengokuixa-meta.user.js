@@ -13992,23 +13992,25 @@ commandButton: function() {
 
 //. 陣被りチェック
 checkOverlap: function() {
-	var postData = {
-	btn_preview:true,
-	country_id: $('INPUT[name="country_id"]').val(),
-	radio_move_type: 307,
-	unit_select:$('INPUT[name="unit_select"]:first').val(),
-	village_x_value: $('INPUT[name="village_x_value"]').val(),
-	village_y_value: $('INPUT[name="village_y_value"]').val(),
-	x:'',
-	y:'',
-	};
-	Page.post( '/facility/send_troop.php', postData )
-	.done( function( html ) {
-		// jQoに変換するとscriptタグが消えるので生から拾う
-		if( /友軍の城主/.test( html ) ) {
-			Display.alert( '友軍の城主が先に陣張り攻撃を行っています。<br>友軍の方が先に到着した場合は、陣を張ることができません。', null, 6000);
-		}
-	});
+	if( $('#establish_camp').length > 0 ) {
+		var postData = {
+			btn_preview    : true,
+			country_id     : $('INPUT[name="country_id"]').val(),
+			radio_move_type: 307,
+			unit_select    : $('INPUT[name="unit_select"]:first').val(),
+			village_x_value: $('INPUT[name="village_x_value"]').val(),
+			village_y_value: $('INPUT[name="village_y_value"]').val(),
+			x              : '',
+			y              : '',
+		};
+		Page.post( '/facility/send_troop.php', postData )
+		.done( function( html ) {
+			// jQoに変換するとscriptタグが消えるので生から拾う
+			if( /友軍の城主/.test( html ) ) {
+				Display.alert( '友軍の城主が先に陣張り攻撃を行っています。<br>友軍の方が先に到着した場合は、陣を張ることができません。');
+			}
+		});
+	}
 },
 
 //. layouter2
