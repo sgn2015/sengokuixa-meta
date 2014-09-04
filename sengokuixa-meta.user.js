@@ -14072,6 +14072,8 @@ sendAll: function() {
 
 		tasks  = [];
 		$list.each(function() {
+			// 加勢専用部隊を対象外とする
+			if( $(this).closest( '.table_waigintunit' ).find('.waitingunittitle_reinforce').length > 0 ) return true;
 			tasks.push( sendData.call( this ) );
 		});
 
