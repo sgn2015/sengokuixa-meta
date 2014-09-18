@@ -12090,7 +12090,7 @@ createPulldownMenu: function() {
 		menu = [];
 
 	// 参加せよをクルクルさせない
-	$('#menu > li[class^=gMenu] > A > IMG').attr('src', Data.images.menu_entry );
+	$('#menu > li.gMenu04,.gMenu05 > A > IMG').attr('src', Data.images.menu_entry );
 
 	//基本href
 	$('#sideboxBottom DIV.basename LI A').each(function() {
