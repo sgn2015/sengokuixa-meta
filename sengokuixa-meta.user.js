@@ -18246,6 +18246,36 @@ style: Page.getAction( 'user', 'ranking', 'style' )
 
 });
 
+//■ /alliance/chat_view
+Page.registerAction( 'alliance', 'chat_view', {
+
+//. main
+main: function() {
+	this.layouter();
+},
+
+//. layouter
+layouter: function() {
+	function replacer( str, m1, m2 ) {
+		return '<a class="ime_coord imc_coord" x="' + m1 + '" y="' + m2 + '">' + str + '</a>';
+	}
+
+	$('.chat_text').each( function() {
+		$(this).html( $(this).text().replace( /\(?\s?(-?\d+)[，,.]\s*(-?\d+)\s?\)?/, replacer ) );
+	});
+
+	$('.ime_coord').live('click', function() {
+		var $this = $(this),
+			x = $this.attr('x'),
+			y = $this.attr('y'),
+			c = $this.attr('c') || '';
+
+			Map.move( x, y, c );
+	});
+},
+
+});
+
 //■ /alliance/alliance_gold_mine_history
 Page.registerAction( 'alliance', 'alliance_gold_mine_history', {
 
