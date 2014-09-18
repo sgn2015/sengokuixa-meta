@@ -18833,6 +18833,7 @@ autoPager: function() {
 
 //. layouter
 layouter: function() {
+	$('.common_box2').hide();
 },
 
 });
