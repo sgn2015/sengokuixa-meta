@@ -10951,6 +10951,33 @@ canSkillAdd: function() {
 //.. canSkillRemove
 canSkillRemove: function() {
 	return ( this.skillCount >= 2 );
+},
+
+//.. outputCSV
+outputCSV: function() {
+	var array = [
+		'"' + this.cardId + '"',
+		'"' + this.cardNo + '"',
+		'"' + this.rarity + '"',
+		'"' + this.name + '"',
+		'"' + this.rank + '"',
+		'"' + this.lv + '"',
+		'"' + this.cost + '"',
+		'"' + this.maxSolNum + '"',
+		'"' + this.commands['槍'] + '"',
+		'"' + this.commands['弓'] + '"',
+		'"' + this.commands['馬'] + '"',
+		'"' + this.commands['器'] + '"',
+		'"' + this.atk + '"',
+		'"' + this.def + '"',
+		'"' + this.int + '"',
+		'"' + this.job + '"',
+	];
+	for( i = 0; i < this.skillList.length; i++ ) {
+		array.push( '"' + this.skillList[i].originName.trim() + '"' );
+	}
+
+	return array.join(',');
 }
 
 });
@@ -14699,6 +14726,10 @@ style: '' +
 '#imi_button_container { padding-bottom: 5px; }' +
 '#imi_button_container IMG { margin: 0px 3px 0px 0px; }' +
 '#imi_button_container BUTTON { margin-right: 5px; }' +
+
+/* コマンド*/
+'#imi_export { text-decoration: none; }' +
+
 '',
 
 //. main
@@ -14823,6 +14854,9 @@ layouter: function() {
 		'<li id="imi_batch_0"><span>兵最大</span></li>' +
 		'<li id="imi_batch_1"><span>兵１</span></li>' +
 	'</ul>' +
+	'<ul id="imi_analysis_selector" class="imc_command_selecter" style="float: right; margin-right: 15px;">' +
+		'<li class="imc_analysis" id="imi_analysis"><a id="imi_export" download="" href="#">集計</a></li>' +
+	'</ul>' +
 	'<ul id="imi_command_selecter" class="imc_command_selecter">' +
 		'<li class="imc_all imc_selected" selecter=".imc_all" batch="0"><span>全て</span></li>' +
 		'<li class="imc_yari" selecter=".yari1, .yari2, .yari3, .yari4" batch="0"><span>槍</span></li>' +
@@ -14859,6 +14893,35 @@ layouter: function() {
 
 		$('#frmlumpsum').append('<INPUT type="hidden" name="btnlumpsum" value="true">');
 		$('#frmlumpsum').submit();
+	});
+
+	// 集計ボタン
+	$('#imi_analysis_selector')
+	.on('click', '#imi_analysis', function() {
+		var $tr = $('#busho_info .tr_gradient').slice( 1 ),
+			array = ['"ID","No.","R","名前","ランク","Lv","コスト","指揮力","槍","弓","馬","器","攻撃","防御","兵法","職","スキル1","スキル2","スキル3"'];
+
+		$tr.each( function() {
+			var card = $(this).data();
+			array.push( card.outputCSV() );
+		});
+
+		var blob = new Blob( [ array.join('\n') ], { 'type' : 'application/x-msdownload' } ),
+			objURL = window.URL.createObjectURL(blob),
+			// toFormatDateだと月日を2桁にできないので...
+			filename = ( Env.world + '_yymmddhhmi.csv' ).replace( /yymmddhhmi/, function( str ) {
+				var now = new Date();
+				return now.getFullYear().toString().substr( -2 ) +
+					   ( '00' + ( now.getMonth() + 1 ) ).substr( -2 ) +
+					   ( '00' + now.getDate() ).substr( -2 ) +
+					   ( '00' + now.getHours() ).substr( -2 ) +
+					   ( '00' + now.getMinutes() ).substr( -2 );
+
+			});
+
+		$('#imi_export').attr('href', objURL ).attr('download', filename ).trigger('click');
+		window.URL.revokeObjectURL(objURL);
+		$('#imi_export').attr('href', '#').attr('download', '');
 	});
 
 	$('#imi_command_selecter')
