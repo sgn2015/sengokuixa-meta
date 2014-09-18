@@ -16283,7 +16283,7 @@ layouter: function( $cards ) {
 		let html =
 			'<div class="tradecmd">' +
 			'<input type=button name="find"  value="取引"   style="float:left;"  title="出品中の同カードを検索します">'+
-			'<input type=button name="net"   value="手取り" style="float:right;" title="出品価格に手数料を上乗せして出品します">' +
+			'<input type=button name="net"   value="手取り" style="float:right;" title="出品価格に手数料を上乗せした価格を表示します">' +
 			'<input type=button name="gross" value="出品"   style="float:right;" title="手数料込みの価格として出品します">' +
 			'<input type=number name="price" value=10 size=10 class="price">' +
 			'</div>';
@@ -16314,13 +16314,7 @@ layouter: function( $cards ) {
 			if (price >=  500) price = Math.floor((bp - 50) / 0.8);
 			if (price >= 1000) price = Math.floor((bp - 150) / 0.7);
 
-			self.exhibit( eo.data.cid, price )
-			.done( function() {
-				$elm.remove();
-			})
-			.fail( function( msg ) {
-				Display.alert( msg );
-			});
+			$(this).parent().find('input[name=price]').val( price );
 		});
 	});
 },
