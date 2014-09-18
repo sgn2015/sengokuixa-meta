@@ -15,12 +15,24 @@ sengokuixa-meta
 ------------
 
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
-* 最新バージョンのインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
-* ハンゲの方は[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/hangame/sengokuixa-meta.user.js)
- - 動作が被ってしまいますので、本家版も最新に更新してください。
+* 最新版のインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
+* ハンゲの方は旧版を削除のうえ、最新版をインストールしてください
 
 更新履歴
 --------
+
+### 1.4.4.1
+2014/09/18
+
+* ハンゲmixi版を本家版に統合
+* 出品画面で手取りボタンを押した場合に、出品額を変更するだけに変更
+* 「参加せよ」を静止画に変更
+* 兵士編成画面に集計機能を追加
+ - 読み込み済みの武将のみです
+ - 出力ファイルの文字コードはUTF-8N、改行コードはLFです
+ - ファイル名は「鯖名_日時.csv」です
+* チャット履歴で座標っぽいものをクリックすると該当座標の地図画面に遷移
+* スキル強化の追加スロット画面のメッセージを非表示に変更
 
 ### 1.4.4.0
 2014/09/04
