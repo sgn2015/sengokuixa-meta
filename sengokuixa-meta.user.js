@@ -4,7 +4,6 @@
 // @version        1.4.4.0
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
-// @exclude        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @website        https://github.com/moonlit-g/sengokuixa-meta
 // @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
@@ -237,7 +236,7 @@ var Env = (function() {
 	var storage = MetaStorage('ENVIRONMENT'),
 		$server = $('#server_time'),
 		$war = $('.situationWorldTable'),
-		world = ( location.hostname.match(/(.\d{3})/) || [] )[1],
+		world = ( location.hostname.match(/(\S+\d{2,3})/) || [] )[1],
 		start = ( document.cookie.match( new RegExp( world + '_st=(\\d+)' ) ) || [] )[1],
 		login = false, season, newseason, chapter, war, server_time, local_time, timeDiff, endtime;
 
@@ -3795,7 +3794,7 @@ panelUnionSlot: function( $panel ) {
 		slot1 = storage.get('slot1'),
 		slot2 = storage.get('slot2'),
 		materials = storage.get('materials') || [],
-		cssClass = { '天': 'imc_ten', '極': 'imc_goku', '特': 'imc_toku', '上': 'imc_jyou', '序': 'imc_jyo', '祝': 'imc_iwai', '雅': 'imc_miyabi' };
+		cssClass = { '天': 'imc_ten', '極': 'imc_goku', '特': 'imc_toku', '上': 'imc_jyou', '序': 'imc_jyo', '祝': 'imc_shuku', '雅': 'imc_miyabi' };
 
 	$panel
 	.on('update', function() {
@@ -4285,7 +4284,7 @@ style: '' +
 '.imc_toku { color: #fff; background-color: #c00; font-weight: bold; }' +
 '.imc_jyou { color: #fff; background-color: #cc0; font-weight: bold; }' +
 '.imc_jyo  { color: #fff; background-color: #06c; font-weight: bold; }' +
-'.imc_iwai,' +
+'.imc_shuku,' +
 '.imc_miyabi { color: #fff; background-color: #f90; font-weight: bold; }' +
 
 /* カーソル行用 */
@@ -9907,7 +9906,7 @@ getRarityByClassName: function( className ) {
 		'toku': '特',
 		'goku': '極',
 		'ten': '天',
-		'iwai': '祝',
+		'shuku': '祝',
 		'miyabi': '雅',
 		'bake': '化',
 		'warabe': '童',
@@ -11763,6 +11762,8 @@ execute: function() {
 	this.ajaxLoadingIcon();
 	this.changeTitle();
 	this.changeStatusBar();
+	this.changeLordNameBox();
+	this.changeControlBox();
 	this.changeSideBar();
 	this.changeChatLink();
 	this.createCoordLink();
@@ -11811,6 +11812,16 @@ changeTitle: function() {
 	if ( Env.world ) {
 		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text() );
 	}
+},
+
+//.. changeLordNameBox
+changeLordNameBox: function() {
+	$('#lordNameBox').css( 'z-index', 0 );
+},
+
+//.. changeControlBox
+changeControlBox: function() {
+	$('#navi01 > ul').css( 'z-index', 0 );
 },
 
 //.. changeStatusBar
@@ -12239,7 +12250,8 @@ main: function() {
 		}
 	})
 	.fail( function( jqXHR, textStatus, textErr ) {
-		Display.alert('合成表の更新確認でエラーが発生しました。', true, 6000 );
+		// Display.alert('合成表の更新確認でエラーが発生しました。', true, 6000 );
+		$.noop();
 	});
 },
 
@@ -12253,7 +12265,7 @@ serverSelected: function() {
 		$server = $this.closest('.mainserver_world_box');
 	}
 
-	world = ( $this.attr('href').match(/wd=(.\d{3})/) || [,''] )[ 1 ];
+	world = ( $this.attr('href').match(/wd=((\S+\d{2,3}))/) || [,''] )[ 1 ];
 	season = ( $server.find('IMG:last').attr('src').match(/flag_.(\d{2})/) || [,''] )[ 1 ];
 	chapter = ( $server.children('DIV').attr('class').match(/(?:main|sub)server_.(\d)/) || [,''] )[ 1 ];
 
