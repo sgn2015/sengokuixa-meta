@@ -222,6 +222,9 @@ var MetaStorage=(function(){var storageList={},storagePrefix='IM.',eventListener
 'ELITE'.split(' ').forEach(function( value ) {
 	MetaStorage.registerStorageName( value );
 });
+'SIDEBAR'.split(' ').forEach(function( value ) {
+	MetaStorage.registerStorageName( value );
+});
 
 MetaStorage.change( 'UNIT_STATUS', function( event, storageEvent ) {
 	$('#imi_unitstatus').trigger('update');
@@ -11103,8 +11106,10 @@ init: function() {
 
 //. setup
 setup: function() {
-	$('#imi_basename .imc_home').prev().css({ cursor: 'pointer' })
-	.find('H4').append('<span style="float: right">設定</span>').end()
+	// カーソルとイベント発生箇所を「設定」のみに変更
+	$('<span style="float: right">設定</span>')
+	.appendTo( $('#imi_basename .imc_home').prev().find('H4') )
+	.css({ cursor: 'pointer' })
 	.on('click', function() {
 		var build = MetaStorage('SETTINGS').get('build') || 0,
 			html;
@@ -11166,6 +11171,24 @@ setup: function() {
 	$('#imi_basename .basename LI').contextMenu( SideBar.contextmenu, true );
 
 	if ( Env.loginProcess ) { Util.getUnitStatusCD(); }
+
+	// サイドバーの状態を復元
+	var storage = MetaStorage('SIDEBAR');
+	$('.sideBox h3').each( function() {
+		let key   = $(this).find('img').attr('alt');
+		let state = storage.get( key );
+		$(this).closest('.sideBox').find('.sideBoxInner').css('display', state);
+		$(this).closest('.sideBox').find('.sideBoxHead').has('h4').css('display', state);
+	})
+	// 各メニューのトグルイベント
+	$('.sideBox h3').click( function() {
+		let key   = $(this).find('img').attr('alt');
+
+		$(this).closest('.sideBox').find('.sideBoxInner').toggle();
+		$(this).closest('.sideBox').find('.sideBoxHead').has('h4').toggle(); // 拠点用
+
+		storage.set( key, $(this).closest('.sideBox').find('.sideBoxInner').css('display') );
+	});
 },
 
 //. countDown
