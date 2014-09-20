@@ -18889,9 +18889,10 @@ autoPager: function() {
 		},
 		load: function( nextPage ) {
 			var page = nextPage,
-				utype = $('#deck_file INPUT#union_type').val();
+				utype = $('#deck_file INPUT#union_type').val(),
+				group = $('#select_card_group').val();
 	
-			return Page.post( '/union/remove.php', { union_type: utype, p: page });
+			return Page.post( '/union/remove.php', { select_card_group: group, union_type: utype, p: page });
 		},
 		loaded: function( html ) {
 			var $html = $(html),
