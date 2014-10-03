@@ -11892,6 +11892,8 @@ changeStatusBar: function() {
 		max = $('#wood_max').text().toInt(),
 		money_b = $('.money_b').text(),
 		money_c = $('.money_c').text(),
+		purchase = $('IMG[alt="金を購入"]').closest('A').attr('href'),
+		item = $('IMG[alt="便利機能一覧"]').closest('A').attr('href'),
 		fame = $('#status_left LI').eq( 4 ).text(),
 		rate = [], period = [];
 
@@ -11922,8 +11924,8 @@ changeStatusBar: function() {
 		'<span class="money_b">' + money_b + '</span>' +
 		'<span class="money_c" style="position: relative;">' + money_c +
 		'<ul class="imc_pulldown">' +
-		'<li class="imc_pulldown_item"><a href="/cp/purchase_cp.php">金を購入</a></li>' +
-		'<li class="imc_pulldown_item"><a href="/cp/item_list.php">便利機能</a></li>' +
+		'<li class="imc_pulldown_item"><a href="' + purchase + '">金を購入</a></li>' +
+		'<li class="imc_pulldown_item"><a href="' + item + '">便利機能</a></li>' +
 		'</span>' +
 		'</ul>' +
 	'</li>' +
