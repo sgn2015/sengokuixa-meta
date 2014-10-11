@@ -219,6 +219,9 @@ var MetaStorage=(function(){var storageList={},storagePrefix='IM.',eventListener
 'UNION_TABLE'.split(' ').forEach(function( value ) {
 	MetaStorage.registerStorageName( value );
 });
+'GOLDMINE'.split(' ').forEach(function( value ) {
+	MetaStorage.registerStorageName( value );
+});
 'ELITE'.split(' ').forEach(function( value ) {
 	MetaStorage.registerStorageName( value );
 });
@@ -2651,6 +2654,184 @@ return {
 }
 
 })();
+
+//■ Mine
+var GoldMine = {
+// Storage
+//  lastInvest: 最終投資日
+//  inv*: 各資源の投資額
+
+// ql_c_excavation.cssより
+style : '' +
+'.ex_logtable { border-left: 1px solid #76601D; border-top: 1px solid #76601D; margin: 0 auto; }' +
+'.ex_logtable th { background: none repeat scroll 0 0 #E0DCC1; border-bottom: 1px solid #76601D; border-right: 1px solid #76601D; color: #330000; font-size: 14px; font-weight: bold; padding: 4px; text-align: center; }' +
+'.ex_logtable th img { vertical-align: middle; }' +
+'.ex_logtable td { background: none repeat scroll 0 0 #F2F1DD; border-bottom: 1px solid #76601D; border-right: 1px solid #76601D; padding: 4px 20px; text-align: center; color: #330000; }' +
+'.ex_logtable td img { vertical-align: middle; }' +
+'.ex_logtable .log { color:#9E2F0A; text-align:left; font-size:13px; font-weight:bold; line-height:1.2em; margin:20px 0;}' +
+'.ex_logtable .gettreger { background: none repeat scroll 0 0 #000000; border-bottom: 1px dotted #333333; color: #FFFFFF; font-size: 12px; line-height: 1.5; margin: 0 auto 10px; padding: 2px 5px; text-align: center; }' +
+'.ex_logtable .gettreger img { margin-left: 3px; margin-right: 3px; vertical-align: middle; }' +
+'.ex_logtable_fight { border-left: 1px solid #76601D; border-top: 1px solid #76601D; margin: 0 auto 10px; }' +
+'.ex_logtable_fight th { border-bottom: 1px solid #76601D; border-right: 1px solid #76601D; padding: 4px; text-align: center; color:#FFF;}' +
+'.ex_logtable_fight th.join { background-color: #707070; }' +
+'.ex_logtable_fight th.dungeon { background-color: #646738; }' +
+'.ex_logtable_fight th img { vertical-align: middle; }' +
+'.ex_logtable_fight td { background: none repeat scroll 0 0 #F2F1DD; border-bottom: 1px solid #76601D; border-right: 1px solid #76601D; padding: 4px 10px; text-align: center; }' +
+'.ex_logtable_fight td img { vertical-align: middle; }' +
+'.ex_layouttable { margin: 0; padding: 0; }' +
+'.ex_layouttable td { border: medium none; margin: 0; padding: 0; }' +
+'.ex_layouttable th { border: medium none; margin: 0; padding: 0; }' +
+'.ex_layouttable td.v_middle { padding: 0 10px; vertical-align: middle; }' +
+'.excavationtable { border-left: 1px solid #76601D; border-top: 1px solid #76601D; margin: 10px auto; }' +
+'.excavationtable th { background-color: #707070; border-bottom: 1px solid #76601D; border-right: 1px solid #76601D; padding: 0 4px 2px; text-align: center; }' +
+'.excavationtable th.excavationtable_title { background: none repeat scroll 0 0 #990000; padding: 4px; }' +
+'.excavationtable th img { vertical-align: middle; }' +
+'.excavationtable td { background: none repeat scroll 0 0 #F2F1DD; border-bottom: 1px solid #76601D; border-right: 1px solid #76601D; color: #333333; padding: 10px; text-align: center; line-height:16px; }' +
+'.excavationtable td img { vertical-align: middle; }' +
+'.excavation_title { border: 1px solid #76601D; padding: 4px; text-align: center; color:#FFF; background-color: #914E4E;}' +
+'.excavationframe{background-color:#F2F1DD; padding:5px; margin-bottom:20px;}' +
+'.t_white { color:#FFFFFF; }',
+
+//. menutext
+getMenuText: function () {
+	var result = '';
+
+	if( this.getState() ) {
+		result = '' +
+		'<li class="sep" id=gold_mine style="display:block;">' +
+		'<span style="position: relative;">' +
+		'<a href="/alliance/alliance_gold_mine.php" style="color:yellow;">金山</a>' +
+		'<ul class="imc_pulldown">' +
+		'<li class="imc_pulldown_item"><a id="imc_mine_spear"  href="javascript:void(0);">青龍(木:槍)</a></li>' +
+		'<li class="imc_pulldown_item"><a id="imc_mine_arrow"  href="javascript:void(0);">朱雀(綿:弓)</a></li>' +
+		'<li class="imc_pulldown_item"><a id="imc_mine_horse"  href="javascript:void(0);">白虎(鉄:馬)</a></li>' +
+		'<li class="imc_pulldown_item"><a id="imc_mine_siege"  href="javascript:void(0);">玄武(糧:器)</a></li>' +
+		'<li class="imc_pulldown_item"><a id="imc_mine_invest" href="javascript:void(0);">【投資設定】</a></li>' +
+		'</ul>' +
+		'</span>' +
+		'</li>';
+	}
+	else {
+		result = '' +
+		'<li class="sep" id=gold_mine style="display:block;">' +
+		'<span style="position: relative;">' +
+		'<a href="/alliance/alliance_gold_mine.php">金山</a>' +
+		'<ul class="imc_pulldown">' +
+		'<li class="imc_pulldown_item">青龍(木:槍)</li>' +
+		'<li class="imc_pulldown_item">朱雀(綿:弓)</li>' +
+		'<li class="imc_pulldown_item">白虎(鉄:馬)</li>' +
+		'<li class="imc_pulldown_item">玄武(糧:器)</li>' +
+		'<li class="imc_pulldown_item"><a id="imc_mine_invest" href="javascript:void(0);">【投資設定】</a></li>' +
+		'</ul>' +
+		'</span>' +
+		'</li>';
+	}
+
+	return result;
+},
+
+//. setEvent
+setEvent: function() {
+	var storage = MetaStorage('GOLDMINE');
+
+	$('#imc_mine_spear,#imc_mine_arrow,#imc_mine_horse,#imc_mine_siege')
+	.click( function() {
+		let id = $(this).attr('id');
+		let postData = {
+			excavation: 1,
+			gold_mine: Env.externalFilePath,
+			wood : /spear/.test( id ) ? storage.get('invWood'): 0,
+			stone: /arrow/.test( id ) ? storage.get('invWool'): 0,
+			iron : /horse/.test( id ) ? storage.get('invIron'): 0,
+			rice : /siege/.test( id ) ? storage.get('invRice'): 0,
+		};
+
+		GM_addStyle( GoldMine.style );
+
+		$.post( '/alliance/alliance_gold_mine.php', postData )
+		.done( function( html ) {
+			GoldMine.update();
+			let $result = $(html).find('#excavationframeid');
+
+			Display.dialog({
+				title: '発掘結果',
+				content: $result.find('.excavationframe').html(),
+				width: 495,
+				height: 230,
+				buttons : {
+					'閉じる': function() { this.close(); }
+				}
+			});
+		})
+	});
+
+	// 【投資設定】
+	$('#imc_mine_invest').click( function() {
+		GoldMine.setInvestment();
+	} );
+},
+
+//. update
+update: function() {
+	var today = new Date(),
+		todayStr = today.toFormatDate('yyyy/mm/dd'),
+		storage = MetaStorage('GOLDMINE');
+	
+	storage.set('lastInvest', todayStr );
+},
+
+//. getState
+getState: function() {
+	if( Env.chapter < 4 ) {
+		return false;
+	}
+
+	var today = new Date(),
+		todayStr = today.toFormatDate('yyyy/mm/dd'),
+		storage = MetaStorage('GOLDMINE'),
+		lastInvest = storage.get('lastInvest');
+
+	return todayStr != lastInvest;
+},
+
+// 投資額設定
+setInvestment: function() {
+	var storage = MetaStorage('GOLDMINE'),
+		html;
+
+	html = '' +
+	'<br/>' +
+	'<div>投資額</div>' +
+	'<br/>' +
+	'<ul id=imi_mine_setting_dialog style="text-align:center;">' +
+	'<li><label>青龍(木:槍)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invWood') || 1000) + '"></label></li>' +
+	'<li><label>朱雀(綿:弓)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invWool') || 1000) + '"></label></li>' +
+	'<li><label>白虎(鉄:馬)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invIron') || 1000) + '"></label></li>' +
+	'<li><label>玄武(糧:器)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invRice') || 1000) + '"></label></li>' +
+	'</ul>';
+
+	Display.dialog({
+		title: '同盟金山設定',
+		width: 200, height: 120,
+		content: html,
+		buttons: {
+			'決定': function() {
+				let $inputs = $('#imi_mine_setting_dialog input');
+				storage.set('invWood', $inputs.eq(0).val() );
+				storage.set('invWool', $inputs.eq(1).val() );
+				storage.set('invIron', $inputs.eq(2).val() );
+				storage.set('invRice', $inputs.eq(3).val() );
+				this.close();
+			},
+			'キャンセル': function() {
+				this.close();
+			},
+		},
+	});
+},
+
+};
+
 
 //■ Display
 var Display = (function() {
@@ -11942,11 +12123,16 @@ changeStatusBar: function() {
 	'<li class="imc_pulldown_item"><a href="/facility/set_unit_list.php?show_num=100&amp;select_card_group=5">【未設定】</a></li>' +
 	'</ul>' +
 	'</span>' +
+		GoldMine.getMenuText() +
+	'</li>' +
+	'<li class="sep">' +
 	'</li>' +
 	'</ul>';
 
 	$('#status_left').html( html );
 
+	// 金山メニューのイベント登録
+	GoldMine.setEvent();
 	//IXA占い
 	$('#status .rightF')
 	.children('P')
@@ -18547,6 +18733,18 @@ main: function() {
 
 		$td.addClass( data[ $td.text() ] );
 	});
+}
+
+});
+
+//■ /alliance/alliance_gold_mine
+Page.registerAction( 'alliance', 'alliance_gold_mine', {
+
+//. main
+main: function() {
+	if( $('.inputnumber_hakkutu').length == 0 ) {
+		GoldMine.update();
+	}
 }
 
 });
