@@ -18506,13 +18506,13 @@ main: function() {
 
 //. layouter
 layouter: function() {
-	function replacer( str, m1, m2 ) {
-		return '<a class="ime_coord imc_coord" x="' + m1 + '" y="' + m2 + '">' + str + '</a>';
-	}
-
 	$('.chat_text').each( function() {
-		$(this).html( $(this).text().replace( /\(?\s?(-?\d+)[，,.]\s*(-?\d+)\s?\)?/, replacer ) );
+		$(this).html( $(this).text().replace( /\(?\s?(-?\d+)[，,.]\s*(-?\d+)\s?\)?/g, replacer ) );
 	});
+
+	function replacer( str, m1, m2 ) {
+		return '<a class="ime_coord imc_coord" x="' + m1 + '" y="' + m2 + '" href="/map.php?x=' + m1 + '&y=' + m2 + '">' + str + '</a>';
+	}
 
 	$('.ime_coord').live('click', function() {
 		var $this = $(this),
@@ -18743,6 +18743,11 @@ getDetail: function() {
 		.pipe(function( html ) {
 			var $html = $(html);
 
+			// メッセージ本文中の座標っぽいものをリンクにする
+			$html.find('.comment_wbr').each( function() {
+				$(this).html( $(this).html().replace( /\(?\s?(-?\d+)[，,.]\s*(-?\d+)\s?\)?/g, replacer ) );
+			});
+
 			$('#imi_message_detail')
 			.children().hide().end()
 			.append(
@@ -18758,6 +18763,10 @@ getDetail: function() {
 	}
 
 	return false;
+
+	function replacer( str, m1, m2 ) {
+		return '<a class="ime_coord imc_coord" x="' + m1 + '" y="' + m2 + '" href="/map.php?x=' + m1 + '&y=' + m2 + '">' + str + '</a>';
+	}
 },
 
 //. selectReport
