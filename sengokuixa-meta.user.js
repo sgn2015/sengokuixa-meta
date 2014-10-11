@@ -11990,8 +11990,9 @@ changeSideBar: function() {
 	// 状態タイトルの消去
 	$joutai_div.children('.sideBoxHead').css({ height: '25px' }).empty().append( $('.stateTable') );
 
-	// 銅銭、金、購入、便利機能の削除 → ステータスバーで表示
-	$kin_div.remove();
+	// 銅銭、金、購入、便利機能をカードブロックに移動
+	$kin_div.find('DL').addClass('sideBoxInner');
+	$card_div.append( $kin_div );
 },
 
 //.. changeChatLink
