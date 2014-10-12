@@ -197,7 +197,7 @@ unique: function() {
 
 //■ jQueryプラグイン
 //. contextMenu
-(function($){var timer,defaults={class_menuitem:'imc_menuitem',class_title:'imc_menutitle',class_separater:'imc_separater',class_nothing:'imc_nothing',class_hover:'imc_hover',timeout:800},options=$.extend({},defaults);$.contextMenu=function(_options){options=$.extend({},defaults,_options);return this};$.extend($.contextMenu,{title:function(key){key=key||'';return $('<li/>').addClass(options.class_title).text(key)},separator:function(){return $('<li/>').addClass(options.class_separater)},nothing:function(key){key=key||'';return $('<li/>').addClass(options.class_nothing).text(key)}});$.fn.contextMenu=function(menu,live){if(live){this.live('contextmenu',collback)}else{this.on('contextmenu',collback)}return this;function collback(e){show.call(this,menu,e);return false}};function show(menu,e){var x=e.pageX,y=e.pageY,menuContainer,containerRight,containerBottom,documentRight,documentBottom;hide();if(typeof(menu)=='function'){menu=menu.call(this,e)}if(menu==null||menu.length==0){return}menuContainer=createMenuList.call(this,menu,e);if(!menuContainer){return}menuContainer.attr('id','imi_contextmenu').css({left:x,top:y}).appendTo('BODY');containerRight=menuContainer.offset().left+menuContainer.width()+10;containerBottom=menuContainer.offset().top+menuContainer.height()+10;documentRight=$(document).scrollLeft()+$(window).width();documentBottom=$(document).scrollTop()+$(window).height();if(containerRight>documentRight){x=x-(containerRight-documentRight);menuContainer.css({left:x})}if(containerBottom>documentBottom){y=y-(containerBottom-documentBottom);menuContainer.css({top:y})}(function(container){var self=arguments.callee;if(container.width()+10>documentRight-container.offset().left){container.css({left:-container.width()-2})}if(container.height()+10>documentBottom-container.offset().top){container.css({marginTop:-container.height()+13})}container.find('> LI > .imc_submenu').each(function(){self.call(self,$(this))})})(menuContainer)}function hide(){var $menu=$('#imi_contextmenu');if($menu.length==0){return}$menu.remove();window.clearTimeout(timer);timer=null};function createMenuList(menu,e,sub){var itemlist=[],$menu;for(key in menu){var menuitem=createMenuItem.call(this,key,menu[key],e);itemlist.push(menuitem.get(0))}if(itemlist.length==0){return null}$menu=$('<ul class="imc_menulist"/>').append(itemlist);if(sub){$menu.addClass('imc_submenu')}return $menu}function createMenuItem(key,menuitem,e){var self=this;if(menuitem===null||menuitem===undefined){return $.contextMenu.nothing(key)}else if(menuitem===$.contextMenu.title){return menuitem.call(self,key)}else if(menuitem===$.contextMenu.separator){return menuitem.call(self)}else if(menuitem===$.contextMenu.nothing){return menuitem.call(self,key)}else if(typeof(menuitem)=='string'){return $('<li/>').addClass(options.class_menuitem).text(menuitem)}else if(typeof(menuitem)=='function'){return $('<li/>').addClass(options.class_menuitem).text(key).click(function(){hide();menuitem.call(self,e)})}else if(menuitem.jquery){return $('<li/>').append(menuitem)}else{var submenu=createMenuList.call(this,menuitem,e,true);return $('<li/>').addClass(options.class_menuitem).append(submenu).append(key+'<span class="imc_submenu_mark">‣</span>')}}$(document).on('click',hide).on('contextmenu',hide).on('contextmenu','#imi_contextmenu',function(){return false}).on('mouseenter','#imi_contextmenu',function(){if(timer){window.clearTimeout(timer);timer=null}}).on('mouseleave','#imi_contextmenu',function(){if(options.timeout>0){timer=window.setTimeout(hide,options.timeout)}})})(jQuery);
+(function($){var timer,defaults={class_menuitem:'imc_menuitem',class_title:'imc_menutitle',class_separater:'imc_separater',class_nothing:'imc_nothing',class_hover:'imc_hover',timeout:800},options=$.extend({},defaults);$.contextMenu=function(_options){options=$.extend({},defaults,_options);return this};$.extend($.contextMenu,{title:function(key){key=key||'';return $('<li/>').addClass(options.class_title).text(key)},separator:function(){return $('<li/>').addClass(options.class_separater)},nothing:function(key){key=key||'';return $('<li/>').addClass(options.class_nothing).text(key)}});$.fn.contextMenu=function(menu,live){if(live){this.live('contextmenu',collback)}else{this.on('contextmenu',collback)}return this;function collback(e){show.call(this,menu,e);return false}};function show(menu,e){var x=e.pageX,y=e.pageY,menuContainer,containerRight,containerBottom,documentRight,documentBottom;hide();if(typeof(menu)=='function'){menu=menu.call(this,e)}if(menu==null||menu.length==0){return}menuContainer=createMenuList.call(this,menu,e);if(!menuContainer){return}menuContainer.attr('id','imi_contextmenu').css({left:x,top:y}).appendTo('BODY');containerRight=menuContainer.offset().left+menuContainer.width()+10;containerBottom=menuContainer.offset().top+menuContainer.height()+10;documentRight=$(document).scrollLeft()+$(window).width();documentBottom=$(document).scrollTop()+$(window).height();if(containerRight>documentRight){x=x-(containerRight-documentRight);menuContainer.css({left:x})}if(containerBottom>documentBottom){y=y-(containerBottom-documentBottom);menuContainer.css({top:y})}(function(container){var self=arguments.callee;if(container.width()+10>documentRight-container.offset().left){container.css({left:-container.width()-2})}if(container.height()+10>documentBottom-container.offset().top){container.css({marginTop:-container.height()+13})}container.find('> LI > .imc_submenu').each(function(){self.call(self,$(this))})})(menuContainer)}function hide(){var $menu=$('#imi_contextmenu');if($menu.length==0){return}$menu.remove();window.clearTimeout(timer);timer=null};function createMenuList(menu,e,sub){var itemlist=[],$menu;for(key in menu){var menuitem=createMenuItem.call(this,key,menu[key],e);itemlist.push(menuitem.get(0))}if(itemlist.length==0){return null}$menu=$('<ul class="imc_menulist"/>').append(itemlist);if(sub){$menu.addClass('imc_submenu')}return $menu}function createMenuItem(key,menuitem,e){var self=this;if(menuitem===null||menuitem===undefined){return $.contextMenu.nothing(key)}else if(menuitem===$.contextMenu.title){return menuitem.call(self,key)}else if(menuitem===$.contextMenu.separator){return menuitem.call(self)}else if(menuitem===$.contextMenu.nothing){return menuitem.call(self,key)}else if(typeof(menuitem)=='string'){var $jQo = $('<li/>').addClass(options.class_menuitem).text(menuitem);if( menuitem.data != undefined ) {$jQo.data(menuitem.data)}return $jQo}else if(typeof(menuitem)=='function'){var $jQo = $('<li/>').addClass(options.class_menuitem).text(key).click(function(){e.data = $(this).data();hide();menuitem.call(self,e)});if( menuitem.data != undefined ) {$jQo.data(menuitem.data)}return $jQo}else if(menuitem.jquery){return $('<li/>').append(menuitem)}else{var submenu=createMenuList.call(this,menuitem,e,true);return $('<li/>').addClass(options.class_menuitem).append(submenu).append(key+'<span class="imc_submenu_mark">‣</span>')}}$(document).on('click',hide).on('contextmenu',hide).on('contextmenu','#imi_contextmenu',function(){return false}).on('mouseenter','#imi_contextmenu',function(){if(timer){window.clearTimeout(timer);timer=null}}).on('mouseleave','#imi_contextmenu',function(){if(options.timeout>0){timer=window.setTimeout(hide,options.timeout)}})})(jQuery);
 //. autoPager
 (function($){var $window=$(window),$document=$(document),fetchPage={},nextPage,container,defaults={next:'',contants:'',container:'',load:function(page){return $.get(page)},loaded:function(html){},ended:function(){}},options=$.extend({},defaults);$.autoPager=function(_options){options=$.extend({},defaults,_options);nextPage=getNext(document);container=$(options.container);if(container.length!=0){$window.scroll(pageScroll)}return this};$.extend($.autoPager,{});function getNext(html){var nextPage;if($.isFunction(options.next)){nextPage=options.next(html)}else{nextPage=$(html).find(options.next).attr('href')}return nextPage}function pageScroll(){var containerBottom=container.offset().top+container.height(),documentBottm=$document.scrollTop()+$window.height();if(containerBottom<documentBottm){pageLoad()}};function pageLoad(){if(nextPage==undefined){return}if(fetchPage[nextPage]){return}fetchPage[nextPage]=true;var jqXhr=options.load(nextPage);jqXhr.pipe(function(html){nextPage=getNext(html);options.loaded(html);if(!nextPage){options.ended()}pageScroll()})}})(jQuery);
 //. keybind
@@ -2649,6 +2649,47 @@ return {
 			else {
 				Util.getUnitStatusCD();
 			}
+		});
+	}
+}
+
+})();
+
+// お気に入り部隊
+var FavoriteUnit = ( function() {
+
+var storage = MetaStorage('FAVORITE_UNIT');
+
+return {
+	// お気に入り部隊情報
+	list: function() {
+		return storage.get('list') || [];
+	},
+	// 登録処理
+	post: function( favorite, village ) {
+		var cardlist = favorite.cardlist,
+			namelist = favorite.namelist;
+
+		var unit = new Unit();
+		unit.village = village;
+
+		// Cardオブジェクトもどきで登録
+		$.each( cardlist, function( i, v ) {
+			var card = {
+				name: namelist[i],
+				cardId: cardlist[i],
+				idx: 0,
+				setStatus: function() {},
+				unsetUnit: function() {},
+			};
+			unit.assignList.push( card );
+		});
+
+		unit.assignCard()
+		.always( function( param ) {
+			var [ ol ] = param;
+			if ( ol && ol.close ) { window.setTimeout( ol.close, 500 ); }
+			Util.getUnitStatusCD();
 		});
 	}
 }
@@ -6061,6 +6102,8 @@ contextmenu: function() {
 
 	// 精鋭部隊取得
 	var elites = Elite.list();
+	// お気に入り部隊取得
+	var favorite = FavoriteUnit.list();
 	
 	menu[ title ] = $.contextMenu.title;
 	menu['ここを中心に表示'] = Map.contextmenu.center;
@@ -6077,19 +6120,33 @@ contextmenu: function() {
 				'セパレーター1': $.contextMenu.separator,
 				'【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
 			},
-			'精鋭部隊': {
-			},
+			'精鋭部隊': {},
+			'お気に入り部隊': {},
 			'セパレーター2': $.contextMenu.separator,
 			'ここへ部隊出陣': Map.contextmenu.send2,
 			'拠点選択': Map.contextmenu.nearbyVillage
 		};
-		// 精鋭部隊追加
+		// 精鋭部隊登録
 		for( let i = 0; i < elites.length; i++ ) {
 			let key = '【' + elites[i] + '】部隊',
 				val = i + 1;
 			menu['最寄りの拠点']['精鋭部隊'][key] = function() {
 				Map.contextmenu.assignEliteNearby( data, val );
 			};
+		}
+		// お気に入り部隊登録
+		for( let i = 0, len = favorite.length; i < len; i++ ) {
+			let tag = favorite[i].tag,
+				key = favorite[i].name;
+
+			if( $.type( menu['最寄りの拠点']['お気に入り部隊'][tag] ) === 'undefined' ) {
+				menu['最寄りの拠点']['お気に入り部隊'][tag] = {};
+			}
+
+			menu['最寄りの拠点']['お気に入り部隊'][tag][key] = function( e ) {
+				Map.contextmenu.assignFavoriteNearby( data, e.data );
+			}
+			menu['最寄りの拠点']['お気に入り部隊'][tag][key].data = favorite[i];
 		}
 	}
 	else if ( data.type == '領地' ) {
@@ -6103,8 +6160,8 @@ contextmenu: function() {
 			'セパレーター1': $.contextMenu.separator,
 				'【全武将】': function() { Map.contextmenu.createUnitNearby( data, 0 ); },
 			},
-			'精鋭部隊': {
-			},
+			'精鋭部隊': {},
+			'お気に入り部隊': {},
 			'セパレーター2': $.contextMenu.separator,
 			'ここへ部隊出陣': Map.contextmenu.send2,
 			'拠点選択': Map.contextmenu.nearbyVillage
@@ -6118,6 +6175,20 @@ contextmenu: function() {
 				Map.contextmenu.assignEliteNearby( data, val );
 			}
 		}
+		// お気に入り部隊登録
+		for( let i = 0, len = favorite.length; i < len; i++ ) {
+			let tag = favorite[i].tag,
+				key = favorite[i].name;
+
+			if( $.type( menu['最寄りの拠点']['お気に入り部隊'][tag] ) === 'undefined' ) {
+				menu['最寄りの拠点']['お気に入り部隊'][tag] = {};
+			}
+
+			menu['最寄りの拠点']['お気に入り部隊'][tag][key] = function( e ) {
+				Map.contextmenu.assignFavoriteNearby( data, e.data );
+			}
+			menu['最寄りの拠点']['お気に入り部隊'][tag][key].data = favorite[i];
+		}
 	}
 	else {
 		menu['この拠点'] = {
@@ -6130,21 +6201,35 @@ contextmenu: function() {
 			'セパレーター1': $.contextMenu.separator,
 				'【全武将】': function() { Map.contextmenu.createUnit( data, 0 ); },
 			},
-			'精鋭部隊': {
-			},
+			'精鋭部隊': {},
+			'お気に入り部隊': {},
 			'セパレーター2': $.contextMenu.separator,
 			'拠点部隊解散': function() { Map.contextmenu.breakUp( data ); },
 			'セパレーター3': $.contextMenu.separator,
 			'拠点選択': Map.contextmenu.changeVillage,
 			'拠点名変更': Map.contextmenu.renameVillage
 		};
-		// 精鋭部隊追加
+		// 精鋭部隊登録
 		for( let i = 0; i < elites.length; i++ ) {
 			let key = '【' + elites[i] + '】部隊',
 				val = i + 1;
 			menu['この拠点']['精鋭部隊'][key] = function() {
 				Map.contextmenu.assignElite( data, val );
 			}
+		}
+		// お気に入り部隊登録
+		for( let i = 0, len = favorite.length; i < len; i++ ) {
+			let tag = favorite[i].tag,
+				key = favorite[i].name;
+
+			if( $.type( menu['この拠点']['お気に入り部隊'][tag] ) === 'undefined' ) {
+				menu['この拠点']['お気に入り部隊'][tag] = {};
+			}
+
+			menu['この拠点']['お気に入り部隊'][tag][key] = function( e ) {
+				Map.contextmenu.assignFavorite( data, e.data );
+			}
+			menu['この拠点']['お気に入り部隊'][tag][key].data = favorite[i];
 		}
 	}
 
@@ -6411,6 +6496,39 @@ assignEliteNearby: function( data, elite ) {
 	}
 	else if ( village ) {
 		Elite.post( elite, village.id );
+	}
+	else {
+		Display.alert( '最寄りの拠点は見つかりませんでした。' );
+	}
+},
+
+//.. assignFavorite
+assignFavorite: function( data, fav ) {
+	var village = Util.getVillageByCoord( data.x, data.y, data.country );
+
+	if ( village ) {
+		FavoriteUnit.post( fav, village );
+	}
+	else {
+		Display.alert( '拠点は見つかりませんでした。' );
+	}
+},
+
+//.. assignFavoriteNearby
+assignFavoriteNearby: function( data, fav ) {
+	var near = Util.getVillageNearby( data.x, data.y, data.country ),
+		village = near.village,
+		territory = near.territory,
+		coord = data.x + ',' + data.y;
+
+	if ( !village && territory ) {
+		Display.dialogNearbyTerritory( village, territory, coord )
+		.done(function( newVillage ) {
+			FavoriteUnit.post( fav, newVillage );
+		});
+	}
+	else if ( village ) {
+		FavoriteUnit.post( fav, village );
 	}
 	else {
 		Display.alert( '最寄りの拠点は見つかりませんでした。' );
@@ -11630,6 +11748,8 @@ contextmenu: function() {
 	if ( location.pathname != '/card/deck.php' ) {
 		// 精鋭部隊取得
 		var elites = Elite.list();
+		// お気に入り部隊取得
+		var favorite = FavoriteUnit.list();
 
 		menu['部隊作成'] = {
 			'【第一組】': function() { Deck.dialog( village, null, 1 ); },
@@ -11640,9 +11760,8 @@ contextmenu: function() {
  			'セパレーター': $.contextMenu.separator,
 			'【全武将】': function() { Deck.dialog( village, null, 0 ); }
 		};
-		menu['精鋭部隊'] = {
-		};
-		// 精鋭部隊追加
+		// 精鋭部隊登録
+		menu['精鋭部隊'] = {};
 		for( let i = 0; i < elites.length; i++ ) {
 			let key = '【' + elites[i] + '】部隊',
 				val = i + 1;
@@ -11650,10 +11769,26 @@ contextmenu: function() {
 				Elite.post( val, village.id );
 			};
 		}
+		// お気に入り部隊登録
+		menu['お気に入り部隊'] = {};
+		for( let i = 0, len = favorite.length; i < len; i++ ) {
+			let tag = favorite[i].tag,
+				key = favorite[i].name;
+
+			if( $.type( menu['お気に入り部隊'][tag] ) === 'undefined' ) {
+				menu['お気に入り部隊'][tag] = {};
+			}
+
+			menu['お気に入り部隊'][tag][key] = function( e ) {
+				FavoriteUnit.post( e.data, village );
+			}
+			menu['お気に入り部隊'][tag][key].data = favorite[i];
+		}
 	}
 	else {
 		menu['部隊作成【使用不可】'] = $.contextMenu.nothing;
 		menu['精鋭部隊【使用不可】'] = $.contextMenu.nothing;
+		menu['お気に入り部隊【使用不可】'] = $.contextMenu.nothing;
 	}
 
 	if ( $units.has('.imc_wait').length > 0 ) {
