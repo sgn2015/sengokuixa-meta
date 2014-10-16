@@ -17,6 +17,8 @@ sengokuixa-meta
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
 * 最新版のインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
 * ハンゲの方は旧版を削除のうえ、最新版をインストールしてください
+* mixiは期と章が取得できないので、[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/mixi-support.user.js)も合わせてインストールしてください
+ - ログイン後、家紋をクリックすると期と章を尋ねられますので入力すると地図画面での不具合が治ると思います
 
 更新履歴
 --------
