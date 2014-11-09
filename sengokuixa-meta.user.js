@@ -4804,6 +4804,22 @@ fortresses: (function() {
 	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
+//. doublegen
+doublegen: (function() {
+	var data = [
+		[
+			[21,27,28,33,34,38,39,42,43,45,46,47,48],
+			[10,14,15,16,19,20,22,23,25,26,29,30,31,32,35,36,37,40,41,44]
+		],
+		[
+			[15,20,21,25,26,29,30,32,33,34,35],
+			[10,11,13,14,16,17,18,19,22,23,24,27,28,31]
+		]
+	];
+
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+})(),
+
 //. countries
 countries: (function() {
 	return [
@@ -6847,12 +6863,13 @@ function drowMap( context, options, zoom ) {
 
 	drowViewArea( context, options );
 	drowRoute( context, options );
-	if ( options.fortress ) { drowFortress( context, options ); }
+	// if ( options.fortress ) { drowFortress( context, options ); }
 	drowBase( context, options, 'fortress' );
 	drowBase( context, options, 'user' );
 	drowBase( context, options, 'target' );
 	drowBase( context, options, 'coord' );
 	drowPointer( context, options );
+	if ( options.fortress ) { drowFortress( context, options ); }
 
 	drowBackground( context, options.mapsize );
 
@@ -6876,6 +6893,7 @@ function drowViewArea( context, options ) {
 function drowFortress( context, options ) {
 	var compass = Data.compass,
 		fortresses = Data.fortresses,
+		doublegen = Data.doublegen,
 		x, y, canvasx, canvasy;
 
 	//大殿
@@ -6893,6 +6911,22 @@ function drowFortress( context, options ) {
 			canvasy = getCanvasPointY( y * fortresses[ j ][ 1 ], options.fortresssize, options.size, options.pxsize );
 
 			drowPoint( context, canvasx, canvasy, options.fortresssize, options.fortresssize, '#fff' );
+
+			// 影武者用背景 size20固定
+			var bg = '#000';
+			if( doublegen[0].indexOf( j ) >= 0 ) {
+				bg = '#600';
+			}
+			else if( doublegen[1].indexOf( j ) >= 0 ) {
+				bg = '#300';
+			}
+			var dx = getCanvasX( x * fortresses[ j ][ 0 ] - ( Math.ceil( 20 / 2 ) - 1 ), options.size, options.pxsize ),
+				dy = getCanvasY( y * fortresses[ j ][ 1 ] + ( Math.ceil( 20 / 2 ) - 1 ), options.size, options.pxsize ),
+				dw = Math.ceil( 20 * options.pxsize ),
+				dh = Math.ceil( 20 * options.pxsize );
+
+			context.fillStyle = bg;
+			context.fillRect( dx - 1, dy - 1, dw + 2, dh + 2 );
 		}
 	}
 }
