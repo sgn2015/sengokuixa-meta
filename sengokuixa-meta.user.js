@@ -19242,7 +19242,7 @@ main: function() {
 //. layouter
 layouter: function() {
 	$('.chat_text').each( function() {
-		$(this).html( $(this).text().replace( /\(?\s?(-?\d+)[，,.]\s*(-?\d+)\s?\)?/g, replacer ) );
+		$(this).html( $(this).text().replace( /\(?\s?(-?\d+)[，、,.]\s*(-?\d+)\s?\)?/g, replacer ) );
 	});
 
 	function replacer( str, m1, m2 ) {
