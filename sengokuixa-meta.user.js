@@ -228,6 +228,9 @@ var MetaStorage=(function(){var storageList={},storagePrefix='IM.',eventListener
 'SIDEBAR'.split(' ').forEach(function( value ) {
 	MetaStorage.registerStorageName( value );
 });
+'FAVORITE_TRADE'.split(' ').forEach(function( value ) {
+	MetaStorage.registerStorageName( value );
+});
 
 MetaStorage.change( 'UNIT_STATUS', function( event, storageEvent ) {
 	$('#imi_unitstatus').trigger('update');
@@ -16475,6 +16478,7 @@ filterList: [
 	{ title: 'Lv0',      condition: [ 'lv',  0 ] },
 	{ title: '入札数0',  condition: [ 'bid', 0 ] },
 	{ title: '即落札',   condition: [ 'expires', '---' ] },
+	{ title: '即落札以外', condition: [ 'expires', '---', 'ne' ] },
 	{ title: '入札可能', condition: [ 'able', '銅銭不足', 'ne' ] },
 ],
 
@@ -16509,18 +16513,105 @@ layouter: function() {
 	$th.eq( 1 ).css('width', '130px');
 	$th.eq( 7 ).css('minWidth', '64px');
 	
-	// 検索ショートカット
+	this.layouter1( $tr );
+},
+
+// 検索ショートカット
+layouter1: function( $cardlist ) {
 	// カードNo.
-	$tr.find('td:eq(0)').html( function( idx, nowhtml ) {
-		return nowhtml.replace( /^\d+$/, function( str ) {
+	$cardlist.find('td:eq(0)').html( function( idx, nowhtml ) {
+		return nowhtml.replace( /\d+/, function( str ) {
 			return '<a href="/card/trade.php?t=no&s=price&o=a&k=' + str + '">' + str + '</a>';
 		} );
 	});
 	// スキル
-	$tr.find('td:eq(3)').html( function( idx, nowhtml ) {
-		return nowhtml.replace( /([攻|防]):([^<].*)LV/g, function( str, m1, m2 ) {
-			return m1 + ':<a href="/card/trade.php?t=skill&s=price&o=a&k=' + m2 + '">' + m2 + '</a>LV';
+	$cardlist.find('td:eq(3)').html( function( idx, nowhtml ) {
+		return nowhtml.replace( /:(.*)LV/g, function( str, m ) {
+			return ':<a href="/card/trade.php?t=skill&s=price&o=a&k=' + m + '">' + m + '</a>LV';
 		} );
+	});
+},
+
+// cardWindowのリンクを変更
+layouter2: function( $cardlist, suffix ) {
+	function replacer( str ) {
+		return str + '_' + suffix;
+	}
+
+	$cardlist.map( function( idx, elm ) {
+		let href = $(elm).find('a.thickbox').attr('href');
+		$(elm).find('a.thickbox')
+		.attr('href', href.replace(/cardWindow_\d+/, replacer ));
+
+		let cwid = $(elm).find('div[id^=cardWindow_]').attr('id');
+		$(elm).find('div[id^=cardWindow_]')
+		.attr('id', cwid.replace(/cardWindow_\d+/, replacer ) );
+	});
+},
+
+// 即落札と日時判定
+layouter3: function( $cardlist ) {
+	var date = new Date(),
+		datestr;
+
+	//8:00:00をセットする
+	date.setHours( 8 );
+	date.setMinutes( 0 );
+	date.setSeconds( 0 );
+	//過去時刻の場合、１日進める
+	if ( date <= new Date() ) {
+		date.setDate( date.getDate() + 1 );
+	}
+
+	datestr = date.toFormatDate();
+
+	$cardlist
+	.hover( Util.enter, Util.leave )
+	.each(function() {
+		let $self = $(this),
+			$td = $self.find('TD'),
+			expires = $td.eq( 6 ).text(),
+			bid = $td.eq( 7 ).text();
+
+		// 即落札
+		if ( expires == '---' && bid == '入札する' ) {
+			let $contents = $td.eq( 7 ).contents(),
+				$href = $td.eq( 7 ).find('a').attr('href'),
+				html = '<a href="javascript:void(0)" data-href="' + $href + '">落札する</a>';
+			$contents.replaceWith( html );
+
+			$td.eq( 7 ).find('a').click( function() {
+				let rarity = $td.eq(1).find('img').attr('alt').trim(),
+					name   = $td.eq(1).find('strong').text().trim(),
+					ranklv = $td.eq(2).html().replace(/<br>/, '/Lv' ).trim(),
+					price  = $td.eq(4).find('strong').text().trim();
+				let confirm_msg = '【'+rarity+'】 ' + name + '('+ ranklv +') を\n銅銭' + price +'で落札します';
+				// if( !window.confirm(confirm_msg) ) { return; }
+
+				$.get( $(this).data('href') )
+				.done( function( html ) {
+					let postData = {
+						exhibit_cid: $(html).find('form.trade input[name="exhibit_cid"]').val(),
+						exhibit_id : $(html).find('form.trade input[name="exhibit_id"]').val(),
+						buy_btn    : '落札する',
+					};
+					$.post( '/card/trade_bid.php', postData )
+					.done( function( html ) {
+						let exhibid_text = $(html).find('.ig_decksection_innermid > p.red').text().trim();
+						if( exhibid_text != '' ) {
+							Display.alert( exhibid_text );
+						}
+						$self.remove();
+						// this.analyzedDataから削除
+					});
+				});
+			});
+		}
+		//翌日
+		else if ( expires != '---' && expires != datestr ) {
+			$self.css('backgroundColor', 'lightgray');
+			$td.eq( 6 ).css('color', '#f00');
+		}
 	});
 },
 
@@ -16593,6 +16684,7 @@ sort: function( cardlist ) {
 
 //.. commandMenu
 commandMenu: function( container ) {
+	Trade.favoriteMenu( container );
 	Trade.filterMenu( container );
 	Trade.sortMenu( container );
 
@@ -16658,7 +16750,7 @@ filterMenu: function( container ) {
 		['指定無し'],
 		['天','極','特','上','序'],
 		['限界突破','★5','★4','★3','★2','★1','☆0'],
-		['Lv20','Lv0', '入札数0', '即落札', '入札可能']
+		['Lv20','Lv0', '入札数0', '即落札', '即落札以外', '入札可能']
 	];
 
 	Trade.createMenu( container, 'imc_filter', Trade.filterList, menulist, '指定無し' );
@@ -16711,19 +16803,104 @@ createMenu: function( container, type, conditionlist, menulist, selected ) {
 },
 
 //.. favoriteMenu
-favoriteMenu: function( container ) {
+favoriteMenu: function( $container ) {
 	var html;
 
 	html = '' +
 	'<span style="float:left; margin-right:8px;">' +
 		'<select id="imi_trade_list" name="favorite" style="max-width:182px;">' +
-			'<option value="0">-- 選択してください --</option>' +
+			// '<option value="0">-- 選択してください --</option>' +
 		'</select>' +
 		'<input id="imi_trade_search" type="button" value="検索">' +
 		'<input id="imi_trade_edit" type="button" value="編集">' +
 	'</span>';
 
-	$(html).appendTo( container );
+	$(html).appendTo( $container );
+
+	$container
+	.on('update', '#imi_trade_list', function() {
+		$(this).empty();
+		$(this).append('<option value="0">-- 選択してください --</option>');
+
+		var storage = MetaStorage('FAVORITE_TRADE'),
+			tlist   = storage.data;
+
+		for( key in tlist ) {
+			if( tlist[key].active ) {
+				$(this).append('<option value="'+ key +'">' + key +'</option>');
+			}
+		}
+	});
+
+	// 「検索」ボタン
+	$('#imi_trade_search').click( function() {
+		var storage = MetaStorage('FAVORITE_TRADE'),
+			tlist   = storage.data;
+			key = $('#imi_trade_list option').filter(':selected').text();
+		if( tlist[key].key.length <= 0 ) return false;
+
+		$('TABLE.common_table1 > TBODY > TR.fs12').remove();
+		$('.pager').remove();
+		Trade.analyzedData = [];
+
+		// オートページャリセット
+		$.autoPager( {
+			container: '',
+			next  : function(html){},
+			load  : function(nextPage) {},
+			loaded: function(html) {},
+			ended : function() {},
+		});
+
+		var ol = Display.dialog();
+		var pattern = $.merge([], tlist[key].key );
+
+		$.Deferred().resolve()
+		.pipe( function() {
+			ol.message('検索開始');
+		})
+		.pipe( function() {
+			if( pattern.length == 0 ) { return; }
+
+			var self = arguments.callee,
+				count = pattern.length,  // suffix用
+				query = pattern.shift();
+
+			var type = '';
+			switch( query.t ) {
+				case 'name' : type = '武将名';     break;
+				case 'lv'   : type = 'レベル';     break;
+				case 'no'   : type = 'カードNo';   break;
+				case 'skill': type = '所持スキル'; break;
+			}
+			ol.message( '検索条件：' + type + ' ＞ ' + query.k );
+
+			let postData = { 't': query.t, 'k': query.k, 's': 'price', 'o': 'a' };
+			return Page.get('/card/trade.php', postData )
+			.then( function( html ) {
+				let $tr = $(html).find( 'TABLE.common_table1 > TBODY > TR.fs12' );
+				let suffix = count;
+
+				Trade.layouter1( $tr );
+				Trade.layouter2( $tr, suffix );
+				Trade.layouter3( $tr );
+				TradeCard.setup( $tr );
+			})
+			.pipe( self );
+		})
+		.pipe( function() {
+			ol.message('検索終了');
+			Trade.updateTradeList();
+		})
+		.always( ol.close );
+	});
+	
+	// 「編集」ボタン
+	$('#imi_trade_edit').click( function() {
+		Trade.dialogFavoriteEdit();
+	});
+
+	$('#imi_trade_list').trigger('update');
 },
 
 updateTradeList: function() {
@@ -16738,6 +16915,243 @@ updateTradeList: function() {
 	}
 
 	$container.append( $cards ).trigger('update');
+},
+
+style: '' +
+'#imi_fvt_left { float: left; }' +
+'#imi_fvt_left LI { padding: 3px 5px; border-bottom: solid 1px #cc9; font-size: 12px; text-align: left; }' +
+'#imi_fvt_left LI .imc_trade_title { display: inline-block; width: 140px; }' +
+'#imi_fvt_left LI .imc_command { width: 140px; }' +
+
+'.imc_command { display: inline-block; text-align: right; width: 100%; }' +
+'.imc_command SPAN { margin: 0px 2px; padding: 2px 4px; border-radius: 5px; cursor: pointer; }' +
+'.imc_command SPAN:hover { color: #fff; background-color: #09f; }' +
+
+'#imi_fvt_right { float: right; width: 252px; }' +
+'#imi_fvt_right LI { padding: 3px 5px; border-bottom: solid 1px #cc9; margin-bottom: 3px; font-size: 12px; text-align: left; }' +
+'#imi_fvt_right LI INPUT { display: inline-block; width: 192px; }' +
+'#imi_fvt_right LI .imc_command { width: 48px; }' +
+'#imi_fvt_right .imc_query_delete { margin: 0px 2px; padding: 2px 4px; border-radius: 5px; cursor: pointer; }' +
+'#imi_fvt_right .imc_query_delete:hover { color: #fff; background-color: #09f; }' +
+'#imi_fvt_right .imc_command.imc_bottom { margin-top: 3px; border-top: solid 1px #cc9; padding-top: 3px; font-size: 12px; }' +
+
+'#imi_fvt_left .imc_active   { color: #000; }' +
+'#imi_fvt_left .imc_deactive { color: #666; }' +
+'#imi_fvt_left .imc_add:before    { content: "新規作成" }' +
+'#imi_fvt_left .imc_import:before { content: "←" }' +
+'#imi_fvt_left .imc_export:before { content: "→" }' +
+
+'.imc_query { margin-bottom: 2px; }' +
+'.imc_query SELECT { width: 80px; font-size:12px; margin-right:5px; }' +
+'',
+
+// お気に入り編集
+dialogFavoriteEdit: function() {
+	GM_addStyle( Trade.style );
+
+	var storage = MetaStorage('FAVORITE_TRADE'),
+		tlist   = storage.data,
+		html, options, dialog;
+
+	var $left  = $('<div id="imi_fvt_left" />'),
+		$right = $('<div id="imi_fvt_right"/>'),
+		$content = $('<div/>');
+
+	//.. 左ペイン イベント設定
+	$left
+	// .on('mouseenter', 'LI', function() {
+	// 	Util.enter.call( this );
+	// })
+	.on('mouseenter', 'LI', Util.enter )
+	.on('mouseleave', 'LI', Util.leave )
+	.on('update', function() {
+		var storage = MetaStorage('FAVORITE_TRADE'),
+			tlist   = storage.data;
+
+		var html = '',
+			$msg = $('<p></p>'),
+			$ul  = $('<ul/>'),
+			$action = $('<div style="padding: 3px 5px;"/>'),
+			$li, order, title, idx = 1;
+
+		// 検索パターン一覧の作成(左側)
+		$.each( tlist, function( title ) {
+			html = '<li>' +
+				'<span class="imc_trade_title">' + title + '</span>' +
+				'<span class="imc_command">' +
+					// ( ( idx == 1 ) ? '': '<span class="imc_up">↑</span>|' ) +
+					'<span class="imc_delete">×</span>' +
+					'|<span class="imc_edit">編集</span>' +
+					'|<span class="imc_activate"/>' +
+					// '|<span class="imc_export"/>' +
+				'</span>' +
+			'</li>';
+
+			$li = $( html ).data( { idx: idx, name: title, content: this } );
+
+			if( this.active ) {
+				$li.addClass('imc_active').find('.imc_activate').text('有効');
+			}
+			else {
+				$li.addClass('imc_deactive').find('.imc_activate').text('無効');
+			}
+
+			$ul.append( $li );
+			idx += 2;
+		});
+
+		// 追加コマンド欄
+		html = '' +
+		'<span class="imc_command">' +
+			'<span class="imc_add" />' +
+			// '|<span class="imc_import" />' +
+		'</span>';
+		$action.append( html );
+
+		$(this).append( $msg, $ul, $action );
+
+		return false;
+	})
+	.on('click', '.imc_up', function() {
+		console.log('.imc_up click', $(this) );
+	})
+	.on('click', '.imc_delete', function() {
+		var $li = $(this).closest('LI'),
+			data = $li.data();
+
+		delete tlist[ data.name ];
+		$(this).closest('LI').remove();
+	})
+	.on('click', '.imc_edit', function() {
+		var $li = $(this).closest('LI'),
+			data = $li.data();
+
+		$right.empty();
+		$right.trigger('update', data);
+	})
+	.on('click', '.imc_activate', function() {
+		var $li = $(this).closest('LI'),
+			data = $li.data();
+
+		data.content.active = !data.content.active;
+		$content.trigger('update');
+	})
+	.on('click', '.imc_add', function() {
+		$right.empty();
+		$right.trigger('update');
+	});
+	// .on('click', '.imc_export', function() {
+	// 	console.log('.imc_export click', $(this) );
+	// })
+	// .on('click', '.imc_import', function() {
+	// 	console.log('.imc_import click', $(this) );
+	// });
+
+	//.. 右ペイン イベント設定
+	$right
+	.on('update', function() {
+		var html =
+		'<li>' +
+			'<input type=text name="title" />' +
+			'<span class=imc_command><span class=imc_ok>確定</span></span>' +
+		'</li>' +
+		'<span class="imc_command imc_bottom">' +
+			'<span class="imc_add">追加</span>' +
+		'</span>';
+		$(this).html( html );
+
+		// arguments[0]はイベントオブジェクト
+		var data = arguments[1];
+		if( data != undefined ) {
+			$(this).find('INPUT[name=title]').val( data.name );
+			for( var i = 0; i < data.content.key.length; i++ ) {
+				var $html = $( queryColumn() )
+				.find('SELECT[name=t]').val( data.content.key[i].t ).end()
+				.find('INPUT[name=k]').val( data.content.key[i].k ).end();
+
+				$(this).find('.imc_command:last').before( $html );
+			}
+		}
+
+		return false;
+	})
+	.on('click', '.imc_command .imc_add', function() {
+		$right.find('.imc_command:last').before( queryColumn() );
+	})
+	.on('click', '.imc_command .imc_ok', function() {
+		if( !window.confirm('確定してよろしいですか？') ) { return false; }
+
+		var title    = $right.find('INPUT[name=title]').val(),
+			$queries = $right.find('.imc_query'),
+			obj = tlist[title];
+
+		if( obj == undefined ) {
+			obj = { active: true, key: [] }
+			tlist[title] = obj;
+		}
+
+		obj.key = [];
+		$queries.each( function() {
+			obj.key.push( {
+				t: $(this).find('SELECT[name=t]').val(),
+				k: $(this).find('INPUT[name=k]').val(),
+			});
+		});
+
+		$content.trigger('update');
+	})
+	.on('click', '.imc_query_delete', function() {
+		//if( !window.confirm('削除しますか') ) { return false; }
+		$(this).closest('.imc_query').remove();
+	});
+
+	// 更新
+	$content
+	.append( $left, $right )
+	.on('update', function() {
+		$left.empty();
+		$right.empty();
+		$left.trigger('update');
+	});
+
+	options = {
+		title: '検索条件編集',
+		width: 584,
+		content: $content,
+		buttons: {
+			'保存': function() {
+				storage.clear();
+				storage.begin();
+				storage.data = tlist;
+				storage.commit();
+				Display.info('保存しました');
+				$('#imi_trade_list').trigger('update');
+			},
+			'閉じる': function() {
+				this.close();
+			},
+		}
+	};
+
+	dialog = Display.dialog( options );
+
+	$content.trigger('update');
+
+	function queryColumn() {
+		var html = '' +
+		'<div class="imc_query">' +
+			'<select name="t">' +
+				'<option value="name">武将名</option>' +
+				'<option value="lv">レベル</option>' +
+				'<option value="no">カードNo</option>' +
+				'<option value="skill">所持スキル</option>' +
+			'</select>' +
+			'<input type="text" name="k"/>' +
+			'<span class="imc_query_delete">×</span>' +
+		'</div>';
+
+		return html;
+	}
 },
 
 });
@@ -16787,17 +17201,24 @@ Page.registerAction( 'card', 'trade', {
 main: function() {
 	$('.common_menu1 .form1').css('width', '80px');
 	$('.ig_decksection_mid .common_menu1:first').find('br').remove();
-	$('.ig_decksection_mid .common_menu1:first').after('<div id="imi_trade_menu" class="common_menu1 mb20 clearfix"/>');
+	$('.ig_decksection_mid .common_menu1:first')
+	.after('<div id="imi_trade_menu" class="common_menu1 mb20 clearfix"/>');
 	$('#imi_trade_menu').append('<ul id="imi_command_selecter" class="imc_command_selecter" />');
 	Trade.commandMenu( $('#imi_trade_menu #imi_command_selecter') );
 
 	// 共通レイアウタ
 	Trade.layouter();
 
-	var $tr = $('TABLE.common_table1 > TBODY > TR.fs12');
+	var $card_list = $('TABLE.common_table1 > TBODY > TR.fs12');
 
 	this.autoPager();
-	this.layouter( $tr );
+	this.layouter();
+
+	Trade.layouter2( $card_list, 'sfx' )
+	Trade.layouter3( $card_list )
+
+	TradeCard.setup( $card_list );
+	Trade.updateTradeList();
 
 	// ページャを上部にも表示
 	$('.pager').clone(true).css({ margin: 0, padding: 0 }).insertBefore('.ig_decksection_innertop');
@@ -16837,22 +17258,11 @@ autoPager: function() {
 				$card_list = $html.find('table.common_table1.center.mt10 tr.fs12'),
 				loadedPage = $html.find('UL.pager LI :not("A")').text();  // 読み込んだページ
 			
-			function replacer( str, m1 ) {
-				return 'cardWindow_' + loadedPage + '_' + m1;
-			}
+			Trade.layouter1( $card_list )
+			Trade.layouter2( $card_list, loadedPage )
+			Trade.layouter3( $card_list )
 
-			$card_list.each( function( idx, elm ) {
-				// cardWindowのリンクを置換
-				let href = $(elm).find('a.thickbox').attr('href');
-				$(elm).find('a.thickbox').attr('href', href.replace(/cardWindow_(\d+)/, replacer ) );
-				
-				let cwid = $(elm).find('div[id^=cardWindow_]').attr('id');
-				$(elm).find('div[id^=cardWindow_]').attr('id', cwid.replace(/cardWindow_(\d+)/, replacer ) );
-			});
-			$card_list.appendTo('table.common_table1.center.mt10 > tbody');
-
-			Trade.layouter();
-			self.layouter( $card_list );
+			TradeCard.setup( $card_list );
 			Trade.updateTradeList();
 		},
 		ended: function() {
@@ -16862,75 +17272,7 @@ autoPager: function() {
 },
 
 //.. layouter
-layouter: function( $tr ) {
-
-	TradeCard.setup( $tr );
-
-	var date = new Date(),
-		datestr;
-
-	//8:00:00をセットする
-	date.setHours( 8 );
-	date.setMinutes( 0 );
-	date.setSeconds( 0 );
-	//過去時刻の場合、１日進める
-	if ( date <= new Date() ) {
-		date.setDate( date.getDate() + 1 );
-	}
-
-	datestr = date.toFormatDate();
-
-	$tr.slice( 0 )
-	.hover( Util.enter, Util.leave )
-	.each(function() {
-		let $self = $(this);
-		var $td = $(this).find('TD'),
-			expires = $td.eq( 6 ).text(),
-			bid = $td.eq( 7 ).text();
-
-		// 即落札
-		if ( expires == '---' && bid == '入札する' ) {
-				let $contents = $td.eq( 7 ).contents(),
-					$href = $td.eq( 7 ).find('a').attr('href'),
-					html = '<a href="javascript:void(0)" data-href="' + $href + '">落札する</a>';
-				$contents.replaceWith( html );
-
-				$td.eq( 7 ).find('a').click( function() {
-					let rarity = $td.eq(1).find('img').attr('alt').trim(),
-						name   = $td.eq(1).find('strong').text().trim(),
-						ranklv = $td.eq(2).html().replace(/<br>/, '/Lv' ).trim(),
-						price  = $td.eq(4).find('strong').text().trim();
-					let confirm_msg = '【'+rarity+'】 ' + name + '('+ ranklv +') を\n銅銭' + price +'で落札します';
-					if( !window.confirm(confirm_msg) ) { return; }
-					
-					$.get( $(this).data('href') )
-					.done( function( html ) {
-						let postData = {
-							exhibit_cid: $(html).find('form.trade input[name="exhibit_cid"]').val(),
-							exhibit_id : $(html).find('form.trade input[name="exhibit_id"]').val(),
-							buy_btn    : '落札する',
-						};
-						$.post( '/card/trade_bid.php', postData )
-						.done( function( html ) {
-							let exhibid_text = $(html).find('.ig_decksection_innermid > p.red').text().trim();
-							if( exhibid_text != '' ) {
-								Display.alert( exhibid_text );
-							$self.remove();
-							}
-							else {
-								$self.remove();
-							}
-						});
-					});
-				});
-			}
-		//翌日
-		else if ( expires != '---' && expires != datestr ) {
-			$self.css('backgroundColor', 'lightgray');
-			$td.eq( 6 ).css('color', '#f00');
-		}
-	});
-
+layouter: function() {
 	// 4桁以上の数値の場合はカードNoとして扱う
 	$('#button').click( function( e ) {
 		if( /\d{4,}/.test( $('#k').val() ) ) {
@@ -16955,7 +17297,7 @@ Page.registerAction( 'card', 'trade_card', {
 style: '' +
 'INPUT { ime-mode: disabled; }' +
 '.tradecmd { position:relative; top:320px; left: 6px; width:212px; }' +
-'.price { float:right; height:18px; margin:2px; text-align:right; }' +
+'.price { float:right; height:18px; margin:2px; text-align:right; width: 72px;}' +
 '',
 
 //.. main
@@ -17009,7 +17351,7 @@ layouter: function( $cards ) {
 			'<input type=button name="find"  value="取引"   style="float:left;"  title="出品中の同カードを検索します">'+
 			'<input type=button name="net"   value="手取り" style="float:right;" title="出品価格に手数料を上乗せした価格を表示します">' +
 			'<input type=button name="gross" value="出品"   style="float:right;" title="手数料込みの価格として出品します">' +
-			'<input type=number name="price" value=10 size=10 class="price">' +
+			'<input type=number name="price" value=10 class="price">' +
 			'</div>';
 		$elm.find('.tradebtn').before( html ).hide();
 		
