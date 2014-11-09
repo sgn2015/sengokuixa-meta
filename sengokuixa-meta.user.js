@@ -10175,9 +10175,9 @@ assignCard: function( ano ) {
 			set_village_id: village_id,
 			set_assign_id: unit_id,
 			set_card_id: card.cardId,
-//			set_squad_id: card.squadId,
+			// set_squad_id: card.squadId,
 			set_squad_id: '',
-//			deck_mode: 'nomal',
+			// deck_mode: 'nomal',
 			p: 1,
 			myselect_2: ''
 		};
@@ -10794,7 +10794,7 @@ layouterStatus1: function() {
 //.. layouterStatus2
 layouterStatus2: function() {
 	var color_table = { '攻': '#058', '防': '#363', '速': '#535', '特': '#850' },
-//		color_table = { '攻': '#036', '防': '#250', '速': '#504', '特': '#850' },
+		// color_table = { '攻': '#036', '防': '#250', '速': '#504', '特': '#850' },
 		html;
 
 	html = '<table class="ig_deck_smallcarddata imc_card_skill">';
@@ -16023,10 +16023,10 @@ main: function() {
 	.live('click', Deck.addCard )
 	.contextMenu( Deck.contextmenu, true );
 
-//	$card_list.remove();
+	// $card_list.remove();
 	SmallCard.setup( $card_list );
 	Deck.updateDeckInfo();
-//	Deck.update();
+	// Deck.update();
 
 	$.each( Soldier.typeKeys, function( type ) {
 		var $input = $( '#pool_unit_cnt_' + type );
@@ -16120,11 +16120,12 @@ layouter: function() {
 	$('#ig_deckheadmenubox').css('height', '55px');
 	// 経験値アップ非表示
 	$('#ig_keikenup').hide();
-//	// @todo 経験値アップ期間はどこかに表示
-//	$('.ig_deckkeikenuptime').text();
-//	
-//	// コストアップ非表示
-//	$('#deck_cost_add_area').hide();
+
+	// // @todo 経験値アップ期間はどこかに表示
+	// $('.ig_deckkeikenuptime').text();
+	// // コストアップ非表示
+	// $('#deck_cost_add_area').hide();
+
 	// 全部隊解散ボタンの配置変更に伴う再配置
 	$('#deck_header').css({'margin-top':'-13px;', 'width':'759px'});
 	$('#normal_unit_state_head').css( {'padding-left': '9px', 'width': '259px' } );
