@@ -2285,7 +2285,43 @@ var Append = {
 			btnlumpsum: true
 			});
 	},
+	// 全部隊最大補充
+	setMaxSoldier: function() {
+		$.get('/facility/set_unit_list.php')
+		.done( function( html ) {
+			let $last = $(html).find( 'div[onclick^="return btn_selectassignno_click"]:not(".tab_off_reinforce"):last' );
+			let anomax = $last.attr('onclick').match(/_click\((\d)\)/)[1].toInt();
+			if( anomax > 4 ) {
+				Display.info( '補充対象部隊なし' );
+				return;
+			}
 	
+			var ol = Display.dialog().message('兵士補充中...');
+			for( let ano = 0; ano < anomax+1; ano++ ) {
+				ol.message( ano );
+				$.get('/facility/set_unit_list.php?ano=' + ano )
+				.done( function( uhtml ) {
+					let postData = $(uhtml).find('#deck_file').serialize() + '&btn_preview_max=true';
+					$.post( '/facility/set_unit_list.php', postData );
+				});
+			}
+			ol.close();
+		});
+	},
+	// 全武将に兵1をセット
+	setOneSoledier: function( type ) {
+		$.post('/facility/set_unit_list.php', {
+            btnlumpsum:             true,
+            edit_unit_count:        1,
+            edit_unit_type:         type,
+            now_group_type:         0,
+            now_unit_type:          'all_unit',
+            p:                      1,
+            select_card_group:      0,
+            show_deck_card_count:   15,
+            show_num:               100,
+		});
+	},
 	// 兵士退避
 	gatherSoldierAll: function( ol ) {
 		return Append.clearSoldier()
