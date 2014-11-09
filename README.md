@@ -8,20 +8,26 @@ sengokuixa-meta
 動作確認
 --------
 
-* Firefox24esr + Scriptish
-* （確か・・・Firefox9以上必須）
+* Firefox31esr + Scriptish0.1.11
 
 インストール
 ------------
 
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
 * 最新版のインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
-* ハンゲの方は旧版を削除のうえ、最新版をインストールしてください
 * mixiは期と章が取得できないので、[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/mixi-support.user.js)も合わせてインストールしてください
  - ログイン後、家紋をクリックすると期と章を尋ねられますので入力すると地図画面での不具合が治ると思います
 
 更新履歴
 --------
+
+### 1.4.4.5
+2014/11/09
+
+* ミニマップを影武者の出現時間帯別に色分け
+* 取引フィルタに「即落札以外」を追加
+* 取引検索の拡充
+ - 複数条件をまとめて検索できます
 
 ### 1.4.4.4
 2014/10/12
@@ -259,3 +265,10 @@ sengokuixa-meta
 オリジナルへのリンク
 ------------------------
 [metameta氏](https://github.com/metameta)の[sengokuixa-meta](https://github.com/metameta/sengokuixa-meta)
+
+Special Thanks
+--------------
+* 株式会社スクウェア・エニックス
+* [戦国IXA wiki](http://www.ixawiki.com/)
+* [ポケットサウンド](http://pocket-se.info/)様
+* 2chのツールスレ
