@@ -249,6 +249,7 @@ var Env = (function() {
 		start = ( document.cookie.match( new RegExp( world + '_st=(\\d+)' ) ) || [] )[1],
 		login = false, season, newseason, chapter, war, server_time, local_time, timeDiff, endtime;
 
+	$.ajaxSetup( { beforeSend: function( xhr ) { xhr.setRequestHeader('X-Requested-With', ' ') } } );
 	//storageから取得
 	endtime = storage.get('endtime');
 	season  = storage.get('season');
@@ -2391,7 +2392,7 @@ var Append = {
 		.pipe(function (html) {
 			var $html = $(html),
 				$card_list = $html.find('#ig_deck_smallcardarea_out').find('.ig_deck_smallcardarea'),
-				$pager = $html.find('UL.pager.cardstock:first'),
+				$pager = $html.find('UL.pager:first'),
 				source = $pager.find('LI.last A:eq(1)').attr('onClick') || '',
 				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
 				pool = {},
@@ -5397,8 +5398,8 @@ analyzeArea: function( $area_list, img_list ) {
 		if ( img_data.type == '空き地' ) {
 			//ソートさせる為、同盟に価値、ユーザーに資源をセット
 			data.alliance  = array[5];
-			data.user      = array.slice( 7, 12 ).join('/');
-			data.materials = array.slice( 7, 12 ).join('');
+			data.user      = array.slice( 9, 14 ).join('/');
+			data.materials = array.slice( 9, 14 ).join('');
 			//NPC扱いとする
 			data.npc  = 1;
 			//価値をセットしフィルタ条件で使用する
@@ -5406,7 +5407,7 @@ analyzeArea: function( $area_list, img_list ) {
 		}
 		else if ( img_data.type == '領地' ) {
 			//資源情報をセットし必要攻撃力を表示させる
-			data.materials = array.slice( 7, 12 ).join('');
+			data.materials = array.slice( 9, 14 ).join('');
 			//価値をセットしフィルタ条件で使用する
 			data.rank = array[5].length;
 		}
@@ -9591,7 +9592,7 @@ loadCard: function( brigade ) {
 	.pipe(function( html ) {
 		var $html = $( html ),
 			$card_list = $html.find('#ig_deck_smallcardarea_out').find('.ig_deck_smallcardarea'),
-			$pager = $html.find('UL.pager.cardstock:first'),
+			$pager = $html.find('UL.pager:first'),
 			source = $pager.find('LI.last A:eq(1)').attr('onClick') || '',
 			match = source.match(/input.name = "p"; input.value = "(\d+)"/),
 			pool = {}, deck_cost, ano, lastPage;
@@ -16103,7 +16104,7 @@ autoPager: function() {
 		container: '.ig_imgtop:last',
 		next: function( html ) {
 			var $html = $(html),
-				$pager = $html.find('UL.pager.cardstock:first'),
+				$pager = $html.find('UL.pager:first'),
 				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
 				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
 				nextPage;
@@ -19773,7 +19774,7 @@ autoPager: function() {
 		container: '.ig_imgtop:last,.float_clear:last',
 		next: function( html ) {
 			var $html = $(html),
-				$pager = $html.find('UL.pager.cardstock:first'),
+				$pager = $html.find('UL.pager:first'),
 				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
 				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
 				nextPage;
@@ -19834,7 +19835,7 @@ autoPager: function() {
 		container: '.ig_imgtop:last,.float_clear:last',
 		next: function( html ) {
 			var $html = $(html),
-				$pager = $html.find('UL.pager.cardstock:first'),
+				$pager = $html.find('UL.pager:first'),
 				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
 				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
 				nextPage;
@@ -19895,7 +19896,7 @@ autoPager: function() {
 		container: '.ig_imgtop:last,.float_clear:last',
 		next: function( html ) {
 			var $html = $(html),
-				$pager = $html.find('UL.pager.cardstock:first'),
+				$pager = $html.find('UL.pager:first'),
 				source = $pager.find('LI.last A:eq(0)').attr('onClick') || '',
 				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
 				nextPage;
