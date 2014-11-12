@@ -14000,7 +14000,7 @@ dealings: function() {
 	var html;
 
 	//施設情報を下へ移動
-	$('#ig_tileheadmenu').nextUntil('DIV:not([class])').insertBefore('.ig_paneloutbtn');
+	$('#ig_tileheadmenu').nextUntil('FORM').insertBefore('.ig_paneloutbtn');
 
 	html = '' +
 	'<img data-type="101" src="' + Env.externalFilePath + '/img/common/ico_wood.gif" />' +
