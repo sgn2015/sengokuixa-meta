@@ -4821,7 +4821,7 @@ compass: [
 ],
 
 //. mapsize
-mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170 ][ Env.chapter ] || 150,
+mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170, 170 ][ Env.chapter ] || 150,
 
 //. fortresses
 fortresses: (function() {
@@ -4841,7 +4841,7 @@ fortresses: (function() {
 		[108,108], [132, 84], [108,132], [132,108], [132,132]
 	]];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. doublegen
@@ -4857,7 +4857,7 @@ doublegen: (function() {
 		]
 	];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. countries
@@ -4880,6 +4880,8 @@ countries: (function() {
 		['dummy', '明智家', '真田家', '鈴木家', '上杉家', '徳川家', '毛利家', '伊達家', '北条家', '長宗我部家', '島津家', '豊臣家', '最上家'],
 		//第８章
 		['dummy', '黒田家', '真田家', '宇喜多家', '上杉家', '徳川家', '毛利家', '伊達家', '加藤家', '福島家', '島津家', '豊臣家', '石田家'],
+		//第９章
+		['dummy', '織田家', '雑賀家', '武田家', '上杉家', '徳川家', '毛利家', '浅井家', '北条家', '長宗我部家', '佐竹家', '大友家', '最上家'],
 	][ Env.chapter ] || [];
 })(),
 
@@ -5042,7 +5044,7 @@ getNpcPower: function() {
 		'8-33342': { '鬼': 905, '天狗': 455 }
 	}];
 
-	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
+	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
 
 	if ( Env.chapter <= 4 ) {
 		Data.npcPower = data;
@@ -12734,6 +12736,9 @@ execute: function() {}
 //■ /world/select_world
 Page.registerAction( 'world', 'select_world', {
 
+style: '' +
+'.infoTable { min-height: 0px !important; }',
+
 //. main
 main: function() {
 	$('A[href^="/world/"]').click( this.serverSelected );
@@ -12774,6 +12779,9 @@ serverSelected: function() {
 	world = ( $this.attr('href').match(/wd=((\S+\d{2,3}))/) || [,''] )[ 1 ];
 	season = ( $server.find('IMG:last').attr('src').match(/flag_.(\d{2})/) || [,''] )[ 1 ];
 	chapter = ( $server.children('DIV').attr('class').match(/(?:main|sub)server_.(\d)/) || [,''] )[ 1 ];
+
+	// 暫定...
+	if( world == 'y001' ) { chapter = 9; }
 
 	if ( world ) {
 		document.cookie = world + '_st=' + time + '; domain=.sengokuixa.jp; path=/;';
