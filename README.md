@@ -14,12 +14,24 @@ sengokuixa-meta
 ------------
 
 * このツールを使用するには[Scriptish](https://addons.mozilla.org/ja/firefox/addon/scriptish/)を事前にインストールしておく必要があります
-* 最新版のインストールは[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)
+* y鯖最新版のインストールは[ここ](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.user.js)をクリック
+* hm鯖最新版のインストールは[ここ](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta-hm.user.js)をクリック
 * mixiは期と章が取得できないので、[こちら](https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/mixi-support.user.js)も合わせてインストールしてください
  - ログイン後、家紋をクリックすると期と章を尋ねられますので入力すると地図画面での不具合が治ると思います
 
 更新履歴
 --------
+
+### 1.4.4.8
+2014/11/20
+* 9章対応
+ - データ修正
+ - 章の取得を修正(@Todo)
+ - チャット欄のボタン配置修正(Thanks>>431)
+ - 受信箱のレイアウト修正
+ - 兵士作成施設のレイアウト修正
+* hm鯖除外
+ - hm鯖用は別ファイルになりましたので必要な方は↑からインストールしてください
 
 ### 1.4.4.6
 2014/11/12
