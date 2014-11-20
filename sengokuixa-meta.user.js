@@ -4,6 +4,7 @@
 // @version        1.4.4.7
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
+// @exclude        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
 // @website        https://github.com/moonlit-g/sengokuixa-meta
 // @updateURL      https://raw.githubusercontent.com/moonlit-g/sengokuixa-meta/master/sengokuixa-meta.meta.js
@@ -4495,7 +4496,7 @@ style: '' +
 /* 募集・チャット用 */
 '#commentBody TD { height: 13px; }' +
 '#commentBody #chatComment TABLE TD.al { width: 105px; }' +
-'#commentBody #chatComment TABLE TD.al A { width: 105px; }' +
+'#commentBody #chatComment TABLE TD.al A { width: 100px; }' +
 '#commentBody #chatComment TABLE TD.msg > SPAN { width: 235px; }' +
 '.imc_coord { display: inline !important; cursor: pointer; font-weight: bold; }' +
 'SPAN.imc_coord:hover { background-color: #f9dea1 !important; }' +
@@ -12780,8 +12781,8 @@ serverSelected: function() {
 	season = ( $server.find('IMG:last').attr('src').match(/flag_.(\d{2})/) || [,''] )[ 1 ];
 	chapter = ( $server.children('DIV').attr('class').match(/(?:main|sub)server_.(\d)/) || [,''] )[ 1 ];
 
-	// 暫定...
-	if( world == 'y001' ) { chapter = 9; }
+	// いいのかな...(問題が出るまではこのままの予定)
+	chapter = chapter.toInt() + 6;
 
 	if ( world ) {
 		document.cookie = world + '_st=' + time + '; domain=.sengokuixa.jp; path=/;';
@@ -13636,6 +13637,7 @@ style: '' +
 'TR.imc_facility TD { text-align: center; }' +
 'TR.imc_facility TD ~ TD { border-left: solid 1px #fff; }' +
 'BUTTON { position: relative; top: 1px; }' +
+'.ig_tilesection_innerborder_high_speed DIV.ig_tilesection_unit_info { left: 0px; width: 100%; }' +
 /* 市用 */
 '.table_tile_market TD IMG { border: solid 2px black; border-radius: 2px; padding: 2px; margin-right: 5px; cursor: pointer; }' +
 '.table_tile_market TD IMG.imc_selected { border-color: #f80; background-color: #860; }' +
@@ -13726,6 +13728,8 @@ training: function( name ) {
 
 		//兵種の説明
 		$this.find('.ig_tile_explain').hide();
+		// 訓練タイプ
+		$this.find('.create_unit_type_title').remove();
 
 		//現在の兵士数表示位置変更
 		text = $this.find('DIV.ig_tilesection_iconarea > P').remove().text() || '';
@@ -13738,17 +13742,19 @@ training: function( name ) {
 		$close = $('<span class="imc_training_button"></span>');
 		$close.click(function() {
 			var $this = $(this),
-				$container = $this.closest('.ig_tilesection_innerborder');
+				$container = $this.closest('.ig_tilesection_innerborder_high_speed');
 
 			if ( $this.hasClass('is_open') ) {
 				$this.removeClass('is_open').addClass('is_close');
 				$container.find('.ig_tilesection_iconarea').hide();
+				$container.find('.ig_tilesection_detailarea DIV').hide();
 				$container.find('.ig_tilesection_detailarea TABLE').hide();
 				storage.set( key, true );
 			}
 			else {
 				$this.addClass('is_open').removeClass('is_close');
 				$container.find('.ig_tilesection_iconarea').show();
+				$container.find('.ig_tilesection_detailarea DIV').show();
 				$container.find('.ig_tilesection_detailarea TABLE').show();
 				storage.remove( key );
 			}
@@ -13759,6 +13765,7 @@ training: function( name ) {
 		if ( close ) {
 			$close.addClass('is_close');
 			$this.find('.ig_tilesection_iconarea').hide();
+			$this.find('.ig_tilesection_detailarea DIV').hide();
 			$this.find('.ig_tilesection_detailarea TABLE').hide();
 		}
 		else {
@@ -19464,11 +19471,12 @@ Page.registerAction( 'message', 'inbox', {
 style: '' +
 /* 受信箱 */
 '#ig_deckheadmenubox.normal { height: 55px; margin-bottom: 0px; }' +
-'#ig_deckmenu { width: 710px; padding: 0px; position: static; margin: 0px auto; color: black; }' +
-'#ig_deckmenu UL.secondmenu { width: 100%; padding: 0px; }' +
-'#ig_deckmenu LI { margin: 2px 0px; padding: 0px 8px; }' +
-'#ig_deckmenu LI.textmenu { margin: 7px 0px; }' +
-'.common_box3bottom { padding: 0px 15px 15px 12px; }' +
+// '.common_box3bottom { padding: 0px 15px 15px 12px; }' +
+'UL.statMenu { width: 710px; padding: 0px; position: static; margin: 0px auto; color: black; }' +
+'UL.statMenu LI { margin: 2px 0px; padding: 0px 8px; }' +
+'UL.statMenu LI.textmenu { margin: 7px 0px; }' +
+'UL.statMenu LI:not(.textmenu)  { float: right; border-right: none; padding: 0px 4px; }' +
+'UL.statMenu LI button { font-size: 12px; }' +
 '#imi_list { width: 710px; height: 210px; margin: 0px auto; margin-bottom: 10px; overflow-y: scroll; }' +
 '#imi_list .imc_selected { background-color: #f9dea1; }' +
 '#imi_list TABLE { position: relative; }' +
@@ -19487,9 +19495,9 @@ layouter: function() {
 	var $table, $menu;
 
 	//プロフィール等リンク・全件表示ボタン・未読のみ表示ボタン削除
-	$('#ig_deckmenu UL').not('.secondmenu').remove();
-	$('.common_box3bottom > P').remove();
-	$('#ig_deckmenu').removeAttr('class').prependTo('FORM');
+	$('.statMenu:not(.no_b)').prependTo('.ig_decksection_innermid');
+	$('#ig_deckmenu').remove();
+	$('FORM[name=message_select]').remove();
 
 	//テーブル変更
 	$table = $('TABLE.common_table1').wrap('<div id="imi_list" />');
@@ -19509,18 +19517,18 @@ layouter: function() {
 	$table.find('A[href^="detail.php"]').click( this.getDetail );
 
 	//ページャーを上に移動
-	$('.common_box3bottom > .pager').insertBefore('#imi_list');
+	$('.pager').insertAfter('.statMenu');
 
 	//各種ボタン
-	$menu = $('#ig_deckmenu .secondmenu');
+	$menu = $('.statMenu');
 	$menu.find('LI').addClass('textmenu');
 
 	$('FORM').find('P INPUT').appendTo( $menu )
-	.wrap('<LI style="float: right; border-right: none;" />');
+	.wrap('<LI/>');
 
 	$('<button key="落札">取引結果を選択</button>').appendTo( $menu )
 	.click( this.selectReport )
-	.wrap('<LI style="float: right; border-right: none; padding-right: 0px;" />');
+	.wrap('<LI/>');
 },
 
 //. getDetail
