@@ -13832,20 +13832,22 @@ trainingPulldown: function( $div ) {
 
 	$div.each(function() {
 		var $this = $(this),
-			$table = $this.find('TABLE').eq( 1 ),
+			$tables = $this.find('TABLE').slice( 1 ),
 			name = $this.find('H3 B').text().slice(1, -1),
-			data = Soldier.getByName( name ),
-			$tr, $select;
+			data = Soldier.getByName( name );
+
+		$tables.each( function( idx, elm ) {
+			var $tr, $select;
 
 		//各拠点の施設表示
-		$tr = $table.find('TR.noborder');
+			$tr = $(this).find('TR.noborder');
 		$tr.removeClass('noborder');
 		$tr.find('TH').first().remove();
 		$tr.find('TD').first().remove();
 		$tr.find('TD').attr('colspan', 3);
 
 		//資源不足等で訓練できない場合はプルダウン化処理をしない
-		var $input = $this.find('INPUT[type="text"]');
+			var $input = $(this).find('INPUT[type="text"]');
 		if ( $input.length == 0 ) { return; }
 
 		html = '（分割回数：<select id="create_count_' + data.type + '">' +
@@ -13863,16 +13865,16 @@ trainingPulldown: function( $div ) {
 		'　<button>複数拠点で訓練する</button>）';
 
 		$tr.find('FORM').append( html );
-		$table
+			$(this)
 		.append('<tr><th>拠点</th><th width="70">LV</th>' +
 			'<th width="120"><img alt="訓練する人数" src="' + Env.externalFilePath + '/img/tile/icon_training_num.png"></th>' +
 			'<th width="120"><img alt="訓練にかかる時間" src="' + Env.externalFilePath + '/img/tile/icon_training_time.png"></th>' +
 			'</tr>'
 		)
-		.append('<tbody id="imi_training_' + data.type + '"></tbody>');
+			.append('<tbody id="imi_training' + idx + '_' + data.type + '"></tbody>');
 
 		//必要資源取得（金山効果は込）
-		$tr = $table.find('TR').eq( 0 );
+			$tr = $(this).find('TR').eq( 0 );
 		materials = [
 			$tr.find('.icon_wood').text().match(/(\d+)/)[ 1 ].toInt(),
 			$tr.find('.icon_cotton').text().match(/(\d+)/)[ 1 ].toInt(),
@@ -13918,6 +13920,7 @@ trainingPulldown: function( $div ) {
 
 		$select.data({ type: data.type, materials: materials })
 		.change( self.trainingDivide ).trigger('change');
+	});
 	});
 },
 
