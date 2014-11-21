@@ -19519,6 +19519,9 @@ layouter: function() {
 	//詳細をajaxで取得する
 	$table.find('A[href^="detail.php"]').click( this.getDetail );
 
+	// 削除用フォームで囲むように調整
+	$('FORM[name=message]').prependTo('.ig_decksection_innermid').prepend($('.statMenu'));
+
 	//ページャーを上に移動
 	$('.pager').insertAfter('.statMenu');
 
