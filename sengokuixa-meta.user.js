@@ -12415,7 +12415,7 @@ createCoordLink: function() {
 		pointReg = /-?\d{1,3}/g,
 		point, html;
 
-	$('#commentBox')
+	$('#commentBox,#commentBox2')
 	.on('update', function() {
 		$('#commentBody TD.msg > SPAN').each(function() {
 			var $this = $(this),
