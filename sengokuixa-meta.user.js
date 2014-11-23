@@ -17575,6 +17575,17 @@ changeTitle: function() {
 
 });
 
+//■ /card/bid_list
+Page.registerAction( 'card', 'bid_list', {
+
+//. main
+main: function() {
+	// 共通レイアウタ
+	Trade.layouter();
+},
+
+});
+
 //■ /card/deck_card_delete
 Page.registerAction( 'card', 'deck_card_delete', {
 
