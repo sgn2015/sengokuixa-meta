@@ -17182,9 +17182,58 @@ dialogFavoriteEdit: function() {
 
 	options = {
 		title: '検索条件編集',
-		width: 584,
+		width: 584, height: 505, top: 30,
 		content: $content,
 		buttons: {
+			'インポート': function() {
+				var storage = MetaStorage('FAVORITE_TRADE'),
+					tlist   = storage.data;
+
+				$('<input/>').attr('type','file')
+				.on( 'change', function( eo ) {
+					var file   = $(this)[0].files[0],
+						reader = new FileReader();
+
+					reader.onload = function( eo ) {
+						var jso = JSON.parse( reader.result );
+						// 元のデータに追加
+						$.extend( tlist, jso );
+
+						// 完了したら保存
+						storage.clear();
+						storage.begin();
+						storage.data = tlist;
+						storage.commit();
+						Display.info('保存しました');
+						$('#imi_trade_list').trigger('update');
+					};
+					
+					reader.readAsText( file );
+				})
+				.click();
+			},
+			'エクスポート': function() {
+				var storage = MetaStorage('FAVORITE_TRADE'),
+					tlist   = storage.data,
+					blob    = new Blob([JSON.stringify( tlist, null, '\t')], {type:'application/json'}),
+					objURL  = window.URL.createObjectURL(blob),
+					filename = ( 'imt_yymmddhhmi.json' ).replace( /yymmddhhmi/, function( str ) {
+						var now = new Date();
+						return now.getFullYear().toString().substr( -2 ) +
+							   ( '00' + ( now.getMonth() + 1 ) ).substr( -2 ) +
+							   ( '00' + now.getDate() ).substr( -2 ) +
+							   ( '00' + now.getHours() ).substr( -2 ) +
+							   ( '00' + now.getMinutes() ).substr( -2 );
+					});
+
+				var $download = $('<a/>').attr('href', objURL).attr('download', filename);
+				// jQo.click()やjQo.trigger('click')ではAタグに反応してくれない...
+				var e = document.createEvent('MouseEvents');
+				e.initEvent('click', true, true );
+				$download[0].dispatchEvent( e );
+				// 消すタイミングがねぇ
+				// window.URL.revokeObjectURL(objURL);
+			},
 			'保存': function() {
 				storage.clear();
 				storage.begin();
