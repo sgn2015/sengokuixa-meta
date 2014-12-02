@@ -2851,7 +2851,10 @@ style : '' +
 '.excavationtable td img { vertical-align: middle; }' +
 '.excavation_title { border: 1px solid #76601D; padding: 4px; text-align: center; color:#FFF; background-color: #914E4E;}' +
 '.excavationframe{background-color:#F2F1DD; padding:5px; margin-bottom:20px;}' +
-'.t_white { color:#FFFFFF; }',
+'.t_white { color:#FFFFFF; }' +
+//
+'#imi_mine_setting_dialog INPUT { width: 72px; }' +
+'',
 
 //. menutext
 getMenuText: function () {
@@ -2960,15 +2963,17 @@ setInvestment: function() {
 	var storage = MetaStorage('GOLDMINE'),
 		html;
 
+	GM_addStyle( GoldMine.style );
+
 	html = '' +
 	'<br/>' +
 	'<div>投資額</div>' +
 	'<br/>' +
 	'<ul id=imi_mine_setting_dialog style="text-align:center;">' +
-	'<li><label>青龍(木:槍)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invWood') || 1000) + '"></label></li>' +
-	'<li><label>朱雀(綿:弓)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invWool') || 1000) + '"></label></li>' +
-	'<li><label>白虎(鉄:馬)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invIron') || 1000) + '"></label></li>' +
-	'<li><label>玄武(糧:器)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invRice') || 1000) + '"></label></li>' +
+	'<li><label>青龍(木:槍)&nbsp;<input type="number" min=1000 value="' + (storage.get('invWood') || 1000) + '"></label></li>' +
+	'<li><label>朱雀(綿:弓)&nbsp;<input type="number" min=1000 value="' + (storage.get('invWool') || 1000) + '"></label></li>' +
+	'<li><label>白虎(鉄:馬)&nbsp;<input type="number" min=1000 value="' + (storage.get('invIron') || 1000) + '"></label></li>' +
+	'<li><label>玄武(糧:器)&nbsp;<input type="number" min=1000 value="' + (storage.get('invRice') || 1000) + '"></label></li>' +
 	'</ul>';
 
 	Display.dialog({
@@ -4907,7 +4912,7 @@ compass: [
 ],
 
 //. mapsize
-mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170 ][ Env.chapter ] || 150,
+mapsize: [ 0, 180, 180, 180, 180, 150, 150, 170, 170, 170 ][ Env.chapter ] || 150,
 
 //. fortresses
 fortresses: (function() {
@@ -4927,7 +4932,7 @@ fortresses: (function() {
 		[108,108], [132, 84], [108,132], [132,108], [132,132]
 	]];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. doublegen
@@ -4943,7 +4948,7 @@ doublegen: (function() {
 		]
 	];
 
-	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0] ][ Env.chapter ] || [];
+	return [ [], data[0], data[0], data[0], data[0], data[1], data[1], data[0], data[0], data[0] ][ Env.chapter ] || [];
 })(),
 
 //. countries
@@ -4966,6 +4971,8 @@ countries: (function() {
 		['dummy', '明智家', '真田家', '鈴木家', '上杉家', '徳川家', '毛利家', '伊達家', '北条家', '長宗我部家', '島津家', '豊臣家', '最上家'],
 		//第８章
 		['dummy', '黒田家', '真田家', '宇喜多家', '上杉家', '徳川家', '毛利家', '伊達家', '加藤家', '福島家', '島津家', '豊臣家', '石田家'],
+		//第９章
+		['dummy', '織田家', '雑賀家', '武田家', '上杉家', '徳川家', '毛利家', '浅井家', '北条家', '長宗我部家', '佐竹家', '大友家', '最上家'],
 	][ Env.chapter ] || [];
 })(),
 
@@ -5128,7 +5135,7 @@ getNpcPower: function() {
 		'8-33342': { '鬼': 905, '天狗': 455 }
 	}];
 
-	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
+	data = [ {}, data[0], data[0], data[1], data[1], data[2], data[2], data[2], data[2], data[2] ][ Env.chapter ] || {};
 
 	if ( Env.chapter <= 4 ) {
 		Data.npcPower = data;
@@ -7382,6 +7389,8 @@ sortList: [
 	{ title: 'コスト：昇',  condition: [ 'cost', 'asc' ] },
 	{ title: 'レア度：降',  condition: [ 'rarity', 'desc', function( card ) { return { '天': 7, '極': 6, '特': 5, '上': 4, '序': 3, '祝': 2, '雅': 1 }[ card.rarity ]; } ] },
 	{ title: 'レア度：昇',  condition: [ 'rarity', 'asc', function( card ) { return { '天': 7, '極': 6, '特': 5, '上': 4, '序': 3, '祝': 2, '雅': 1 }[ card.rarity ]; } ] },
+	{ title: '次LV：降',  condition: [ 'nextExp', 'desc' ] },
+	{ title: '次LV：昇',  condition: [ 'nextExp', 'asc' ] },
 	{ title: '経験値：降',  condition: [ 'exp', 'desc' ] },
 	{ title: '経験値：昇',  condition: [ 'exp', 'asc' ] },
 	{ title: 'ランク：降',  condition: [ 'rank', 'desc' ] },
@@ -7714,7 +7723,7 @@ sortMenu: function( container, up ) {
 		[ '攻撃力：降', '攻撃力：昇', '防御力：降', '防御力：昇', '兵法：降', '兵法：昇' ],
 		[ '現兵攻：降', '現兵攻：昇', '現兵防：降', '現兵防：昇', '防/C：降', '防/C：昇', ],
 		[ '兵数：降', '兵数：昇', '指揮力：降', '指揮力：昇', '破壊力：降', '破壊力：昇' ],
-		[ 'コスト：降', 'コスト：昇', 'レア度：降', 'レア度：昇' ],
+		[ 'コスト：降', 'コスト：昇', 'レア度：降', 'レア度：昇', '次LV：降', '次LV：昇' ],
 		[ '経験値：降', '経験値：昇', 'ランク：降', 'ランク：昇', 'レベル：降', 'レベル：昇' ],
 		[ 'HP：降', 'HP：昇', '討伐：降', '討伐：昇' ]
 	];
@@ -10578,7 +10587,7 @@ analyzeLarge: function( element ) {
 	this.job = [ '', '将', '剣', '忍', '文', '姫', '覇' ][ text.toInt() ] || '';
 	//経験値 ※限界突破の場合はexp==NaNになる
 	this.exp = param[ 2 ].firstChild.nodeValue.toInt();
-	this.nextExp = param[ 3 ].firstChild.nodeValue;
+	this.nextExp = param[ 3 ].firstChild.nodeValue.toInt();
 
 	//スキル
 	skilllist = [];
@@ -12891,6 +12900,9 @@ serverSelected: function() {
 	season = ( $server.find('IMG:last').attr('src').match(/flag_.(\d{2})/) || [,''] )[ 1 ];
 	chapter = ( $server.children('DIV').attr('class').match(/(?:main|sub)server_.(\d)/) || [,''] )[ 1 ];
 
+	// いいのかな...(問題が出るまではこのままの予定)
+	chapter = chapter.toInt() + 6;
+
 	if ( world ) {
 		document.cookie = world + '_st=' + time + '; domain=.sengokuixa.jp; path=/;';
 		document.cookie = world + '_s=' + season + '; domain=.sengokuixa.jp; path=/;';
@@ -14116,7 +14128,7 @@ dealings: function() {
 	var html;
 
 	//施設情報を下へ移動
-	$('#ig_tileheadmenu').nextUntil('FORM').insertBefore('.ig_paneloutbtn');
+	$('#ig_tileheadmenu').nextUntil('DIV:not([class])').insertBefore('.ig_paneloutbtn');
 
 	html = '' +
 	'<img data-type="101" src="' + Env.externalFilePath + '/img/common/ico_wood.gif" />' +
@@ -14151,7 +14163,7 @@ research: function() {
 	$('.ig_tilesection_innermid, .ig_tilesection_innermid2')
 	.each(function() {
 		var $this = $(this),
-			name = $this.find('H3:last').text().slice(1, -1),
+			name = $this.find('H3:last').text().slice(3),
 			data = Soldier.getByName( name ),
 			maxtime = 0, materials, $tr, $clone;
 
@@ -17332,16 +17344,36 @@ dialogFavoriteEdit: function() {
 		content: $content,
 		buttons: {
 			'インポート': function() {
-				$.noop;
+				var storage = MetaStorage('FAVORITE_TRADE'),
+					tlist   = storage.data;
+
+				$('<input/>').attr('type','file')
+				.on( 'change', function( eo ) {
+					var file   = $(this)[0].files[0],
+						reader = new FileReader();
+
+					reader.onload = function( eo ) {
+						var jso = JSON.parse( reader.result );
+						// 元のデータに追加
+						$.extend( tlist, jso );
+
+						// 完了したら保存
+						storage.clear();
+						storage.begin();
+						storage.data = tlist;
+						storage.commit();
+						Display.info('保存しました');
+						$('#imi_trade_list').trigger('update');
+					};
+					
+					reader.readAsText( file );
+				})
+				.click();
 			},
 			'エクスポート': function() {
-				try {
 				var storage = MetaStorage('FAVORITE_TRADE'),
 					tlist   = storage.data,
-					// blob    = new Blob([JSON.stringify( tlist, null, '\t')], {'type':'application/x-msdownload'}),
 					blob    = new Blob([JSON.stringify( tlist, null, '\t')], {type:'application/json'}),
-					// blob    = new Blob([JSON.stringify(tlist)], {type:'application/json'}),
-					// blob    = new Blob([JSON.stringify(tlist)], {type:'application/json'}),
 					objURL  = window.URL.createObjectURL(blob),
 					filename = ( 'imt_yymmddhhmi.json' ).replace( /yymmddhhmi/, function( str ) {
 						var now = new Date();
@@ -17352,32 +17384,13 @@ dialogFavoriteEdit: function() {
 							   ( '00' + now.getMinutes() ).substr( -2 );
 					});
 
-				// $('<a>hoge</a>').attr('href', objURL).attr('download', filename)
-				$('<a/>').attr('id','hoge').attr('href', objURL).attr('download', filename)
-				// .on('click', function( e ) {
-				// 	console.log( e );
-				// 	// location.href = $(this).attr('href');
-				// })
-				// .on('mousedown', function( e ) {
-				// 	console.log( e );
-				// 	// location.href = $(this).attr('href');
-				// })
-				.prependTo('BODY')
-				// .trigger('click');
-	var e = document.createEvent('MouseEvents');
-	e.initEvent( 'click', true, true );
-	$('#hoge')[0].dispatchEvent(e);
-
-				// $('#hoge').click();
-				// $('#hoge').trigger('click');
-
+				var $download = $('<a/>').attr('href', objURL).attr('download', filename);
+				// jQo.click()やjQo.trigger('click')ではAタグに反応してくれない...
+				var e = document.createEvent('MouseEvents');
+				e.initEvent('click', true, true );
+				$download[0].dispatchEvent( e );
+				// 消すタイミングがねぇ
 				// window.URL.revokeObjectURL(objURL);
-				}
-				catch( e ) {
-					console.error( e );
-				}
-				// href = 'data:application/octet-stream,' + encodeURIComponent( JSON.stringify( tlist, null, '\t') );
-				// location.href = href;
 			},
 			'保存': function() {
 				storage.clear();
@@ -17765,6 +17778,17 @@ changeTitle: function() {
 	if ( Env.world ) {
 		$('TITLE').text( '【' + Env.world + '】' + $('TITLE').text().replace(/出品/, '出品中') );
 	}
+},
+
+});
+
+//■ /card/bid_list
+Page.registerAction( 'card', 'bid_list', {
+
+//. main
+main: function() {
+	// 共通レイアウタ
+	Trade.layouter();
 },
 
 });
