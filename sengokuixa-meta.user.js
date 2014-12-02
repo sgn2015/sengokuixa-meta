@@ -14065,7 +14065,7 @@ research: function() {
 	$('.ig_tilesection_innermid, .ig_tilesection_innermid2')
 	.each(function() {
 		var $this = $(this),
-			name = $this.find('H3:last').text().slice(1, -1),
+			name = $this.find('H3:last').text().slice(3),
 			data = Soldier.getByName( name ),
 			maxtime = 0, materials, $tr, $clone;
 
