@@ -7304,6 +7304,8 @@ sortList: [
 	{ title: 'コスト：昇',  condition: [ 'cost', 'asc' ] },
 	{ title: 'レア度：降',  condition: [ 'rarity', 'desc', function( card ) { return { '天': 7, '極': 6, '特': 5, '上': 4, '序': 3, '祝': 2, '雅': 1 }[ card.rarity ]; } ] },
 	{ title: 'レア度：昇',  condition: [ 'rarity', 'asc', function( card ) { return { '天': 7, '極': 6, '特': 5, '上': 4, '序': 3, '祝': 2, '雅': 1 }[ card.rarity ]; } ] },
+	{ title: '次LV：降',  condition: [ 'nextExp', 'desc' ] },
+	{ title: '次LV：昇',  condition: [ 'nextExp', 'asc' ] },
 	{ title: '経験値：降',  condition: [ 'exp', 'desc' ] },
 	{ title: '経験値：昇',  condition: [ 'exp', 'asc' ] },
 	{ title: 'ランク：降',  condition: [ 'rank', 'desc' ] },
@@ -7636,7 +7638,7 @@ sortMenu: function( container, up ) {
 		[ '攻撃力：降', '攻撃力：昇', '防御力：降', '防御力：昇', '兵法：降', '兵法：昇' ],
 		[ '現兵攻：降', '現兵攻：昇', '現兵防：降', '現兵防：昇', '防/C：降', '防/C：昇', ],
 		[ '兵数：降', '兵数：昇', '指揮力：降', '指揮力：昇', '破壊力：降', '破壊力：昇' ],
-		[ 'コスト：降', 'コスト：昇', 'レア度：降', 'レア度：昇' ],
+		[ 'コスト：降', 'コスト：昇', 'レア度：降', 'レア度：昇', '次LV：降', '次LV：昇' ],
 		[ '経験値：降', '経験値：昇', 'ランク：降', 'ランク：昇', 'レベル：降', 'レベル：昇' ],
 		[ 'HP：降', 'HP：昇', '討伐：降', '討伐：昇' ]
 	];
@@ -10500,7 +10502,7 @@ analyzeLarge: function( element ) {
 	this.job = [ '', '将', '剣', '忍', '文', '姫', '覇' ][ text.toInt() ] || '';
 	//経験値 ※限界突破の場合はexp==NaNになる
 	this.exp = param[ 2 ].firstChild.nodeValue.toInt();
-	this.nextExp = param[ 3 ].firstChild.nodeValue;
+	this.nextExp = param[ 3 ].firstChild.nodeValue.toInt();
 
 	//スキル
 	skilllist = [];
@@ -12691,7 +12693,7 @@ createPulldownMenu: function() {
 		{ title: 'スキル追加', action: function() { Page.form( '/union/levelup.php', { union_type: 2 }, true ); } },
 		{ title: 'スキル削除', action: function() { Page.form( '/union/remove.php', { union_type: 3 }, true ); } },
 		{ title: '合成履歴', action: '/union/union_history.php' },
-		{ title: '【合成表更新】', action: function() { Data.skillTableUpdate(); } }
+		{ title: '【合成表更新】', action: function() { Data.skillTableUpdate(); } },
 	]);
 
 	function createMenu( target, menu ) {
