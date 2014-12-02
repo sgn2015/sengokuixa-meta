@@ -5491,14 +5491,8 @@ analyzeArea: function( $area_list, img_list ) {
 		if ( img_data.type == '空き地' ) {
 			//ソートさせる為、同盟に価値、ユーザーに資源をセット
 			data.alliance  = array[5];
-			if( !/^hm/.test(location.hostname) ) {
-				data.user      = array.slice( 9, 14 ).join('/');
-				data.materials = array.slice( 9, 14 ).join('');
-			}
-			else {
-				data.user      = array.slice( 7, 12 ).join('/');
-				data.materials = array.slice( 7, 12 ).join('');
-			}
+			data.user      = array.slice( 9, 14 ).join('/');
+			data.materials = array.slice( 9, 14 ).join('');
 			//NPC扱いとする
 			data.npc  = 1;
 			//価値をセットしフィルタ条件で使用する
@@ -5506,12 +5500,7 @@ analyzeArea: function( $area_list, img_list ) {
 		}
 		else if ( img_data.type == '領地' ) {
 			//資源情報をセットし必要攻撃力を表示させる
-			if( !/^hm/.test(location.hostname) ) {
-				data.materials = array.slice( 9, 14 ).join('');
-			}
-			else {
-				data.materials = array.slice( 7, 12 ).join('');
-			}
+			data.materials = array.slice( 9, 14 ).join('');
 			//価値をセットしフィルタ条件で使用する
 			data.rank = array[5].length;
 		}
