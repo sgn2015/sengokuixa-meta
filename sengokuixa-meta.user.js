@@ -2772,7 +2772,10 @@ style : '' +
 '.excavationtable td img { vertical-align: middle; }' +
 '.excavation_title { border: 1px solid #76601D; padding: 4px; text-align: center; color:#FFF; background-color: #914E4E;}' +
 '.excavationframe{background-color:#F2F1DD; padding:5px; margin-bottom:20px;}' +
-'.t_white { color:#FFFFFF; }',
+'.t_white { color:#FFFFFF; }' +
+//
+'#imi_mine_setting_dialog INPUT { width: 72px; }' +
+'',
 
 //. menutext
 getMenuText: function () {
@@ -2881,15 +2884,17 @@ setInvestment: function() {
 	var storage = MetaStorage('GOLDMINE'),
 		html;
 
+	GM_addStyle( GoldMine.style );
+
 	html = '' +
 	'<br/>' +
 	'<div>投資額</div>' +
 	'<br/>' +
 	'<ul id=imi_mine_setting_dialog style="text-align:center;">' +
-	'<li><label>青龍(木:槍)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invWood') || 1000) + '"></label></li>' +
-	'<li><label>朱雀(綿:弓)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invWool') || 1000) + '"></label></li>' +
-	'<li><label>白虎(鉄:馬)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invIron') || 1000) + '"></label></li>' +
-	'<li><label>玄武(糧:器)&nbsp;<input type="number" size=8 min=1000 value="' + (storage.get('invRice') || 1000) + '"></label></li>' +
+	'<li><label>青龍(木:槍)&nbsp;<input type="number" min=1000 value="' + (storage.get('invWood') || 1000) + '"></label></li>' +
+	'<li><label>朱雀(綿:弓)&nbsp;<input type="number" min=1000 value="' + (storage.get('invWool') || 1000) + '"></label></li>' +
+	'<li><label>白虎(鉄:馬)&nbsp;<input type="number" min=1000 value="' + (storage.get('invIron') || 1000) + '"></label></li>' +
+	'<li><label>玄武(糧:器)&nbsp;<input type="number" min=1000 value="' + (storage.get('invRice') || 1000) + '"></label></li>' +
 	'</ul>';
 
 	Display.dialog({
