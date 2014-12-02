@@ -12161,7 +12161,8 @@ ajax: function( url, options ) {
 			return $.Deferred().reject();
 		}
 
-		[ 'TABLE.stateTable', '#chatComment', '#chatComment_i', '#chatComment_g', '#chatComment_s5_h' ].forEach(function( selecter ) {
+		// [ 'TABLE.stateTable', '#chatComment', '#chatComment_i', '#chatComment_g', '#chatComment_s5_h' ].forEach(function( selecter ) {
+		[ 'TABLE.stateTable' ].forEach(function( selecter ) {
 			var $elem = $html.find( selecter );
 			if ( $elem.length == 0 ) { return; }
 			$( selecter ).replaceWith( $elem );
