@@ -1490,6 +1490,7 @@ divide: function( list, soldata, solnum ) {
 		else {
 			facility.trainingtime = Math.floor( facility.solnum * soldata.training[ facility.lv - 1 ] * uranai[ 1 ] );
 		}
+		// 9章以降ではここの訓練時間は使わない
 	}
 
 	return facilities;
@@ -13747,7 +13748,7 @@ training: function( name ) {
 		$close = $('<span class="imc_training_button"></span>');
 		$close.click(function() {
 			var $this = $(this),
-				$container = $this.closest('.ig_tilesection_innerborder_high_speed');
+				$container = $this.closest('.ig_tilesection_innerborder_high_speed,.ig_tilesection_innerborder');
 
 			if ( $this.hasClass('is_open') ) {
 				$this.removeClass('is_open').addClass('is_close');
@@ -13842,10 +13843,14 @@ trainingPulldown: function( $div ) {
 			data = Soldier.getByName( name );
 
 		$tables.each( function( idx, elm ) {
-			var $tr, $select;
+			var $tr, $select,
+				tm, dmy, hh, mi, ss;
 
 		//各拠点の施設表示
 			$tr = $(this).find('TR.noborder');
+			//訓練時間を取得
+			[ dmy, hh, mi, ss ] = $tr.find('TD').first().text().match(/(\d{2}):(\d{2}):(\d{2})/);
+			tm = hh.toInt() * 3600 + mi.toInt() * 60 + ss.toInt();
 		$tr.removeClass('noborder');
 		$tr.find('TH').first().remove();
 		$tr.find('TD').first().remove();
@@ -13923,7 +13928,7 @@ trainingPulldown: function( $div ) {
 		$input.parent().next().remove();
 		$input.replaceWith( $select );
 
-		$select.data({ type: data.type, materials: materials })
+			$select.data({ type: data.type, materials: materials, idx: idx, tm: tm })
 		.change( self.trainingDivide ).trigger('change');
 	});
 	});
@@ -13933,7 +13938,7 @@ trainingPulldown: function( $div ) {
 trainingDivide: function( e ) {
 	var $this = $(this),
 		solnum = $this.val().toInt(),
-		{ type, materials } = $this.data(),
+		{ type, materials, idx, tm } = $this.data(),
 		list = $(document).data('facilitylist'),
 		soldata = Soldier.getByType( type ),
 		html = '', total_wood = total_stone = total_iron = total_rice = 0,
@@ -13954,7 +13959,7 @@ trainingDivide: function( e ) {
 			'<th>' + this.name + '</th>' +
 			'<td>' + this.lv + '</td>' +
 			'<td>' + this.solnum + '</td>' +
-			'<td>' + this.trainingtime.toFormatTime(); + '</td>' +
+			'<td>' + ( tm * this.solnum ).toFormatTime() + '</td>' + 
 		'</tr>';
 	});
 
@@ -13979,7 +13984,7 @@ trainingDivide: function( e ) {
 	$tr.find('.icon_food').text( '糧 ' + total_rice.toFormatNumber() )
 		.toggleClass('imc_surplus', surplus ).toggleClass('imc_shortage', !surplus );
 
-	$('#imi_training_' + type).html( html ).append( $tr );
+	$('#imi_training' + idx + '_' + type).html( html ).append( $tr );
 
 	$this.data({ facilities: facilities, total: [ total_wood, total_stone, total_iron, total_rice ] });
 },
