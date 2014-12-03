@@ -1789,9 +1789,6 @@ keyBindCommon: function() {
 		'l': Util.keyBindCallback(function() {
 			location.href = '/senkuji/senkuji.php';
 		}),
-		'C-l': Util.keyBindCallback(function() {
-			window.open('/senkuji/senkuji.php').blur();
-		}),
 		
 		'c': Util.keyBindCallback(function() {
 			location.href = '/alliance/chat_view.php?pager_select=100';
@@ -14117,7 +14114,7 @@ dealings: function() {
 	var html;
 
 	//施設情報を下へ移動
-	$('#ig_tileheadmenu').nextUntil('DIV:not([class])').insertBefore('.ig_paneloutbtn');
+	$('#ig_tileheadmenu').nextUntil('FORM').insertBefore('.ig_paneloutbtn');
 
 	html = '' +
 	'<img data-type="101" src="' + Env.externalFilePath + '/img/common/ico_wood.gif" />' +
