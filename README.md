@@ -13,7 +13,7 @@ Firefox側の仕様変更によって、元のページにあるスクリプト�
 
 大変申し訳ありませんが、しばらくの間は「Firefox31ESR+Scriptish0.1.11」までを動作対象環境とさせていただきます。
 
-Firefoxは[ここ](ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr)から使用中のOSに合ったものをダウンロードしてください。
+Firefoxは ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr から使用中のOSに合ったものをダウンロードしてください。
 
 
 動作確認
