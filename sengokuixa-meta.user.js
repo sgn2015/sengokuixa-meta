@@ -2637,21 +2637,6 @@ var Append = {
 			},
 		});
 	},
-
-	// 資源の更新(カンマ区切り)
-	resorcesChange: unsafeWindow.resorcesChange = function(b, a) {
-		var id = '#' + a;
-		calc = parseInt( $(id).text().toInt() ) + b;
-		if (parseInt($(id + "_max").text()) < calc) {
-			calc = parseInt($(id + "_max").text())
-		} else {
-			if (0 > calc) {
-				calc = 0
-			}
-		}
-		$(id).text( calc.toFormatNumber() );
-	},
-
 };
 
 // 精鋭部隊
@@ -12327,10 +12312,10 @@ changeStatusBar: function() {
 
 	html = '' +
 	'<ul>' +
-	'<li><img align="middle" src="' + Data.images.icon_wood +'" alt="木" title="木">&nbsp;<span class="imc_outer_bar ' + period[ 0 ] + '"><span style="width: ' + rate[ 0 ] + '" class="imc_inner_bar imc_wood"><span class="imc_bar_contents"><span id="wood">' + resource[ 0 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="wood_max" style="display:none;">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Data.images.icon_wool +'" alt="綿" title="綿">&nbsp;<span class="imc_outer_bar ' + period[ 1 ] + '"><span style="width: ' + rate[ 1 ] + '" class="imc_inner_bar imc_stone"><span class="imc_bar_contents"><span id="stone">' + resource[ 1 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="stone_max" style="display:none;">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Data.images.icon_iron +'" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron"><span class="imc_bar_contents"><span id="iron">' + resource[ 2 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="iron_max" style="display:none;">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Data.images.icon_rice +'" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice"><span class="imc_bar_contents"><span id="rice">' + resource[ 3 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="rice_max" style="display:none;">' + max + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_wood +'" alt="木" title="木">&nbsp;<span class="imc_outer_bar ' + period[ 0 ] + '"><span style="width: ' + rate[ 0 ] + '" class="imc_inner_bar imc_wood" ><span class="imc_bar_contents"><span id="wood"  style="display:none;">' + resource[ 0 ] + '</span><span id="wood_max"  style="display:none;">' + max + '</span><span id="wood_view" >' + resource[ 0 ].toFormatNumber() + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_wool +'" alt="綿" title="綿">&nbsp;<span class="imc_outer_bar ' + period[ 1 ] + '"><span style="width: ' + rate[ 1 ] + '" class="imc_inner_bar imc_stone"><span class="imc_bar_contents"><span id="stone" style="display:none;">' + resource[ 1 ] + '</span><span id="stone_max" style="display:none;">' + max + '</span><span id="stone_view">' + resource[ 1 ].toFormatNumber() + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_iron +'" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron" ><span class="imc_bar_contents"><span id="iron"  style="display:none;">' + resource[ 2 ] + '</span><span id="iron_max"  style="display:none;">' + max + '</span><span id="iron_view" >' + resource[ 2 ].toFormatNumber() + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_rice +'" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice" ><span class="imc_bar_contents"><span id="rice"  style="display:none;">' + resource[ 3 ] + '</span><span id="rice_max"  style="display:none;">' + max + '</span><span id="rice_view" >' + resource[ 3 ].toFormatNumber() + '</span></span></span></span></li>' +
 	'<li><img align="middle" src="' + Data.images.icon_gran +'" alt="蔵" title="蔵"><span id="wood_max">' + max.toFormatNumber() + '</span></li>' +
 	'<li><img align="middle" src="' + Data.images.icon_fame +'" alt="名声" title="名声"><span>' + fame + '</span></li>' +
 	'<li class="sep">' +
@@ -12372,6 +12357,15 @@ changeStatusBar: function() {
 	.css('padding', '0px').end()
 	.appendTo('#status_left')
 	.wrapAll('<a href="/user/uranai/uranai.php"/>');
+
+	// 資源の更新
+	//  resorcesChange()で更新された値を桁区切りして出力
+	$('#wood,#stone,#iron,#rice').on('update', function() {
+		$('#' + $(this).attr('id') + '_view').text( $(this).text().toInt().toFormatNumber() );
+	});
+	setInterval( function() {
+		$('#wood,#stone,#iron,#rice').trigger('update');
+	}, 1000 );
 },
 
 //.. changeSideBar
