@@ -10649,8 +10649,9 @@ power: function() {
 	this.tmpAtk = ( data.attack * this.maxSolNum + this.atk ) * mod / 100;
 	//現兵種による最大防御力
 	this.tmpDef = ( data.defend * this.maxSolNum + this.def ) * mod / 100;
-	//現兵種によるコス比防御力
-	this.tmpDefCost = this.tmpDef / this.cost;
+
+	//総防御力/C
+	this.tmpDefCost = this.totalDef / this.cost;
 },
 
 //.. layouter
