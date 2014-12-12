@@ -33,6 +33,11 @@ Firefoxは ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr か
 更新履歴
 --------
 
+### 1.4.4.13(y/hm鯖)
+2014/12/12
+* 資源更新がうまくいかなかったのを修正(Firefox34以降)
+* 編成ダイアログの「防/C」の計算式を「総防御力/C」に変更
+
 ### 1.4.4.12(hm鯖用)
 2014/12/03
 * 市が使えなくなっていたのを修正
