@@ -203,8 +203,6 @@ unique: function() {
 //. keybind
 // https://github.com/pd/jquery.keybind
 (function($){$.fn.extend({keybind:function(seq,handler){var data=this.data("keybind");if(!data){data={bindings:{}};this.data("keybind",data).bind({keypress:keypressHandler,keydown:keydownHandler})}if(typeof seq==="object")$.each(seq,function(s,h){attachBinding(data.bindings,seqChords(s),h)});else attachBinding(data.bindings,seqChords(seq),handler);return this},keyunbind:function(seq,handler){var data=this.data("keybind");if(handler!==undefined)data.bindings[seq]=$.grep(data.bindings[seq],function(h){return h!==handler});else delete data.bindings[seq];return this},keyunbindAll:function(){$(this).removeData("keybind").unbind({keypress:keypressHandler,keydown:keydownHandler});return this}});function keypressHandler(event){var data=$(this).data("keybind"),desc=keyDescription(event);if(shouldTriggerOnKeydown(desc,event))return true;return triggerHandlers(data.bindings,desc,event)}function keydownHandler(event){var data=$(this).data("keybind"),desc=keyDescription(event);if(!shouldTriggerOnKeydown(desc,event))return true;return triggerHandlers(data.bindings,desc,event)}function attachBinding(bindings,chords,handler){var chord=chords.shift(),entry=bindings[chord];if(entry){if(chords.length>0&&entry.length!==undefined)throw"Keybinding would be shadowed by pre-existing keybinding";if(chords.length===0&&entry.length===undefined)throw"Keybinding would shadow pre-existing keybinding"}else if(chords.length>0)bindings[chord]=entry={};else bindings[chord]=entry=[];if(chords.length===0)entry.push(handler);else attachBinding(entry,chords,handler)}function triggerHandlers(bindings,desc,event){var handlers=bindings[desc.name],retVal=true;if(handlers===undefined)return retVal;$.each(handlers,function(i,fn){if(fn(desc,event)===false)retVal=false});return retVal}function seqChords(seq){return seq.split(/\s+/)}function shouldTriggerOnKeydown(desc,event){if(desc.ctrl||desc.meta||desc.alt)return true;if(desc.charCode>=37&&desc.charCode<=40||event.type==="keypress"&&desc.keyCode>=37&&desc.keyCode<=40)return false;if(desc.keyCode===189||desc.keyCode===187)return true;if(desc.charCode===45||desc.keyCode===45)return true;if(desc.charCode===95||desc.keyCode===95)return true;if(desc.charCode===61||desc.keyCode===61||desc.charCode===43||desc.keyCode===43)return true;if(desc.keyCode in _specialKeys)return true;return false}function keyDescription(event){var desc={};if(event.ctrlKey)desc.ctrl=true;if(event.altKey)desc.alt=true;if(event.originalEvent.metaKey)desc.meta=true;if(event.shiftKey)desc.shift=true;desc.keyCode=realKeyCode(desc,event);desc.charCode=event.charCode;desc.name=keyName(desc,event);return desc}function realKeyCode(desc,event){var keyCode=event.keyCode;if(keyCode in _funkyKeyCodes)keyCode=_funkyKeyCodes[keyCode];return keyCode}function keyName(desc,event){var name,mods="";if(desc.ctrl)mods+="C-";if(desc.alt)mods+="A-";if(desc.meta)mods+="M-";if(event.type==="keydown"){var keyCode=desc.keyCode;if(keyCode in _specialKeys)name=_specialKeys[keyCode];else name=String.fromCharCode(keyCode).toLowerCase();if(desc.shift&&name in _shiftedKeys)name=_shiftedKeys[name];else if(desc.shift)mods+="S-"}else if(event.type==="keypress")name=String.fromCharCode(desc.charCode||desc.keyCode);else throw"could prolly support keyup but explicitly don't right now";return mods+name}var _specialKeys={8:"Backspace",9:"Tab",13:"Enter",27:"Esc",32:"Space",33:"PageUp",34:"PageDown",35:"End",36:"Home",37:"Left",38:"Up",39:"Right",40:"Down",45:"Insert",46:"Del",112:"F1",113:"F2",114:"F3",115:"F4",116:"F5",117:"F6",118:"F7",119:"F8",120:"F9",121:"F10",122:"F11",123:"F12",187:"=",189:"-"},_funkyKeyCodes={109:189},_shiftedKeys={"1":"!","2":"@","3":"#","4":"$","5":"%","6":"^","7":"&","8":"*","9":"(","0":")","=":"+","-":"_"}})(jQuery);
-//. pulldownMenu
-// (function($){var timer,defaults={class_menuitem:'imc_menuitem',class_title:'imc_menutitle',class_separater:'imc_separater',class_nothing:'imc_nothing',class_hover:'imc_hover',timeout:800},options=$.extend({},defaults);$.contextMenu=function(_options){options=$.extend({},defaults,_options);return this};$.extend($.contextMenu,{title:function(key){key=key||'';return $('<li/>').addClass(options.class_title).text(key)},separator:function(){return $('<li/>').addClass(options.class_separater)},nothing:function(key){key=key||'';return $('<li/>').addClass(options.class_nothing).text(key)}});$.fn.contextMenu=function(menu,live){if(live){this.live('contextmenu',collback)}else{this.on('contextmenu',collback)}return this;function collback(e){show.call(this,menu,e);return false}};function show(menu,e){var x=e.pageX,y=e.pageY,menuContainer,containerRight,containerBottom,documentRight,documentBottom;hide();if(typeof(menu)=='function'){menu=menu.call(this,e)}if(menu==null||menu.length==0){return}menuContainer=createMenuList.call(this,menu,e);if(!menuContainer){return}menuContainer.attr('id','imi_contextmenu').css({left:x,top:y}).appendTo('BODY');containerRight=menuContainer.offset().left+menuContainer.width()+10;containerBottom=menuContainer.offset().top+menuContainer.height()+10;documentRight=$(document).scrollLeft()+$(window).width();documentBottom=$(document).scrollTop()+$(window).height();if(containerRight>documentRight){x=x-(containerRight-documentRight);menuContainer.css({left:x})}if(containerBottom>documentBottom){y=y-(containerBottom-documentBottom);menuContainer.css({top:y})}(function(container){var self=arguments.callee;if(container.width()+10>documentRight-container.offset().left){container.css({left:-container.width()-2})}if(container.height()+10>documentBottom-container.offset().top){container.css({marginTop:-container.height()+13})}container.find('> LI > .imc_submenu').each(function(){self.call(self,$(this))})})(menuContainer)}function hide(){var $menu=$('#imi_contextmenu');if($menu.length==0){return}$menu.remove();window.clearTimeout(timer);timer=null};function createMenuList(menu,e,sub){var itemlist=[],$menu;for(key in menu){var menuitem=createMenuItem.call(this,key,menu[key],e);itemlist.push(menuitem.get(0))}if(itemlist.length==0){return null}$menu=$('<ul class="imc_menulist"/>').append(itemlist);if(sub){$menu.addClass('imc_submenu')}return $menu}function createMenuItem(key,menuitem,e){var self=this;if(menuitem===null||menuitem===undefined){return $.contextMenu.nothing(key)}else if(menuitem===$.contextMenu.title){return menuitem.call(self,key)}else if(menuitem===$.contextMenu.separator){return menuitem.call(self)}else if(menuitem===$.contextMenu.nothing){return menuitem.call(self,key)}else if(typeof(menuitem)=='string'){return $('<li/>').addClass(options.class_menuitem).text(menuitem)}else if(typeof(menuitem)=='function'){return $('<li/>').addClass(options.class_menuitem).text(key).click(function(){hide();menuitem.call(self,e)})}else if(menuitem.jquery){return $('<li/>').append(menuitem)}else{var submenu=createMenuList.call(this,menuitem,e,true);return $('<li/>').addClass(options.class_menuitem).append(submenu).append(key+'<span class="imc_submenu_mark">‣</span>')}}$(document).on('click',hide).on('contextmenu',hide).on('contextmenu','#imi_contextmenu',function(){return false}).on('mouseenter','#imi_contextmenu',function(){if(timer){window.clearTimeout(timer);timer=null}}).on('mouseleave','#imi_contextmenu',function(){if(options.timeout>0){timer=window.setTimeout(hide,options.timeout)}})})(jQuery);
 
 //■ MetaStorage
 var MetaStorage=(function(){var storageList={},storagePrefix='IM.',eventListener=new Object(),propNames='expires'.split(' ');function MetaStorage(name){var storageName=storagePrefix+name,storage,storageArea;storageArea=MetaStorage.keys[storageName];if(!storageArea){throw new Error('「'+storageName+'」このストレージ名は存在しません。');}storage=storageList[storageName];if(storage==undefined){storage=new Storage(storageArea,storageName);loadData.call(storage);storageList[storageName]=storage}return storage}$.extend(MetaStorage,{keys:{},registerStorageName:function(storageName){storageName=storagePrefix+storageName;MetaStorage.keys[storageName]='local'},registerSessionName:function(storageName){storageName=storagePrefix+storageName;MetaStorage.keys[storageName]='session'},clearAll:function(){$.each(MetaStorage.keys,function(key,value){localStorage.removeItem(key)});storageList={}},import:function(string){var importData=JSON.parse(string),keys=MetaStorage.keys;this.clearAll();$.each(importData,function(key,value){if(keys[key]){localStorage.setItem(key,importData[key])}})},export:function(){var exportData={};$.each(MetaStorage.keys,function(key,value){var stringData=localStorage.getItem(key);if(stringData){exportData[value]=stringData}});return JSON.stringify(exportData)},change:function(name,callback){var storageName=storagePrefix+name;$(eventListener).on(storageName,callback)}});function Storage(storageArea,storageName){this.storageArea=storageArea;this.storageName=storageName;this.data={};return this}$.extend(Storage.prototype,{clear:function(){this.data={};clearData.call(this)},get:function(key){return this.data[key]},set:function(key,value){this.data[key]=value;saveData.call(this)},remove:function(key){delete this.data[key];saveData.call(this)},begin:function(){this.transaction=true;this.tranData=$.extend({},this.data)},commit:function(){var trans=this.transaction;delete this.transaction;delete this.tranData;if(trans){saveData.call(this)}},rollback:function(){delete this.transaction;this.data=this.tranData;delete this.tranData},toJSON:function(){return JSON.stringify(this.data)}});function loadData(){this.data=load(this.storageArea,this.storageName)}function saveData(){if(this.transaction){return}save(this.storageArea,this.storageName,this.data)}function clearData(){var storageArea;if(this.transaction){return}if(this.storageArea=='local'){storageArea=localStorage}else if(this.storageArea=='session'){storageArea=sessionStorage}storageArea.removeItem(this.storageName)}function load(storageArea,storageName){var parseData={},stringData,storage;if(storageArea=='local'){storage=localStorage}else if(storageArea=='session'){storage=sessionStorage}stringData=storage.getItem(storageName);if(stringData){try{parseData=JSON.parse(stringData)}catch(e){}}return parseData}function save(storageArea,storageName,data){var stringData=JSON.stringify(data),storage;if(storageArea=='local'){storage=localStorage}else if(storageArea=='session'){storage=sessionStorage}if($.isEmptyObject(data)){storage.removeItem(storageName)}else{storage.setItem(storageName,stringData)}}$(window).on('storage',function(event){var storageName=event.originalEvent.key,storage;if(!MetaStorage.keys[storageName]){return}storage=storageList[storageName];if(storage!==undefined){loadData.call(storage)}$(eventListener).trigger(storageName,event)});return MetaStorage})();
@@ -242,76 +240,6 @@ MetaStorage.change( 'UNIT_STATUS', function( event, storageEvent ) {
 
 //■■■■■■■■■■■■■■■■■■■
 
-//■ KnightErrant
-var KnightErrant = {
-
-setEvent: function() {
-	$('#imi_knightErrant').on( 'click', function( eo ) {
-		// 待機中→実行
-		if( $(this).data('state') == 'wait' ) {
-			console.log( '待機中');
-			$(this).data('state', 'busy');
-			$(this).text('修行中');
-
-			// // 部隊リストの取得？
-			// Util.getUnitStatus()
-			// .then( function( e ) {
-			// 	$(e).each( function() { 
-			// 		console.log( $(this) );
-			// 	});
-			// 	var list = MetaStorage('UNIT_STATUS').get('部隊') || [];
-			// 	$(list).each( function() {
-			// 		console.log( $(this) );
-			// 	});
-			// })
-			var x = ( Env.world == 'y001' ) ? 10: 120,
-				y = ( Env.world == 'y001' ) ?  6: -90,
-				c = ( Env.world == 'y001' ) ?  9:   4;
-			console.log( x, y, c );
-			var near = Util.getVillageNearby( x, y, c );
-			console.log( near );
-			// createUnitNearby
-		}
-		// 実行中→待機
-		else {
-			console.log( '実行中');
-			$(this).data('state', 'wait');
-			$(this).text('修行');
-		}
-	})
-},
-/*
-//.. Map.createUnitNearby
-createUnitNearby: function( data, brigade ) {
-	var near = Util.getVillageNearby( data.x, data.y, data.country ),
-		village = near.village,
-		territory = near.territory,
-		coord = data.x + ',' + data.y;
-
-	brigade |= 0;
-
-	if ( !village && territory ) {
-		Display.dialogNearbyTerritory( village, territory, coord )
-		.done(function( newVillage ) {
-			Deck.dialog( newVillage, null, brigade, coord );
-		});
-	}
-	else if ( village ) {
-		Deck.dialog( village, territory, brigade, coord );
-	}
-	else {
-		Display.alert( '最寄りの拠点は見つかりませんでした。' );
-	}
-},
-
-//. Deck.dialog
-Deck.dialog = function( village, territory, brigade, coord, ano ) {
-},
-*/
-};
-
-//■ Analysis
-
 //■ Env
 var Env = (function() {
 	var storage = MetaStorage('ENVIRONMENT'),
@@ -321,12 +249,7 @@ var Env = (function() {
 		start = ( document.cookie.match( new RegExp( world + '_st=(\\d+)' ) ) || [] )[1],
 		login = false, season, newseason, chapter, war, server_time, local_time, timeDiff, endtime;
 
-	// // テスト
-	// $.get('/card/deck.php');
-	// $.get('/map.php');
-
 	$.ajaxSetup( { beforeSend: function( xhr ) { xhr.setRequestHeader('X-Requested-With', ' ') } } );
-
 	//storageから取得
 	endtime = storage.get('endtime');
 	season  = storage.get('season');
@@ -786,7 +709,7 @@ getVillageNearby: function( x, y, country ) {
 	list.forEach(function( value ) {
 		if ( value.country != country ) { return; }
 		if ( value.type == '領地' ) { return; }
-		// if ( value.fall == 1 ) { return; }
+		if ( value.fall == 1 ) { return; }
 
 		var dist = Util.getDistance( { x: x, y: y }, value );
 		if ( dist >= minDist ) { return; }
@@ -1566,6 +1489,7 @@ divide: function( list, soldata, solnum ) {
 		else {
 			facility.trainingtime = Math.floor( facility.solnum * soldata.training[ facility.lv - 1 ] * uranai[ 1 ] );
 		}
+		// 9章以降ではここの訓練時間は使わない
 	}
 
 	return facilities;
@@ -2712,21 +2636,6 @@ var Append = {
 			},
 		});
 	},
-
-	// 資源の更新(カンマ区切り)
-	resorcesChange: unsafeWindow.resorcesChange = function(b, a) {
-		var id = '#' + a;
-		calc = parseInt( $(id).text().toInt() ) + b;
-		if (parseInt($(id + "_max").text()) < calc) {
-			calc = parseInt($(id + "_max").text())
-		} else {
-			if (0 > calc) {
-				calc = 0
-			}
-		}
-		$(id).text( calc.toFormatNumber() );
-	},
-
 };
 
 // 精鋭部隊
@@ -4523,9 +4432,6 @@ var Data = {
 
 //. style
 style: '' +
-/* モダンスタイル用フォント設定 */
-// 'body {font-family: "Times New Roman", "游明朝", "Yu Mincho", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, "ＭＳ Ｐ明朝","細明朝体", serif;}' +
-// 'body {font-family: "Noto Sans Japanese Regular", "游明朝", "Yu Mincho", YuMincho, "ヒラギノ明朝 ProN W3", "Hiragino Mincho ProN", "メイリオ", Meiryo, "ＭＳ Ｐ明朝", "細明朝体", serif;}' +
 /* ajax用 */
 '.imc_ajax_load { position: fixed; top: 0px; left: 0px; padding: 2px; background-color: #fff; border-right: solid 3px #999; border-bottom: solid 3px #999; border-bottom-right-radius: 5px; z-index: 3001; }' +
 
@@ -4604,9 +4510,6 @@ style: '' +
 '#status .imc_pulldown { position: absolute; left: 0px; top: 100%; margin-top: -1px; width: 90px; z-index: 120; background-color: #000; border: solid 1px #b8860b; display: none; }' +
 '#status SPAN:hover .imc_pulldown { display: block; }' +
 '#status .imc_pulldown_item { margin: 5px; height: 15px;}' +
-// '#status .imc_pulldown_item { margin: 5px; height: 15px; width: 120px; }' +
-// '#status .imc_pulldown_item { margin: 5px; height: 15px; min-width: 120px; }' +
-// '#status .imc_pulldown_item { margin: 5px; height: 15px; width: auto !important; }' +
 
 /* プルダウンメニュー用 z-index: 2000 */
 '#gnavi { height: 33px; }' +
@@ -5488,8 +5391,14 @@ analyzeArea: function( $area_list, img_list ) {
 		if ( img_data.type == '空き地' ) {
 			//ソートさせる為、同盟に価値、ユーザーに資源をセット
 			data.alliance  = array[5];
+			if( !/^hm/.test(location.hostname) ) {
 			data.user      = array.slice( 9, 14 ).join('/');
 			data.materials = array.slice( 9, 14 ).join('');
+			}
+			else {
+				data.user      = array.slice( 7, 12 ).join('/');
+				data.materials = array.slice( 7, 12 ).join('');
+			}
 			//NPC扱いとする
 			data.npc  = 1;
 			//価値をセットしフィルタ条件で使用する
@@ -5497,7 +5406,12 @@ analyzeArea: function( $area_list, img_list ) {
 		}
 		else if ( img_data.type == '領地' ) {
 			//資源情報をセットし必要攻撃力を表示させる
+			if( !/^hm/.test(location.hostname) ) {
 			data.materials = array.slice( 9, 14 ).join('');
+			}
+			else {
+				data.materials = array.slice( 7, 12 ).join('');
+			}
 			//価値をセットしフィルタ条件で使用する
 			data.rank = array[5].length;
 		}
@@ -7024,7 +6938,6 @@ function drowFortress( context, options ) {
 	var compass = Data.compass,
 		fortresses = Data.fortresses,
 		doublegen = Data.doublegen,
-		// bg, dx, dy, dw, dh,
 		x, y, canvasx, canvasy;
 
 	//大殿
@@ -10735,8 +10648,9 @@ power: function() {
 	this.tmpAtk = ( data.attack * this.maxSolNum + this.atk ) * mod / 100;
 	//現兵種による最大防御力
 	this.tmpDef = ( data.defend * this.maxSolNum + this.def ) * mod / 100;
-	//現兵種によるコス比防御力
-	this.tmpDefCost = this.tmpDef / this.cost;
+
+	//総防御力/C
+	this.tmpDefCost = this.totalDef / this.cost;
 },
 
 //.. layouter
@@ -12397,10 +12311,10 @@ changeStatusBar: function() {
 
 	html = '' +
 	'<ul>' +
-	'<li><img align="middle" src="' + Data.images.icon_wood +'" alt="木" title="木">&nbsp;<span class="imc_outer_bar ' + period[ 0 ] + '"><span style="width: ' + rate[ 0 ] + '" class="imc_inner_bar imc_wood"><span class="imc_bar_contents"><span id="wood">' + resource[ 0 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="wood_max" style="display:none;">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Data.images.icon_wool +'" alt="綿" title="綿">&nbsp;<span class="imc_outer_bar ' + period[ 1 ] + '"><span style="width: ' + rate[ 1 ] + '" class="imc_inner_bar imc_stone"><span class="imc_bar_contents"><span id="stone">' + resource[ 1 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="stone_max" style="display:none;">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Data.images.icon_iron +'" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron"><span class="imc_bar_contents"><span id="iron">' + resource[ 2 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="iron_max" style="display:none;">' + max + '</span></span></span></span></li>' +
-	'<li><img align="middle" src="' + Data.images.icon_rice +'" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice"><span class="imc_bar_contents"><span id="rice">' + resource[ 3 ].toFormatNumber() + '</span><span style="display:none;">&nbsp;/&nbsp;</span><span id="rice_max" style="display:none;">' + max + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_wood +'" alt="木" title="木">&nbsp;<span class="imc_outer_bar ' + period[ 0 ] + '"><span style="width: ' + rate[ 0 ] + '" class="imc_inner_bar imc_wood" ><span class="imc_bar_contents"><span id="wood"  style="display:none;">' + resource[ 0 ] + '</span><span id="wood_max"  style="display:none;">' + max + '</span><span id="wood_view" >' + resource[ 0 ].toFormatNumber() + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_wool +'" alt="綿" title="綿">&nbsp;<span class="imc_outer_bar ' + period[ 1 ] + '"><span style="width: ' + rate[ 1 ] + '" class="imc_inner_bar imc_stone"><span class="imc_bar_contents"><span id="stone" style="display:none;">' + resource[ 1 ] + '</span><span id="stone_max" style="display:none;">' + max + '</span><span id="stone_view">' + resource[ 1 ].toFormatNumber() + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_iron +'" alt="鉄" title="鉄">&nbsp;<span class="imc_outer_bar ' + period[ 2 ] + '"><span style="width: ' + rate[ 2 ] + '" class="imc_inner_bar imc_iron" ><span class="imc_bar_contents"><span id="iron"  style="display:none;">' + resource[ 2 ] + '</span><span id="iron_max"  style="display:none;">' + max + '</span><span id="iron_view" >' + resource[ 2 ].toFormatNumber() + '</span></span></span></span></li>' +
+	'<li><img align="middle" src="' + Data.images.icon_rice +'" alt="糧" title="糧">&nbsp;<span class="imc_outer_bar ' + period[ 3 ] + '"><span style="width: ' + rate[ 3 ] + '" class="imc_inner_bar imc_rice" ><span class="imc_bar_contents"><span id="rice"  style="display:none;">' + resource[ 3 ] + '</span><span id="rice_max"  style="display:none;">' + max + '</span><span id="rice_view" >' + resource[ 3 ].toFormatNumber() + '</span></span></span></span></li>' +
 	'<li><img align="middle" src="' + Data.images.icon_gran +'" alt="蔵" title="蔵"><span id="wood_max">' + max.toFormatNumber() + '</span></li>' +
 	'<li><img align="middle" src="' + Data.images.icon_fame +'" alt="名声" title="名声"><span>' + fame + '</span></li>' +
 	'<li class="sep">' +
@@ -12412,10 +12326,6 @@ changeStatusBar: function() {
 		'</span>' +
 		'</ul>' +
 	'</li>' +
-	// '<li class="sep">' +
-	// 	// enemy = MetaStorage('UNIT_STATUS').get('敵襲') || [],
-	// 	'<a href="/facility/unit_status.php?dmo=enemy">敵襲</a>' +
-	// '</li>' +
 	'<li class="sep">' +
 	'<a href="/facility/unit_status.php?dmo=all">全部隊</a>' +
 	'<span>&nbsp;</span>' +
@@ -12432,12 +12342,6 @@ changeStatusBar: function() {
 		GoldMine.getMenuText() +
 	'</li>' +
 	'<li class="sep">' +
-		'<span style="position: relative;">' +
-		'<span id="imi_knightErrant" data-state="wait">修行</span>' +
-		// '<ul class="imc_pulldown">' +
-		// 	'<li class="imc_pulldown_item"><a href="javascript:void(0)">設定</a></li>' +
-		// '</ul>' +
-		'</span>' +
 	'</li>' +
 	'</ul>';
 
@@ -12445,9 +12349,6 @@ changeStatusBar: function() {
 
 	// 金山メニューのイベント登録
 	GoldMine.setEvent();
-	// 修行のイベント登録
-	KnightErrant.setEvent();
-
 	//IXA占い
 	$('#status .rightF')
 	.children('P')
@@ -12455,6 +12356,15 @@ changeStatusBar: function() {
 	.css('padding', '0px').end()
 	.appendTo('#status_left')
 	.wrapAll('<a href="/user/uranai/uranai.php"/>');
+
+	// 資源の更新
+	//  resorcesChange()で更新された値を桁区切りして出力
+	$('#wood,#stone,#iron,#rice').on('update', function() {
+		$('#' + $(this).attr('id') + '_view').text( $(this).text().toInt().toFormatNumber() );
+	});
+	setInterval( function() {
+		$('#wood,#stone,#iron,#rice').trigger('update');
+	}, 1000 );
 },
 
 //.. changeSideBar
@@ -12718,20 +12628,7 @@ createPulldownMenu: function() {
 			});
 		} },
 		{ title: '【一括レベルアップ】', action: function() { Append.togetherLevelup(); } },
-		{ title: '【全部隊兵士0】', action: function() { Append.clearSoldier(); } },
-		{ title: '【全部隊最大補充】', action: function() { Append.setMaxSoldier(); } },
-		{ title: '【精鋭騎馬1】', action: function() { Append.setOneSoledier( 330 );} },
-		{ title: '【赤備え1】', action: function() { Append.setOneSoledier( 331 );} },
-		// { title: '全待機武将', 	menu: [
-		// 	{ title: '', action: function() { $.noop; } },
-		// ] },
 	]);
-	// // テスト
-	// createMenu($('#gnavi .gMenu02 .imc_pulldown .imc_pulldown_item:eq(2)'), [
-	// 	{ title: '全部隊状況', action: '/facility/unit_status.php?dmo=all' },
-	// 	{ title: '敵襲状況', action: '/facility/unit_status.php?dmo=enemy' },
-	// 	{ title: '友軍状況', action: '/facility/unit_status.php?dmo=help' },
-	// ]);
 
 	//秘境用メニュー
 	createMenu($('#gnavi .gMenu04'), [
@@ -12790,7 +12687,7 @@ createPulldownMenu: function() {
 		{ title: 'スキル追加', action: function() { Page.form( '/union/levelup.php', { union_type: 2 }, true ); } },
 		{ title: 'スキル削除', action: function() { Page.form( '/union/remove.php', { union_type: 3 }, true ); } },
 		{ title: '合成履歴', action: '/union/union_history.php' },
-		{ title: '【合成表更新】', action: function() { Data.skillTableUpdate(); } }
+		{ title: '【合成表更新】', action: function() { Data.skillTableUpdate(); } },
 	]);
 
 	function createMenu( target, menu ) {
@@ -14829,14 +14726,11 @@ arrivalCopy: function() {
 
 	$button.click(function() {
 		var text = '';
-	console.log( $('#ig_gofightconfirmboxtitle').text() );
-		var hoge = $('#ig_gofightconfirmboxtitle').text();
-		// 【空き地】 (10,6) 1.00 到着まで　00:01:58コピー 2014-09-03 00:08:14 
+
 		text += $('#ig_gofightconfirmboxtitle TR:first TD:first SPAN').text().replace(/\t/g, '').trim();
-	console.log( text );
 		text += '　';
 		text += $('#imi_arrival').text();
-// /\(-?\d+,-?\d+\)$/
+
 		GM_setClipboard( text );
 
 		return false;
@@ -15272,27 +15166,27 @@ style: '' +
 '#busho_info .icon_protect { width: 24px; height: 20px; background-position: 3px 3px; background-repeat: no-repeat; }' +
 
 /* 兵種による色分け */
-'#busho_info .yari1 TD:nth-child(11) { background-color: #bd9; color: #000; font-size: 12px; }' +
-'#busho_info .yari2 TD:nth-child(11) { background-color: #bd9; color: #000; font-size: 12px; }' +
-'#busho_info .yari3 TD:nth-child(11) { background-color: #9b7; color: #000; font-size: 12px; }' +
-'#busho_info .yari4 TD:nth-child(11) { background-color: #bd9; color: #000; font-size: 12px; }' +
+'#busho_info .yari1 TD:nth-child(10) { background-color: #bd9; color: #000; font-size: 12px; }' +
+'#busho_info .yari2 TD:nth-child(10) { background-color: #bd9; color: #000; font-size: 12px; }' +
+'#busho_info .yari3 TD:nth-child(10) { background-color: #9b7; color: #000; font-size: 12px; }' +
+'#busho_info .yari4 TD:nth-child(10) { background-color: #bd9; color: #000; font-size: 12px; }' +
 
-'#busho_info .yumi1 TD:nth-child(11) { background-color: #fcb; color: #000; font-size: 12px; }' +
-'#busho_info .yumi2 TD:nth-child(11) { background-color: #fcb; color: #000; font-size: 12px; }' +
-'#busho_info .yumi3 TD:nth-child(11) { background-color: #da9; color: #000; font-size: 12px; }' +
-'#busho_info .yumi4 TD:nth-child(11) { background-color: #fcb; color: #000; font-size: 12px; }' +
+'#busho_info .yumi1 TD:nth-child(10) { background-color: #fcb; color: #000; font-size: 12px; }' +
+'#busho_info .yumi2 TD:nth-child(10) { background-color: #fcb; color: #000; font-size: 12px; }' +
+'#busho_info .yumi3 TD:nth-child(10) { background-color: #da9; color: #000; font-size: 12px; }' +
+'#busho_info .yumi4 TD:nth-child(10) { background-color: #fcb; color: #000; font-size: 12px; }' +
 
-'#busho_info .kiba1 TD:nth-child(11) { background-color: #fe8; color: #000; font-size: 12px; }' +
-'#busho_info .kiba2 TD:nth-child(11) { background-color: #fe8; color: #000; font-size: 12px; }' +
-'#busho_info .kiba3 TD:nth-child(11) { background-color: #dc6; color: #000; font-size: 12px; }' +
-'#busho_info .kiba4 TD:nth-child(11) { background-color: #fe8; color: #000; font-size: 12px; }' +
+'#busho_info .kiba1 TD:nth-child(10) { background-color: #fe8; color: #000; font-size: 12px; }' +
+'#busho_info .kiba2 TD:nth-child(10) { background-color: #fe8; color: #000; font-size: 12px; }' +
+'#busho_info .kiba3 TD:nth-child(10) { background-color: #dc6; color: #000; font-size: 12px; }' +
+'#busho_info .kiba4 TD:nth-child(10) { background-color: #fe8; color: #000; font-size: 12px; }' +
 
-'#busho_info .heiki1 TD:nth-child(11) { background-color: #c9c; color: #000; font-size: 12px; }' +
-'#busho_info .heiki2 TD:nth-child(11) { background-color: #c9c; color: #000; font-size: 12px; }' +
-'#busho_info .heiki3 TD:nth-child(11) { background-color: #c9c; color: #000; font-size: 12px; }' +
-'#busho_info .heiki4 TD:nth-child(11) { background-color: #dbd; color: #000; font-size: 12px; }' +
-'#busho_info .heiki5 TD:nth-child(11) { background-color: #b9b; color: #000; font-size: 12px; }' +
-'#busho_info .heiki6 TD:nth-child(11) { background-color: #b9b; color: #000; font-size: 12px; }' +
+'#busho_info .heiki1 TD:nth-child(10) { background-color: #c9c; color: #000; font-size: 12px; }' +
+'#busho_info .heiki2 TD:nth-child(10) { background-color: #c9c; color: #000; font-size: 12px; }' +
+'#busho_info .heiki3 TD:nth-child(10) { background-color: #c9c; color: #000; font-size: 12px; }' +
+'#busho_info .heiki4 TD:nth-child(10) { background-color: #dbd; color: #000; font-size: 12px; }' +
+'#busho_info .heiki5 TD:nth-child(10) { background-color: #b9b; color: #000; font-size: 12px; }' +
+'#busho_info .heiki6 TD:nth-child(10) { background-color: #b9b; color: #000; font-size: 12px; }' +
 
 /* 合成カード選択 */
 '#busho_info TR.imc_selected > TD { background-color: rgba( 0, 153, 204, 0.4 ); }' +
@@ -15407,10 +15301,8 @@ layouter: function() {
 	$th.eq( 4 ).text('槍/弓');
 	$th.eq( 5 ).hide();
 	$th.eq( 6 ).text('馬/器');
-	// $th.eq( 7 ).width( 90 );
-	// $th.eq( 8 ).width( 155 );
-	// スキル欄追加
-	$th.eq( 6 ).after( '<th>スキル</th>' );
+	$th.eq( 7 ).width( 90 );
+	$th.eq( 8 ).width( 155 );
 
 	$table
 	.on('change', 'SELECT', function() {
@@ -15451,7 +15343,6 @@ layouter: function() {
 		'<li class="imc_analysis" id="imi_analysis"><a id="imi_export" download="" href="#">集計</a></li>' +
 	'</ul>' +
 	'<ul id="imi_command_selecter" class="imc_command_selecter">' +
-		'<li class="imc_group imc_selected" selecter=".imc_brigade1, .imc_brigade2, .imc_brigade3, .imc_brigade4, .imc_brigade5" batch="0"><span>全武将</span></li>' +
 		'<li class="imc_all imc_selected" selecter=".imc_all" batch="0"><span>全て</span></li>' +
 		'<li class="imc_yari" selecter=".yari1, .yari2, .yari3, .yari4" batch="0"><span>槍</span></li>' +
 		'<li class="imc_yumi" selecter=".yumi1, .yumi2, .yumi3, .yumi4" batch="0"><span>弓</span></li>' +
@@ -15544,24 +15435,6 @@ layouter: function() {
 		$('#imi_command_selecter').find('LI.imc_selected').removeClass('imc_selected');
 		$(this).addClass('imc_selected');
 	});
-
-	createMenu( $('.imc_group'), [
-		{ title: '全武将', selecter: '.imc_brigade1, .imc_brigade2, .imc_brigade3, .imc_brigade4, .imc_brigade5', batch: 0 },
-		{ title: '第一組', selecter: '.imc_brigade1', batch: 0 },
-		{ title: '第二組', selecter: '.imc_brigade2', batch: 0 },
-		{ title: '第三組', selecter: '.imc_brigade3', batch: 0 },
-		{ title: '第四組', selecter: '.imc_brigade4', batch: 0 },
-		{ title: '未設定', selecter: '.imc_brigade5', batch: 0 },
-	]);
-
-	createMenu( $('.imc_rarity'), [
-		{ title: '全て', selecter: '.imc_rarity_ten, .imc_rarity_goku, .imc_rarity_toku, .imc_rarity_jou, .imc_rarity_jo', batch: 0 },
-		{ title: '天', selecter: '.imc_rarity_ten',  batch: 0 },
-		{ title: '極', selecter: '.imc_rarity_goku', batch: 0 },
-		{ title: '特', selecter: '.imc_rarity_toku', batch: 0 },
-		{ title: '上', selecter: '.imc_rarity_jou',  batch: 0 },
-		{ title: '序', selecter: '.imc_rarity_jo',   batch: 0 },
-	]);
 
 	createMenu( $('.imc_all'), [
 		{ title: '全て', selecter: '.imc_all', batch: 0 },
@@ -15946,30 +15819,6 @@ analyze: function( $tr, deck, edit ) {
 		$td.eq( 8 ).prepend( $td.eq( 7 ).children() );
 		$td.eq( 5 ).hide();
 		$td.eq( 7 ).hide();
-
-		// スキル欄追加
-		var skills = '<td class="td_left" style="font-size:11px;">';
-		for( i = 0; i < card.skillList.length; i++ ) {
-			skills += '<div style="margin:0.25em 0px;">';
-			skills += card.skillList[i].type ? card.skillList[i].type + ':': '';
-			skills += card.skillList[i].name;
-			skills += card.skillList[i].lv ? 'LV' + card.skillList[i].lv : '';
-			skills += '</div>';
-		}
-		skills += '</td>';
-		$td.eq( 8 ).after( skills );
-
-		// 最初だけ deck_unit.jsの318行で更新されてしまう
-		// 兵種から待機兵士数削除
-		$this.find('select[id^=unit_id_select_]').each( function() {
-			$(this).find('option').each( function() {
-				$(this).text( $(this).text().replace(/\(\d+\)/, '') );
-			});
-			var changeAct = $(this).attr( 'onchange' );
-		});
-
-		// 組
-		$this.addClass( $this.find('[id^=unit_group_type_]').attr('class').replace(/unit(_brigade\d)/, function( s, m ) { return 'imc'+m; } ) );
 
 		//兵士数
 		if ( card.solNum == card.maxSolNum ) {
