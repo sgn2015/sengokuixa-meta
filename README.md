@@ -33,6 +33,10 @@ Firefoxは ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr か
 更新履歴
 --------
 
+### 1.4.4.14(hm鯖)
+2014/12/18
+* 空き地攻撃力が表示されない不具合を修正
+
 ### 1.4.4.13(y/hm鯖)
 2014/12/12
 * 資源更新がうまくいかなかったのを修正(Firefox34以降)
