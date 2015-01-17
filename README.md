@@ -5,15 +5,15 @@ sengokuixa-meta
 
 戦国IXAを変態させるツール
 
-重要なお知らせ
+~~重要なお知らせ~~
 --------------
 
-Firefox側の仕様変更によって、元のページにあるスクリプトを置き換えることが(簡単には)できなくなりました。  
-このため、カードウィンドウに表示されていた拡張情報と資源の更新がうまく動かなくなっています。
+~~Firefox側の仕様変更によって、元のページにあるスクリプトを置き換えることが(簡単には)できなくなりました。  ~~
+~~このため、カードウィンドウに表示されていた拡張情報と資源の更新がうまく動かなくなっています。~~
 
-大変申し訳ありませんが、しばらくの間は「Firefox31ESR+Scriptish0.1.11」までを動作対象環境とさせていただきます。
+~~大変申し訳ありませんが、しばらくの間は「Firefox31ESR+Scriptish0.1.11」までを動作対象環境とさせていただきます。~~
 
-Firefoxは ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr から使用中のOSに合ったものをダウンロードしてください。
+~~Firefoxは ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr から使用中のOSに合ったものをダウンロードしてください。~~
 
 
 動作確認
@@ -32,6 +32,11 @@ Firefoxは ftp://ftp.mozilla.org/pub/mozilla.org/firefox/releases/latest-esr か
 
 更新履歴
 --------
+
+### 1.4.5.0
+2015/01/17
+* 武将カードの詳細をFirefox34以降でも表示できるように修正
+ - thickboxの実装をぺたぺた(MITライセンス)
 
 ### 1.4.4.14(hm鯖)
 2014/12/18
