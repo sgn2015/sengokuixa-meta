@@ -238,6 +238,226 @@ MetaStorage.change( 'UNIT_STATUS', function( event, storageEvent ) {
 	$('#imi_basename').trigger('update');
 });
 
+//■ Metabox(thickboxの最低限な実装)
+//    unsafeWindowが扱えなくなったことで、thickboxの拡張ができなくなったため
+//    thickboxのinlineコンテンツ表示を実装
+//    参考
+//    http://codylindley.com/thickbox/
+//    http://black-flag.net/jquery/20100526-1094.html
+var Metabox = ( function() {
+	function Metabox() {
+		$.noop;
+	}
+	$.extend( Metabox, {
+		showCore: function( caption, url ) {
+			if( url.search(/#TB_inline/) < 0 ) { return; }
+
+			var $document = $(document),
+				$body = $('body'),
+				self = this;
+
+			if( caption === null ) { caption = ''; }
+
+			if( $('#TB_overlay').length == 0 ) {
+				$('<div id=TB_overlay class=TB_overlayBG/>').appendTo( $body )
+				.on( 'click', function() {
+					self.remove();
+				});
+			}
+			if( $('#TB_window').length == 0 ) {
+				$('<div id=TB_window/>').appendTo( $body )
+			}
+
+			var queryString;
+			if( url.search(/#TB_inline/) != -1 ) {
+				queryString = url.slice( url.search(/#TB_inline/) );
+			}
+			queryString = queryString.replace(/^[^\?]+\??/,'');
+			var params = this.parseQuery( queryString );
+
+			var TB_WIDTH  = (params['width' ]*1) + 30 || 630, //defaults to 630 if no paramaters were added to URL
+				TB_HEIGHT = (params['height']*1) + 40 || 440, //defaults to 440 if no paramaters were added to URL
+				ajaxContentW = TB_WIDTH  - 30,
+				ajaxContentH = TB_HEIGHT - 45;
+
+			var html = '' +
+			'<div id=TB_title>' +
+				'<div id=TB_ajaxWindowTitle>' + caption + '</div>' +
+				'<div id=TB_closeAjaxWindow><a href="javascript:void(0)" id=TB_closeWindowButton>close</a> or Esc Key</div>' +
+			'</div>' +
+			'<div id=TB_ajaxContent style="width:' + ajaxContentW + 'px; height:' + ajaxContentH + 'px"></div>' +
+			'';
+
+			$('#TB_window').append( html );
+
+			$("#TB_ajaxContent").append( $('#' + params['inlineId']).children() );
+			// unload時に元に戻す
+			$("#TB_window").unload(function () {
+				$('#' + params['inlineId']).append( $("#TB_ajaxContent").children() );
+			});
+			this.position( TB_WIDTH, TB_HEIGHT );
+
+			$('#TB_closeWindowButton').click( this.remove );
+
+			$('#TB_overlay,#TB_window').show();
+			return false;
+		},
+
+		parseQuery: function( query ) {
+			var Params = {};
+			if ( !query ) { return Params; }
+
+			var Pairs = query.split(/[;&]/);
+			for ( var i = 0; i < Pairs.length; i++ ) {
+				var KeyVal = Pairs[i].split('=');
+				if ( ! KeyVal || KeyVal.length != 2 ) { continue; }
+				var key = unescape( KeyVal[0] );
+				var val = unescape( KeyVal[1] );
+				val = val.replace(/\+/g, ' ');
+				Params[key] = val;
+			}
+			return Params;
+		},
+
+		position: function( w, h ) {
+			$("#TB_window").css({marginLeft: '-' + parseInt((w / 2),10) + 'px', width: w + 'px'});
+			$("#TB_window").css({marginTop: '-' + parseInt((h / 2),10) + 'px'});
+		},
+
+		remove: function() {
+			$('#TB_window').fadeOut('fast', function() {
+				$('#TB_window,#TB_overlay').trigger('unload').off().remove();
+			});
+		},
+
+		show: function( caption, url ) {
+			this.showCore( caption, url );
+			// ここに独自実装を追加
+
+			//カードウィンドウチェック
+			if ( url.indexOf('cardWindow') == -1 ) { return; }
+
+			$tb = $('#TB_ajaxContent');
+
+			//微調整
+			$tb.css({ height: 'auto' });
+			margintop = -Math.floor( $('#TB_window').height() / 2 - 20 );
+			if ( margintop < -350 ) { margintop = -350; }
+			$('#TB_window').css({ marginTop: margintop });
+
+			if ( $tb.find('.imc_table').length > 0 ) { return; }
+
+			var card = new Card( $tb ),
+				list = [], type, html, html2, $table;
+
+			//仮想の兵数セット
+			card.solNum = card.maxSolNum;
+
+			type = '長槍足軽 武士 長弓兵 弓騎馬 雑賀衆 精鋭騎馬 赤備え 騎馬鉄砲 焙烙火矢 鉄砲足軽'.split(' ');
+			$.each( type, function( idx, key ) {
+				//仮想の兵種セット
+				card.solName = key;
+				card.power();
+
+				list.push({
+					solName: card.solName,
+					atk: Math.floor( card.totalAtk ),
+					def: Math.floor( card.totalDef ),
+					costDef: Math.floor( card.totalDef / card.cost )
+				});
+			})
+
+			html = '<table class="imc_table td_right" style="width: 483px; margin: 0px;">' +
+				'<tr><th width="14%">兵種</th><th width="12%">攻撃力</th><th width="12%">防御力</th><th width="12%">防 / C</th>' +
+				'<th width="14%">兵種</th><th width="12%">攻撃力</th><th width="12%">防御力</th><th width="12%">防 / C</th></tr>';
+
+			for ( var i = 0, len = Math.ceil( list.length / 2 ); i < len; i++ ) {
+				var left = list[ i ],
+					right = list[ len + i ];
+
+				html += '<tr>';
+
+				html += '<th>' + left.solName + '</th>' +
+					'<td>' + left.atk.toFormatNumber() + '</td>' +
+					'<td>' + left.def.toFormatNumber() + '</td>' +
+					'<td>' + left.costDef.toFormatNumber() + '</td>';
+
+				if ( right ) {
+					html += '<th>' + right.solName + '</th>' +
+						'<td>' + right.atk.toFormatNumber() + '</td>' +
+						'<td>' + right.def.toFormatNumber() + '</td>' +
+						'<td>' + right.costDef.toFormatNumber() + '</td>';
+				}
+				else {
+					html += '<td colspan="4"></td>';
+				}
+
+				html += '</tr>';
+			}
+
+			html += '</table>';
+
+			//スキル候補
+			var { table, table_s1, s2, s2_s1 } = Util.getSkillCandidate( card.skillList );
+			html += '<table class="imc_table" style="width: 483px; margin: 0px;">' +
+				'<tr>' +
+					'<th width="20%">候補Ａ</th>' +
+					'<th width="20%">候補Ｂ</th>' +
+					'<th width="20%">候補Ｃ</th>' +
+					'<th width="20%">候補Ｄ</th>' +
+					'<th width="20%">Ｓ２</th>' +
+				'</tr>' +
+				'<tr>';
+			html2 = '';
+
+			for ( var i = 0, len = table.length; i < len; i++ ) {
+				html  += '<td>' + table[ i ] + '</td>';
+				html2 += '<td>' + table_s1[ i ] + '</td>';
+			}
+			for ( var i = table.length; i < 4; i++ ) {
+				html  += '<td>-</td>';
+				html2 += '<td>-</td>';
+			}
+
+			html  += '<td>' + ( ( s2 ) ? s2 : '-' ) + '</td>';
+			html2 += '<td>' + ( ( s2_s1 ) ? s2_s1 : '-' ) + '</td>';
+
+			html += '</tr><tr>' + html2 + '</tr>';
+			html += '</table>';
+
+			$table = $( html ).appendTo( $tb );
+			$table.find('TR').filter(':even').css({ backgroundColor: '#eee' });
+
+			margintop = -Math.floor( $('#TB_window').height() / 2 - 20 );
+			if ( margintop < -350 ) { margintop = -350; }
+			$('#TB_window').css({ marginTop: margintop });
+
+			$tb.find('IMG[src$="nouryoku_title_white.png"]').parent().remove();
+			$tb.find('#trade_btn').css('padding-bottom', '10px');
+			$tb.find('#table_posi').css('background-color', '#000');
+
+			if ( card.rarity == '雅' ) {
+				$tb.find('.ig_card_cost').removeClass('ig_card_cost').addClass('ig_card_cost_over');
+			}
+		}
+	});
+
+	$('A.thickbox').removeClass('thickbox').addClass('metabox');
+
+	var selector = 'A.metabox';
+	$(document)
+	.on('click', selector, function() {
+		var caption = this.title || this.name || null,
+			anchor  = this.href || this.alt;
+		Metabox.show( caption, anchor );
+		this.blur();
+		return false;
+	});
+
+	return Metabox;
+})();
+
+
 //■■■■■■■■■■■■■■■■■■■
 
 //■ Env
@@ -1972,133 +2192,6 @@ wait: function( ms ) {
 enter: function() { $(this).addClass('imc_current'); },
 //. leave
 leave: function() { $(this).removeClass('imc_current'); },
-
-//. tb_init
-tb_init: unsafeWindow.tb_init = function( a ) {
-	$( document ).on('click', a, function () {
-		var c = this.title || this.name || null;
-		var b = this.href || this.alt;
-		var d = this.rel || false;
-
-		Util.tb_show( c, b, d );
-
-		this.blur();
-		return false;
-	});
-},
-
-//. tb_show
-tb_show: function( j, b, h ) {
-	var $tb, margintop;
-
-	unsafeWindow.tb_show( j, b, h );
-
-	//カードウィンドウチェック
-	if ( b.indexOf('cardWindow') == -1 ) { return; }
-
-	$tb = $('#TB_ajaxContent');
-
-	//微調整
-	$tb.css({ height: 'auto' });
-	margintop = -Math.floor( $('#TB_window').height() / 2 - 20 );
-	if ( margintop < -350 ) { margintop = -350; }
-	$('#TB_window').css({ marginTop: margintop });
-
-	if ( $tb.find('.imc_table').length > 0 ) { return; }
-
-	var card = new Card( $tb ),
-		list = [], type, html, html2, $table;
-
-	//仮想の兵数セット
-	card.solNum = card.maxSolNum;
-
-	type = '長槍足軽 武士 長弓兵 弓騎馬 雑賀衆 精鋭騎馬 赤備え 騎馬鉄砲 焙烙火矢 鉄砲足軽'.split(' ');
-	$.each( type, function( idx, key ) {
-		//仮想の兵種セット
-		card.solName = key;
-		card.power();
-
-		list.push({
-			solName: card.solName,
-			atk: Math.floor( card.totalAtk ),
-			def: Math.floor( card.totalDef ),
-			costDef: Math.floor( card.totalDef / card.cost )
-		});
-	})
-
-	html = '<table class="imc_table td_right" style="width: 483px; margin: 0px;">' +
-		'<tr><th width="14%">兵種</th><th width="12%">攻撃力</th><th width="12%">防御力</th><th width="12%">防 / C</th>' +
-		'<th width="14%">兵種</th><th width="12%">攻撃力</th><th width="12%">防御力</th><th width="12%">防 / C</th></tr>';
-
-	for ( var i = 0, len = Math.ceil( list.length / 2 ); i < len; i++ ) {
-		var left = list[ i ],
-			right = list[ len + i ];
-
-		html += '<tr>';
-
-		html += '<th>' + left.solName + '</th>' +
-			'<td>' + left.atk.toFormatNumber() + '</td>' +
-			'<td>' + left.def.toFormatNumber() + '</td>' +
-			'<td>' + left.costDef.toFormatNumber() + '</td>';
-
-		if ( right ) {
-			html += '<th>' + right.solName + '</th>' +
-				'<td>' + right.atk.toFormatNumber() + '</td>' +
-				'<td>' + right.def.toFormatNumber() + '</td>' +
-				'<td>' + right.costDef.toFormatNumber() + '</td>';
-		}
-		else {
-			html += '<td colspan="4"></td>';
-		}
-
-		html += '</tr>';
-	}
-
-	html += '</table>';
-
-	//スキル候補
-	var { table, table_s1, s2, s2_s1 } = Util.getSkillCandidate( card.skillList );
-	html += '<table class="imc_table" style="width: 483px; margin: 0px;">' +
-		'<tr>' +
-			'<th width="20%">候補Ａ</th>' +
-			'<th width="20%">候補Ｂ</th>' +
-			'<th width="20%">候補Ｃ</th>' +
-			'<th width="20%">候補Ｄ</th>' +
-			'<th width="20%">Ｓ２</th>' +
-		'</tr>' +
-		'<tr>';
-	html2 = '';
-
-	for ( var i = 0, len = table.length; i < len; i++ ) {
-		html  += '<td>' + table[ i ] + '</td>';
-		html2 += '<td>' + table_s1[ i ] + '</td>';
-	}
-	for ( var i = table.length; i < 4; i++ ) {
-		html  += '<td>-</td>';
-		html2 += '<td>-</td>';
-	}
-
-	html  += '<td>' + ( ( s2 ) ? s2 : '-' ) + '</td>';
-	html2 += '<td>' + ( ( s2_s1 ) ? s2_s1 : '-' ) + '</td>';
-
-	html += '</tr><tr>' + html2 + '</tr>';
-	html += '</table>';
-
-	$table = $( html ).appendTo( $tb );
-	$table.find('TR').filter(':even').css({ backgroundColor: '#eee' });
-
-	margintop = -Math.floor( $('#TB_window').height() / 2 - 20 );
-	if ( margintop < -350 ) { margintop = -350; }
-	$('#TB_window').css({ marginTop: margintop });
-
-	$tb.find('IMG[src$="nouryoku_title_white.png"]').parent().remove();
-	$tb.find('#trade_btn').css('padding-bottom', '10px');
-	$tb.find('#table_posi').css('background-color', '#000');
-
-	if ( card.rarity == '雅' ) {
-		$tb.find('.ig_card_cost').removeClass('ig_card_cost').addClass('ig_card_cost_over');
-	}
-},
 
 //. countDown
 countDown: (function() {
@@ -4485,9 +4578,9 @@ style: '' +
 
 /* 募集・チャット用 */
 '#commentBody TD { height: 13px; }' +
-'#commentBody #chatComment TABLE TD.al { width: 105px; }' +
-'#commentBody #chatComment TABLE TD.al A { width: 105px; }' +
-'#commentBody #chatComment TABLE TD.msg > SPAN { width: 235px; }' +
+// '#commentBody #chatComment TABLE TD.al { width: 100px; }' +
+// '#commentBody #chatComment TABLE TD.al A { width: 100px; }' +
+// '#commentBody #chatComment TABLE TD.msg > SPAN { width: 235px; }' +
 '.imc_coord { display: inline !important; cursor: pointer; font-weight: bold; }' +
 'SPAN.imc_coord:hover { background-color: #f9dea1 !important; }' +
 
@@ -10690,7 +10783,7 @@ layouterSmall: function( unit ) {
 	'<div class="ig_deck_smallcardimage">' +
 		'<div class="ig_deck_smallcardbox">' +
 			this.layouterStatus2() +
-			( ( unit ) ? '<img src="' + Env.externalFilePath + '/img/card/deck/' + this.image + '" class="smallcard_chara">' : '<a href="#TB_inline?height=490&amp;width=485&amp;inlineId=cardWindow_' + this.cardId + '&amp;caption=general_detail" class="thickbox"><img src="' + Env.externalFilePath + '/img/card/deck/' + this.image + '" class="smallcard_chara"></a>' ) +
+			( ( unit ) ? '<img src="' + Env.externalFilePath + '/img/card/deck/' + this.image + '" class="smallcard_chara">' : '<a href="#TB_inline?height=490&amp;width=485&amp;inlineId=cardWindow_' + this.cardId + '&amp;caption=general_detail" class="metabox"><img src="' + Env.externalFilePath + '/img/card/deck/' + this.image + '" class="smallcard_chara"></a>' ) +
 		'</div>';
 
 	//ランクアップ
@@ -14359,7 +14452,7 @@ showSpeed: function() {
 		var $table = $(this),
 			cards = [], list, unitskill, html;
 
-		$table.find('.busho_name A.thickbox').each(function() {
+		$table.find('.busho_name A.metabox').each(function() {
 			var href = $(this).attr('href') || '',
 				id = ( href.match(/cardWindow_\d+/) )[ 0 ],
 				$card = $( '#' + id );
@@ -14646,7 +14739,7 @@ unitSpeed: function() {
 	dist = Util.getDistance( village, { x: x, y: y } );
 
 	//カード情報取得
-	$('.ig_gofightconfirm_data').find('A.thickbox').each(function() {
+	$('.ig_gofightconfirm_data').find('A.metabox').each(function() {
 		var href = $(this).attr('href') || '',
 			id = ( href.match(/cardWindow_\d+/) )[ 0 ],
 			$card = $( '#' + id );
@@ -16587,8 +16680,8 @@ layouter2: function( $cardlist, suffix ) {
 	}
 
 	$cardlist.map( function( idx, elm ) {
-		let href = $(elm).find('a.thickbox').attr('href');
-		$(elm).find('a.thickbox')
+		let href = $(elm).find('a.metabox').attr('href');
+		$(elm).find('a.metabox')
 		.attr('href', href.replace(/cardWindow_\d+/, replacer ));
 
 		let cwid = $(elm).find('div[id^=cardWindow_]').attr('id');
