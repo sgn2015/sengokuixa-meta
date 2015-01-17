@@ -16680,6 +16680,7 @@ layouter2: function( $cardlist, suffix ) {
 	}
 
 	$cardlist.map( function( idx, elm ) {
+		$(elm).find('A.thickbox').removeClass('thickbox').addClass('metabox');
 		let href = $(elm).find('a.metabox').attr('href');
 		$(elm).find('a.metabox')
 		.attr('href', href.replace(/cardWindow_\d+/, replacer ));
