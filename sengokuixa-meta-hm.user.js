@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta-hm
 // @description    戦国IXAを変態させるツール for hm鯖
-// @version        1.4.5.1
+// @version        1.4.5.2
 // @namespace      sengokuixa-meta
 // @include        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
