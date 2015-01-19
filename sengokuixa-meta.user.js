@@ -2127,21 +2127,37 @@ keyBindMap: function() {
 },
 
 //. senkuji
-senkuji: function( count, ol ) {
+senkuji: function( count, ol, token ) {
 	if ( !ol ) { ol = Display.dialog({ height: 350 }); }
 	ol.message('クジを引いています...');
+
+	var dfd = $.Deferred();
+	if( !token ) {
+		$.get('/senkuji/senkuji.php')
+		.done( function( html ) {
+			token = $(html).find('INPUT[name=senkuji_token]').val();
+			dfd.resolve();
+		});
+	}
+	else {
+		dfd.resolve();
+	}
+
+	dfd.done( function() {
 
 	if ( count <= 1 ) {
 		Page.form('/senkuji/senkuji.php', {
 			send: 'send',
-			got_type: 0
+			got_type: 0,
+			senkuji_token: token
 		});
 		return;
 	}
 
 	$.post('/senkuji/senkuji.php', {
 		send: 'send',
-		got_type: 0
+		got_type: 0,
+		senkuji_token: token
 	})
 	.pipe(function( html ) {
 		var $html = $(html),
@@ -2178,7 +2194,8 @@ senkuji: function( count, ol ) {
 	.pipe(function() { return Util.wait( 500 ); })
 	.always(function() {
 		count--;
-		Util.senkuji( count, ol );
+		Util.senkuji( count, ol, token );
+	});
 	});
 },
 
