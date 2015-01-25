@@ -439,10 +439,14 @@ var Metabox = ( function() {
 			if ( card.rarity == '雅' ) {
 				$tb.find('.ig_card_cost').removeClass('ig_card_cost').addClass('ig_card_cost_over');
 			}
+		},
+
+		replaceClass: function() {
+			$('A.thickbox').removeClass('thickbox').addClass('metabox');
 		}
 	});
 
-	$('A.thickbox').removeClass('thickbox').addClass('metabox');
+	Metabox.replaceClass();
 
 	var selector = 'A.metabox';
 	$(document)
@@ -13172,6 +13176,7 @@ autoPager: function() {
 
 			$('.ig_decksection_mid').append( $div );
 			$('#ig_boxInner').append( $card );
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
@@ -15371,9 +15376,10 @@ autoPager: function( deck, edit ) {
 			//カード情報
 			$html.find('#ig_boxInner > DIV[id^="cardWindow"]').appendTo( '#ig_boxInner' );
 			$('#busho_info').append( $tr );
+			Metabox.replaceClass();
 
 			self.analyze( $tr, deck, edit );
-			unsafeWindow.unit_brigade_btn_func();
+			window.wrappedJSObject.unit_brigade_btn_func();
 			$('#imi_command_selecter').trigger('click');
 		},
 		ended: function() {
@@ -17788,6 +17794,7 @@ autoPager: function() {
 			$html.find('#ig_boxInner > DIV').not('#ig_deckbox, #sidebar').appendTo( '#ig_boxInner' );
 
 			$('DIV.ig_decksection_innermid TABLE.common_table1').append( $tr );
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
@@ -17862,6 +17869,7 @@ autoPager: function() {
 			$('.common_box3bottom TABLE.normal > TBODY').append( $html.find('.common_box3bottom TABLE.normal TR') );
 			//ポップアップ用
 			$('.common_box3bottom').append( $html.find('.common_box3bottom > DIV[id^=cardWindow_]') );
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
@@ -19988,6 +19996,7 @@ autoPager: function() {
 			else {
 				$card_list.appendTo('#ig_deck_smallcardarea_out');
 			}
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
@@ -20049,6 +20058,7 @@ autoPager: function() {
 			else {
 				$card_list.appendTo('#ig_deck_smallcardarea_out');
 			}
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
@@ -20109,6 +20119,7 @@ autoPager: function() {
 			else {
 				$card_list.appendTo('#ig_deck_smallcardarea_out');
 			}
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
