@@ -13951,6 +13951,7 @@ trainingPulldown: function( $div ) {
 		//各拠点の施設表示
 			$tr = $(this).find('TR.noborder');
 			//訓練時間を取得
+			if( $tr.find('TD').first().text() == '' ) { return true; }
 			[ dmy, hh, mi, ss ] = $tr.find('TD').first().text().match(/(\d{2}):(\d{2}):(\d{2})/);
 			tm = hh.toInt() * 3600 + mi.toInt() * 60 + ss.toInt();
 		$tr.removeClass('noborder');
