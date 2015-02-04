@@ -20005,13 +20005,13 @@ autoPager: function() {
 		},
 		loaded: function( html ) {
 			var $html = $(html),
-				$card_list = $html.find('#ig_deck_smallcardarea_out .ig_deck_smallcardarea,#busho_info > tbody > tr:not(#busho_info tr:eq(0))');
+				$card_list = $html.find('#ig_deck_smallcardarea_out .ig_deck_smallcardarea,TABLE#busho_info > tbody > tr:not(TABLE#busho_info tr:eq(0))');
 
 			//ポップアップ用
 			$('#deck_file').append( $html.find('#ig_boxInner DIV[id^=cardWindow_]') );
 
-			if( $('#busho_info').size() > 0 ) {
-				$card_list.appendTo('#busho_info');
+			if( $('TABLE#busho_info').size() > 0 ) {
+				$card_list.appendTo('TABLE#busho_info');
 			}
 			else {
 				$card_list.appendTo('#ig_deck_smallcardarea_out');
