@@ -1940,7 +1940,7 @@ keyBindCommon: function() {
 		}),
 		
 		'c': Util.keyBindCallback(function() {
-			location.href = '/alliance/chat_view.php?pager_select=100';
+			location.href = '/alliance/chat_view.php?ct=1&pager_select=100';
 		}),
 
 		'b': Util.keyBindCallback(function() {
@@ -12513,7 +12513,7 @@ changeSideBar: function() {
 
 //.. changeChatLink
 changeChatLink: function() {
-	$('#header DIV.commentbtn2 A:eq(1)').attr('href', '/alliance/chat_view.php?pager_select=100');
+	$('#header DIV.commentbtn2 A:eq(1)').attr('href', '/alliance/chat_view.php?ct=1&pager_select=100');
 },
 
 //.. createCoordLink
@@ -12758,7 +12758,7 @@ createPulldownMenu: function() {
 
 	//同盟用メニュー
 	createMenu($('#gnavi .gMenu07'), [
-		{ title: '同盟チャット', action: '/alliance/chat_view.php?pager_select=100' },
+		{ title: '同盟チャット', action: '/alliance/chat_view.php?ct=1&pager_select=100' },
 		{ title: '同盟掲示板', action: '/bbs/topic_view.php' },
 		( Env.chapter >= 4 ) ? { title: '同盟金山', action: '/alliance/alliance_gold_mine.php' } : {},
 		{ title: '同盟情報', action: $('#gnavi .gMenu07 > A').attr('href') },
