@@ -4189,7 +4189,7 @@ panelUnionSlot: function( $panel ) {
 		'<tr><th colspan="3">追加スロット</th></tr>';
 
 		materials.forEach(function( elem, idx ) {
-			if ( idx >= 5 ) {
+			if ( idx >= 9 ) {
 				html += '<tr data-id="' + elem.id + '" style="background-color: #fdc;">';
 			}
 			else {
@@ -7977,7 +7977,7 @@ addCardUnion: function() {
 		$this.addClass('imc_selected imc_added');
 		$('#imi_card_container2').append( card.clone() );
 	}
-	else if ( Deck.union.materials.length < 5 ) {
+	else if ( Deck.union.materials.length < 9 ) {
 		if ( !card.useMaterial() ) {
 			Display.info('このカードは合成【追加スロット】に使用できません。');
 			return;
@@ -10413,7 +10413,21 @@ unionLevelup: function( type, card_id, added_cid, material ) {
 
 	data.union_type = type;
 
-	if ( added_cid ) {
+	// スキル強化 / 仕様変更 added_cidがmaterial_arr[0]になる
+	if( type == 1 && added_cid ) {
+		data.base_cid = card_id;
+		data.sub_id = 0;
+		if ( $.isArray( material ) && material.length > 0 ) {
+			material.unshift( added_cid );
+		}
+		else {
+			material.unshift( added_cid );
+		}
+		if( material.length > 10 ) { material.length = 10; }
+		data['material_arr[]'] = material;
+		Page.form( '/union/levelup.php', data, true );
+	}
+	else if ( added_cid ) {
 		//素材カードが指定されている場合は、指定後の画面へ飛ばす
 		data.base_cid = card_id;
 		data.added_cid = added_cid;
@@ -15899,7 +15913,7 @@ unionMode: function() {
 		if ( $this.hasClass('imc_selected') ) {
 			$this.removeClass('imc_selected imc_added');
 		}
-		else if ( len < 6 ) {
+		else if ( len < 10 ) {
 			var added = $('TR.imc_added').length;
 
 			if ( added == 0 && !data.useSlot2() ) {
@@ -16362,10 +16376,7 @@ layouter: function() {
 		var $this = $(this);
 
 		if ( $this.hasClass('imc_union_mode') ) {
-			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_union_mode').addClass('imc_union_keep_mode');
-		}
-		else if ( $this.hasClass('imc_union_keep_mode') ) {
-			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_union_keep_mode').addClass('imc_deck_mode');
+			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_union_mode').addClass('imc_deck_mode');
 		}
 		else {
 			$('#ig_deck_smallcardarea_out, #imi_mode').removeClass('imc_deck_mode').addClass('imc_union_mode');
