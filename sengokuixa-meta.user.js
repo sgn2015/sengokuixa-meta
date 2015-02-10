@@ -16310,6 +16310,8 @@ autoPager: function() {
 			SmallCard.setup( $card_list );
 			//$card_list.appendTo('#ig_deck_smallcardarea_out');
 			Deck.updateDeckCard();
+			
+			Metabox.replaceClass();
 		},
 		ended: function() {
 			Display.info('全ページ読み込み完了');
