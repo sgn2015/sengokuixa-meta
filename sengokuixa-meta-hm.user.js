@@ -4251,7 +4251,7 @@ panelUnionSlot: function( $panel ) {
 		Card.skillLevelup( slot1.id, slot2.id, cid_list );
 	})
 	.one('click', '.imc_skill_add', function() {
-		Card.skillAdd( slot1.id, slot2.id );
+		Card.skillAdd( slot1.id, slot2.id, [] );
 	})
 	.one('click', '.imc_rankup', function() {
 		var cid_list = materials.map(function( elem ) { return elem.id });
@@ -8384,18 +8384,23 @@ contextmenu: function() {
 			submenu['スキル強化'] = $.contextMenu.nothing;
 		}
 
-		if ( card.canSkillLvup() && added_list.length > 0 ) {
-			submenu['スキル連続強化'] = function() { Display.dialogUnionKeep( card_id, added_list ); };
-		}
-		else {
-			submenu['スキル連続強化'] = $.contextMenu.nothing;
-		}
-
 		if ( card.canSkillAdd() && ( !added_card || added_card.useSkillSlot2() ) ) {
-			submenu['スキル追加'] = function() { Card.skillAdd( card_id, added_cid ); };
+			submenu['スキル追加'] = function() { Card.skillAdd( card_id, added_cid, card.skillCount + 1 ); };
 		}
 		else {
 			submenu['スキル追加'] = $.contextMenu.nothing;
+		}
+		if ( card.canSkillReplace() >= 2 && ( !added_card || added_card.useSkillSlot2() ) ) {
+			submenu['スキル２入替'] = function() { Card.skillAdd( card_id, added_cid, 2 ); };
+		}
+		else {
+			submenu['スキル２入替'] = $.contextMenu.nothing;
+		}
+		if ( card.canSkillReplace() >= 3 && ( !added_card || added_card.useSkillSlot2() ) ) {
+			submenu['スキル３入替'] = function() { Card.skillAdd( card_id, added_cid, 3 ); };
+		}
+		else {
+			submenu['スキル３入替'] = $.contextMenu.nothing;
 		}
 
 		if ( card.canSkillRemove() ) {
@@ -10386,7 +10391,8 @@ unionData: {
 	'sort_order[]': [ 0, 0, 0 ], 'sort_order_type[]': [ 0, 0, 0 ],
 	show_deck_card_count: 15,
 	base_cid: '', added_cid: '', add_flg: '', new_cid: '', remove_cid: '',
-	p: '', selected_cid: '', deck_mode: '', union_type: '', btn_change_flg: ''
+	p: '', selected_cid: '', deck_mode: '', union_type: '', btn_change_flg: '',
+	target_sort: ''
 },
 
 //.. getRarityByClassName
@@ -10407,10 +10413,12 @@ getRarityByClassName: function( className ) {
 },
 
 //.. unionLevelup
-unionLevelup: function( type, card_id, added_cid, material ) {
+unionLevelup: function( type, card_id, added_cid, material, target ) {
 	var data = $.extend( {}, Card.unionData );
 
 	data.union_type = type;
+	// スキル追加 / 仕様変更 追加と入れ替えは対象スキル欄のみによる
+	data.target_sort = target;
 
 	// スキル強化 / 仕様変更 added_cidがmaterial_arr[0]になる
 	if( type == 1 && added_cid ) {
@@ -10457,8 +10465,8 @@ skillLevelup: function( card_id, added_cid, material_cid ) {
 },
 
 //.. skillAdd
-skillAdd: function( card_id, added_cid ) {
-	Card.unionLevelup( 2, card_id, added_cid, [] );
+skillAdd: function( card_id, added_cid, target ) {
+	Card.unionLevelup( 2, card_id, added_cid, [], target );
 },
 
 //.. skillRemove
@@ -11452,6 +11460,11 @@ canSkillLvup: function() {
 //.. canSkillAdd
 canSkillAdd: function() {
 	return ( this.skillCount < 3 );
+},
+
+//.. canSkillReplace
+canSkillReplace: function() {
+	return ( this.skillCount );
 },
 
 //.. canSkillRemove
@@ -16026,8 +16039,14 @@ contextmenu: function() {
 			separator = true;
 		}
 		if ( card.canSkillAdd() && ( !added_card || added_card.useSkillSlot2() ) ) {
-			menu['スキルを追加する'] = function() { Card.skillAdd( card_id, added_cid ); };
+			menu['スキルを追加する'] = function() { Card.skillAdd( card_id, added_cid, card.skillCount + 1 ); };
 			separator = true;
+		}
+		if ( card.canSkillReplace() >= 2 && ( !added_card || added_card.useSkillSlot2() ) ) {
+			menu['スキル２を入れ替える'] = function() { Card.skillAdd( card_id, added_cid, 2 ); };
+		}
+		if ( card.canSkillReplace() >= 3 && ( !added_card || added_card.useSkillSlot2() ) ) {
+			menu['スキル３を入れ替える'] = function() { Card.skillAdd( card_id, added_cid, 3 ); };
 		}
 		if ( card.canSkillRemove() ) {
 			menu['スキルを削除する'] = function() { Card.skillRemove( card_id ); };
