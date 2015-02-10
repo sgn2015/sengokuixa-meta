@@ -15313,27 +15313,28 @@ style: '' +
 '#busho_info .icon_protect { width: 24px; height: 20px; background-position: 3px 3px; background-repeat: no-repeat; }' +
 
 /* 兵種による色分け */
-'#busho_info .yari1 TD:nth-child(10) { background-color: #bd9; color: #000; font-size: 12px; }' +
-'#busho_info .yari2 TD:nth-child(10) { background-color: #bd9; color: #000; font-size: 12px; }' +
-'#busho_info .yari3 TD:nth-child(10) { background-color: #9b7; color: #000; font-size: 12px; }' +
-'#busho_info .yari4 TD:nth-child(10) { background-color: #bd9; color: #000; font-size: 12px; }' +
+'#busho_info .yari1 TD:nth-child(12) { background-color: #bd9; }' +
+'#busho_info .yari2 TD:nth-child(12) { background-color: #bd9; }' +
+'#busho_info .yari3 TD:nth-child(12) { background-color: #9b7; }' +
+'#busho_info .yari4 TD:nth-child(12) { background-color: #bd9; }' +
 
-'#busho_info .yumi1 TD:nth-child(10) { background-color: #fcb; color: #000; font-size: 12px; }' +
-'#busho_info .yumi2 TD:nth-child(10) { background-color: #fcb; color: #000; font-size: 12px; }' +
-'#busho_info .yumi3 TD:nth-child(10) { background-color: #da9; color: #000; font-size: 12px; }' +
-'#busho_info .yumi4 TD:nth-child(10) { background-color: #fcb; color: #000; font-size: 12px; }' +
+'#busho_info .yumi1 TD:nth-child(12) { background-color: #fcb; }' +
+'#busho_info .yumi2 TD:nth-child(12) { background-color: #fcb; }' +
+'#busho_info .yumi3 TD:nth-child(12) { background-color: #da9; }' +
+'#busho_info .yumi4 TD:nth-child(12) { background-color: #fcb; }' +
 
-'#busho_info .kiba1 TD:nth-child(10) { background-color: #fe8; color: #000; font-size: 12px; }' +
-'#busho_info .kiba2 TD:nth-child(10) { background-color: #fe8; color: #000; font-size: 12px; }' +
-'#busho_info .kiba3 TD:nth-child(10) { background-color: #dc6; color: #000; font-size: 12px; }' +
-'#busho_info .kiba4 TD:nth-child(10) { background-color: #fe8; color: #000; font-size: 12px; }' +
+'#busho_info .kiba1 TD:nth-child(12) { background-color: #fe8; }' +
+'#busho_info .kiba2 TD:nth-child(12) { background-color: #fe8; }' +
+'#busho_info .kiba3 TD:nth-child(12) { background-color: #dc6; }' +
+'#busho_info .kiba4 TD:nth-child(12) { background-color: #fe8; }' +
 
-'#busho_info .heiki1 TD:nth-child(10) { background-color: #c9c; color: #000; font-size: 12px; }' +
-'#busho_info .heiki2 TD:nth-child(10) { background-color: #c9c; color: #000; font-size: 12px; }' +
-'#busho_info .heiki3 TD:nth-child(10) { background-color: #c9c; color: #000; font-size: 12px; }' +
-'#busho_info .heiki4 TD:nth-child(10) { background-color: #dbd; color: #000; font-size: 12px; }' +
-'#busho_info .heiki5 TD:nth-child(10) { background-color: #b9b; color: #000; font-size: 12px; }' +
-'#busho_info .heiki6 TD:nth-child(10) { background-color: #b9b; color: #000; font-size: 12px; }' +
+'#busho_info .heiki1 TD:nth-child(12) { background-color: #c9c; }' +
+'#busho_info .heiki2 TD:nth-child(12) { background-color: #c9c; }' +
+'#busho_info .heiki3 TD:nth-child(12) { background-color: #c9c; }' +
+'#busho_info .heiki4 TD:nth-child(12) { background-color: #dbd; }' +
+'#busho_info .heiki5 TD:nth-child(12) { background-color: #b9b; }' +
+'#busho_info .heiki6 TD:nth-child(12) { background-color: #b9b; }' +
+'#busho_info .heiki7 TD:nth-child(12) { background-color: #b9b; }' +
 
 /* 合成カード選択 */
 '#busho_info TR.imc_selected > TD { background-color: rgba( 0, 153, 204, 0.4 ); }' +
@@ -15444,13 +15445,18 @@ layouter: function() {
 	//後の処理の為classを削除
 	$tr.removeClass('tr_gradient').css('background-color', '#272521');
 	$th = $tr.find('TH');
+	// 0:武将情報(組:画像:名前) 1:★/Lv 2:コスト
+	// 3:槍 4:弓 5:馬 6:器
+	// 7:指揮兵数 8:兵種 9:兵数:変更ボタン
 	$th.eq( 0 ).width( 135 );
 	$th.eq( 3 ).hide();
 	$th.eq( 4 ).text('槍/弓');
 	$th.eq( 5 ).hide();
 	$th.eq( 6 ).text('馬/器');
-	$th.eq( 7 ).width( 90 );
-	$th.eq( 8 ).width( 155 );
+	// 指揮兵数非表示
+	$th.eq( 7 ).hide();
+	// スキル欄追加
+	$th.eq( 6 ).after( '<th>スキル</th>' );
 
 	$table
 	.on('change', 'SELECT', function() {
@@ -15495,7 +15501,7 @@ layouter: function() {
 		'<li class="imc_yari" selecter=".yari1, .yari2, .yari3, .yari4" batch="0"><span>槍</span></li>' +
 		'<li class="imc_yumi" selecter=".yumi1, .yumi2, .yumi3, .yumi4" batch="0"><span>弓</span></li>' +
 		'<li class="imc_kiba" selecter=".kiba1, .kiba2, .kiba3, .kiba4" batch="0"><span>馬</span></li>' +
-		'<li class="imc_heiki" selecter=".heiki1, .heiki2, .heiki3, .heiki4, .heiki5, .heiki6" batch="0"><span>兵器</span></li>' +
+		'<li class="imc_heiki" selecter=".heiki1, .heiki2, .heiki3, .heiki4, .heiki5, .heiki6, .heiki7" batch="0"><span>兵器</span></li>' +
 	'</ul>';
 
 	$('#bar_card').first().before( html );
@@ -15919,7 +15925,7 @@ unionMode: function() {
 		}
 
 		var idx = $this.children('TD').index( $target );
-		if ( !( 2 <= idx && idx <= 8 ) ) { return; }
+		if ( !( 2 <= idx && idx <= 9 ) ) { return; }
 
 		var len = $('TR.imc_selected').length;
 
@@ -15963,10 +15969,35 @@ analyze: function( $tr, deck, edit ) {
 
 		$this.data( card );
 
+		// 0:組 1:画像 2:名前 3:★/Lv 4:コスト
+		// 5:槍 6:弓 7:馬 8:器
+		// 9:指揮兵数 10:兵種 11:兵数 12:変更ボタン
 		$td.eq( 6 ).prepend( $td.eq( 5 ).children() );
 		$td.eq( 8 ).prepend( $td.eq( 7 ).children() );
 		$td.eq( 5 ).hide();
 		$td.eq( 7 ).hide();
+		$td.eq( 9 ).hide();
+
+		// スキル欄追加
+		var skills = '<td class="td_left" style="font-size:11px;">';
+		for( i = 0; i < card.skillList.length; i++ ) {
+			if( card.skillList[i].lv < 10 ) {
+				skills += '<div style="margin:0.25em 0px;">';
+			}
+			else {
+				skills += '<div style="margin:0.25em 0px; color: gold">';
+			}
+			// skills += '<div style="margin:0.25em 0px;">';
+			skills += card.skillList[i].type ? card.skillList[i].type + ':': '';
+			skills += card.skillList[i].name;
+			skills += card.skillList[i].lv ? 'LV' + card.skillList[i].lv : '';
+			skills += '</div>';
+		}
+		skills += '</td>';
+		$td.eq( 8 ).after( skills );
+
+		// 組
+		$this.addClass( $this.find('[id^=unit_group_type_]').attr('class').replace(/unit(_brigade\d)/, function( s, m ) { return 'imc'+m; } ) );
 
 		//兵士数
 		if ( card.solNum == card.maxSolNum ) {
