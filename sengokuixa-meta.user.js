@@ -19985,7 +19985,7 @@ layouter: function() {
 },
 
 rankup: function( cid ) {
-	if ( $('IMG[src$="hd_success.jpg"]').length == 0 ) { return; }
+	if ( $('IMG[src$="st_success1.png"]').length == 0 ) { return; }
 
 	var html = '<span class="rankup_btn"><a href="/card/lead_info.php?cid=' + cid + '&p=1&ano=0&dmo=nomal">指揮力強化</a></span>';
 	$('.parameta_area').append( html );
