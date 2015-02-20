@@ -14731,11 +14731,9 @@ arrivalCopy: function() {
 
 	$button.click(function() {
 		var text = '';
-
-		text += $('#ig_gofightconfirmboxtitle TR:first TD:first SPAN').text().replace(/\t/g, '').trim();
-		text += '　';
-		text += $('#imi_arrival').text();
-
+		text += $('#ig_gofightconfirmboxtitle TR:first TD:first SPAN').text().replace(/\t/g, '').trim().match(/\(-?\d+,-?\d+\)$/);
+		text += ' ';
+		text += $('#imi_arrival').text().match(/\d+:\d+:\d+/);
 		GM_setClipboard( text );
 
 		return false;
