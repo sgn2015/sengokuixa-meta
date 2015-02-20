@@ -19855,6 +19855,7 @@ layouter: function() {
 	'<span>' +
 		'<span class="imc_senkuji" data-num="1">1枚</span>' +
 		'<span class="imc_senkuji" data-num="6">6枚</span>' +
+		'<span class="imc_senkuji" data-num="10">10枚</span>'+
 	'<span>';
 
 	$span = $( html )
