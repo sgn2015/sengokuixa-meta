@@ -2479,17 +2479,11 @@ var Append = {
 		})
 	},
 	
-	// 一括レベルアップ
-	togetherLevelup: function () {
+	// 一括レベルアップ改
+	togetherLevelup: function() {
 		if( !window.confirm('極振りになるように未使用ステータスポイントを分配します\n(未配分の武将はそのままです)') ) { return; }
-		
-		var pageData = [],
-			cardlist, cache, ol;
-
 		$('#imi_info').show();
-		$('<div id="imi_temporary" style="display: none;" />').appendTo('BODY');
-
-		ol = Display.dialog({
+		var ol = Display.dialog({
 			title: '一括レベルアップ',
 			width: 500,
 			height: 340,
@@ -2500,198 +2494,62 @@ var Append = {
 			},
 		});
 		ol.buttons.eq(0).attr('disabled', true);
-
 		ol.message('武将カード情報取得中...');
 
-		// 全頁読み込み
-		$.get('/card/deck.php')
-		.pipe(function (html) {
-			var $html = $(html),
-				$card_list = $html.find('#ig_deck_smallcardarea_out').find('.ig_deck_smallcardarea'),
-				$pager = $html.find('UL.pager:first'),
-				source = $pager.find('LI.last A:eq(1)').attr('onClick') || '',
-				match = source.match(/input.name = "p"; input.value = "(\d+)"/),
-				pool = {},
-				deck_cost, ano, lastPage;
+		$.ajax('/card/deck.php', { beforeSend: function(xhr) { xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); } } )
+		.then( function( responseJSON ) {
+			var tasks = [];
+			tasks.push( $.Deferred().resolve() );
 
-			$('#imi_temporary').append($html.find('#ig_boxInner > DIV[id^=cardWindow_]'));
-			pageData.push($card_list);
+			for( var i = 0; i < responseJSON.card_data.length; i++ ) {
+				var card = responseJSON.card_data[i];
+				// 未使用ポイントがなければ対象外
+				if( card.status_up_point == 0 )  continue;
 
-			if (match) {
-				lastPage = match[1].toInt();
-			} else {
-				lastPage = 1;
-			}
+				var pushData = {
+					attack_pt       : 0,
+					defense_pt      : 0,
+					intellect_pt    : 0,
+					btn_update      : true,
+					cid             : card.card_id,
+					hidden_remain_pt: card.status_up_point,
+					dmo             : 'normal',
+				};
 
-			return [2, lastPage];
-		})
-		.pipe(function (param) {
-			var self = arguments.callee,
-				[next, lastPage] = param,
-				tasks = new Array(5);
-
-			if (next > lastPage) {
-				return;
-			}
-
-			for (var i = 0; next <= lastPage && i < 3; next++, i++) {
-				tasks[i] = $.get('/card/deck.php', { p: next });
-			}
-
-			return $.when.apply($, tasks)
-			.pipe(function () {
-				for (var i = 0, len = arguments.length; i < len; i++) {
-					if (!arguments[i]) {
-						continue;
-					}
-
-					let jqXHR = arguments[i][2],
-						$html = $(jqXHR.responseText),
-						$card_list = $html.find('#ig_deck_smallcardarea_out').find('.ig_deck_smallcardarea');
-
-					$('#imi_temporary').append($html.find('#ig_boxInner > DIV[id^=cardWindow_]'));
-					pageData.push($card_list);
+				var msg = '';
+				msg += card.name + ' ★' + card.rank + '/Lv' + card.level;
+				msg += ' 未配分[<span style="font-weight: bold;">'+ card.status_up_point + '</span>]を';
+				if( card.attack_point > 0 && card.defense_point == 0 && card.intellect_point == 0 ) {
+					msg += '<span style="color:red">攻撃力</span>に配分します。';
+					pushData.attack_pt = card.status_up_point;
 				}
-
-				return self.call(self, [next, lastPage]);
-			});
-		})
-		.pipe(function () {
-			for (var i = 0, len = pageData.length; i < len; i++) {
-				MiniCard.setup(pageData[i]);
-			}
-
-			var cardlist = Deck.analyzedData;
-			let cardKeys = Object.keys(cardlist);
-
-			return [cardlist, cardKeys, []];
-			
-		})
-		// 再帰でレベルアップ対象カードの配分状況を取得
-		.pipe(function (param) {
-			let self = arguments.callee,
-				[cardlist, cardKeys, cardLvup] = param,
-				tasks = [];
-
-				if( cardKeys.length == 0 ) {
-				return cardLvup;  // 次のpipeへ
+				else if( card.attack_point == 0 && card.defense_point > 0 && card.intellect_point == 0 ) {
+					msg += '<span style="color:blue">防御力</span>に配分します。';
+					pushData.defense_pt = card.status_up_point;
 				}
-
-			for( let i = 0; i < 3; i++ ) {
-				if( cardKeys.length > 0 ) {
-					let card_id = cardKeys.shift();
-					let card = cardlist[ card_id ];
-					if ( card.status == Card.EXHIBITED ) {
-					card.element.remove();
-					card.element = null;
-					}
-					else if( card.lvup ) {
-						tasks.push( $.get('/card/status_info.php', { cid: card.cardId }) );
-					}
-
-					delete cardlist[card.cardId];
+				else if( card.attack_point == 0 && card.defense_point > 0 && card.intellect_point == 0 ) {
+					msg += '<span style="color:green">兵法</span>に配分します。';
+					pushData.intellect_pt = card.status_up_point;
 				}
-			}
-
-			return $.when.apply($, tasks)
-			.pipe( function() {
-				let jqXHR, $html = '';
-				// 登録されたタスクが1つの場合と2つ以上の場合で配列の構成が異なる
-				if( tasks.length == 1 ) {
-					jqXHR = arguments[ 2 ],
-					$html = $( jqXHR.responseText );
-					cardLvup.push( lvupParametar( $html ) );
+				else {
+					msg += '配分しません。';
 				}
-				else if( tasks.length > 1 ) {
-					for( let i = 0; i < arguments.length; i++ ) {
-						jqXHR = arguments[ i ][ 2 ],
-						$html = $( jqXHR.responseText );
-						cardLvup.push( lvupParametar( $html ) );
-					}
-				}
-				// 再帰
-				return self.call( self, [cardlist, cardKeys, cardLvup] );
-				
-				// レベルアップ用のオブジェクト作成
-				// ついでにメッセージ表示
-				function lvupParametar( $html ) {
-					let $name = $html.find('.lvup_parametar .common_table2:first th').text();
-					let $stRow = $html.find('#status_table tr');
-					let card = {
-						'cid'   : $html.find('input[name=cid]').val(),
-						'name'  : $name.replace(/\s/g, '').replace(/ランク/g, '　ランク'),
-						'remPt' : $html.find('#remain_point').text().toInt(),
-						'stAtk' : $stRow.eq(2).find('td:last').text().toInt(),
-						'stDef' : $stRow.eq(3).find('td:last').text().toInt(),
-						'stInt' : $stRow.eq(4).find('td:last').text().toInt(),
-					};
+				ol.message( msg );
 
-					let msg = '';
-					msg += card.name + ' 未配分[<span style="font-weight: bold;">'+ card.remPt + '</span>]を';
-
-					if (card.stAtk > 0 && card.stDef == 0 && card.stInt == 0) {
-							msg += '<span style="color:red">攻撃力</span>に配分します。';
-					} else if (card.stAtk == 0 && card.stDef > 0 && card.stInt == 0) {
-							msg += '<span style="color:blue">防御力</span>に配分します。';
-					} else if (card.stAtk == 0 && card.stDef == 0 && card.stInt > 0) {
-							msg += '<span style="color:green">兵法</span>に配分します';
-					} else {
-							msg += '配分しません。';
-						}
-						ol.message(msg);
-
-					return card;
-				}
-			});
-		})
-		.pipe( function (param) {
-			let self = arguments.callee,
-				cardLvup = param,
-				tasks = [];
-
-			for( let i = 0; cardLvup.length > 0 && i < 3; i++ ) {
-				let card = cardLvup.shift();
-
-				let ptAtk = ptDef = ptInt = 0;
-				if (card.stAtk > 0 && card.stDef == 0 && card.stInt == 0) {
-					ptAtk = card.remPt;
-				} else if (card.stAtk == 0 && card.stDef > 0 && card.stInt == 0) {
-					ptDef = card.remPt;
-				} else if (card.stAtk == 0 && card.stDef == 0 && card.stInt > 0) {
-					ptInt = card.remPt;
-				}
-
-				if (ptAtk > 0 || ptDef > 0 || ptInt > 0) {
-					let pushData = {
-						attack_pt       : ptAtk,
-						defense_pt      : ptDef,
-						intellect_pt    : ptInt,
-						btn_update      : true,
-						cid             : card.cid,
-						hidden_remain_pt: card.remPt,
-						dmo             : 'normal',
-					};
+				if( pushData.attack_pt > 0 || pushData.defense_pt > 0 || pushData.intellect_pt > 0 ) {
 					tasks.push( $.post('/card/status_info.php', pushData ) );
 				}
 			}
-			return $.when.apply($, tasks)
-			.pipe( function() {
-				if( cardLvup.length == 0 && tasks.length == 0 ) {
-					return;
-				}
-				else {
-					return self.call( self, cardLvup );
-				}
-			});
+			return $.when.apply($, tasks);
 		})
 		.always(function () {
-			$('#imi_temporary').remove();
 			ol.buttons.eq(0).attr('disabled', false);
 		});
 
 		$('#imi_info').hide();
+
 	},
-	
+
 	// 秘境へ行く
 	goDungeon: function( select ) {
 		var dungeon = {
