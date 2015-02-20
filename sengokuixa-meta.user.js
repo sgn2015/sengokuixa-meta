@@ -2528,7 +2528,7 @@ var Append = {
 					msg += '<span style="color:blue">防御力</span>に配分します。';
 					pushData.defense_pt = card.status_up_point;
 				}
-				else if( card.attack_point == 0 && card.defense_point > 0 && card.intellect_point == 0 ) {
+				else if( card.attack_point == 0 && card.defense_point == 0 && card.intellect_point > 0 ) {
 					msg += '<span style="color:green">兵法</span>に配分します。';
 					pushData.intellect_pt = card.status_up_point;
 				}
