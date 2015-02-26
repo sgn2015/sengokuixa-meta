@@ -2562,32 +2562,156 @@ var Append = {
 			200: '煉獄の島(兵:6h)',
 		};
 		
-		// 確認ダイアログ
-		if( window.confirm( dungeon[select] + 'に出発します。\nよろしいですか？') ) {
+		if( window.confirm( '部隊を再編成して\n' + dungeon[select] + 'に出発します。\nよろしいですか？') ) {
 		// 部隊解散
-		//Deck.breakUpAll()
-		//.always(function( ol ) {
-		//	Util.getUnitStatus();
-		//	if ( ol && ol.close ) {
-		//		window.setTimeout( ol.close, 500 );
-		//	}
-		//});
-		// 部隊編成
-		// 秘境出発
-		$.get('/facility/dungeon.php')
-		.done( function(html) {
-			var postData = {
-				btn_send_all:true,
-				dungeon_select:select,
-				unit_select:[],
-			};
-			$(html).find('input[name^=unit_select]').each( function(idx,elm) {
-				postData.unit_select.push($(elm).val());
+			Deck.breakUpAll()
+			.always(function( ol ) {
+				Util.getUnitStatus();
+				if ( ol && ol.close ) {
+					window.setTimeout( ol.close, 500 );
+				}
+
+				// コストの取得
+				$.get('/card/deck.php', { ano: 4 } )
+				.pipe( function( responseText ) {
+					var $html = $(responseText),
+						[dmy, use, max] = $html.find('.deckcost SPAN').text().match(/(\d+)\/(\d+)/),
+						newano = 5 - $html.find('#ig_unitchoice LI:contains("[---新規部隊を作成---]")').length;
+
+					return [ max, use, newano ];
+				})
+				// デッキ情報の初期化と武将一覧を取得
+				.pipe( function() {
+					var [ max, use, newano ] = arguments[0],
+						unit = new Unit();
+					Deck.setup( max, use, newano, unit );
+
+					return $.ajax('/card/deck.php', {
+						beforeSend: function(xhr) {
+							xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+						}
+					});
+				})
+				// 武将一覧の作成とソート条件の定義
+				.pipe( function( responseJSON ) {
+					JsonCard.setup( responseJSON.card_data );
+
+					var data, conditions = [];
+					
+					Deck.filter.conditions = [];
+					Deck.filter.exceptions = {}; // ブラックリスト
+
+					data = Deck.getConditionByTitle( '討伐：降',   Deck.sortList );
+					if ( data ) { conditions.push( data ); }
+
+					data = Deck.getConditionByTitle( 'コスト：昇', Deck.sortList );
+					if ( data ) { conditions.push( data ); }
+
+					data = Deck.getConditionByTitle( 'ランク：降', Deck.sortList );
+					if ( data ) { conditions.push( data ); }
+
+					Deck.sort.conditions = conditions;
+
+					return [ 4 ];
+				})
+				// 新規部隊作成
+				.pipe(function( unitnum ) {
+					var units = [],
+						cardlist = Deck.targetList(),
+						assignlist = [],
+						namelist = {},
+						freecost = Deck.freeCost - Deck.currentUnit.cost,
+						freecard = ( 5 - Deck.newano ) * unitnum,
+						village = Util.getVillageCurrent();
+
+					if ( freecost == 0 || freecard == 0 ) {
+						Display.alert('編成できませんでした。');
+						return $.Deferred().reject();
+					}
+
+					for ( var i = 0, len = cardlist.length; i < len && freecard > 0; i++ ) {
+						let card = cardlist[ i ];
+						if ( !card.canAssign() ) { continue; }
+						if ( card.cost > freecost ) { continue; }
+						if ( namelist[ card.name ] ) { continue; }
+						if ( card.cost == 0 ) { continue; }	// 童除外
+
+						namelist[ card.name ] = true;
+						freecost -= card.cost;
+						freecard--;
+						assignlist.push( card );
+					}
+
+					if ( assignlist.length == 0 ) {
+						Display.alert('編成できませんでした。');
+						return $.Deferred().reject();
+					}
+
+					var count = Math.ceil( assignlist.length / unitnum );
+					for ( var i = 0; i < count; i++ ) {
+						let unit = new Unit();
+						unit.village = village;
+						units.push( unit );
+					}
+
+					return [ units, assignlist, unitnum ];
+				})
+				.pipe(function( param ) {
+					var self = arguments.callee,
+						village = Util.getVillageCurrent(),
+						[ units, assignlist, unitnum ] = param,
+						unit;
+
+					// 登録終了
+					if ( assignlist.length == 0 ) {
+						// Util.getUnitStatusCD();
+						Display.dialog().message('秘境に出発します...');
+						// 秘境出発
+						$.get('/facility/dungeon.php')
+						.done( function(html) {
+							var postData = {
+								btn_send_all:true,
+								dungeon_select:select,
+								unit_select:[],
+							};
+							$(html).find('input[name^=unit_select]').each( function(idx,elm) {
+								postData.unit_select.push($(elm).val());
+							});
+							$.post('/facility/dungeon.php', postData).done( function() {
+								location.href = '/facility/unit_status.php?dmo=all';
+							});
+						});
+						return;
+					}
+
+					unit = units.shift();
+					for ( var i = 0; ( unit.list.length + unit.assignList.length ) < unitnum && assignlist.length > 0; i++ ) {
+						unit.assignList.push( assignlist.shift() );
+					}
+
+					unit.assignCard( Deck.newano )
+					.done(function() {
+						var cardlist = Deck.analyzedData,
+							assignlist = unit.assignList;
+
+						for ( var i = 0, len = assignlist.length; i < len; i++ ) {
+							let card = assignlist[ i ];
+
+							card.element.remove();
+							card.element = null;
+							delete cardlist[ card.cardId ];
+						}
+
+						Deck.newano++;
+					})
+					.always(function( param2 ) {
+						var [ ol ] = param2;
+						if ( ol && ol.close ) { ol.close(); }
+						self( param );
+					});
+				});
 			});
-			$.post('/facility/dungeon.php', postData).done( function() {
-				location.href = '/facility/unit_status.php?dmo=all';
-			});
-		});
+
 		}
 	},
 
@@ -10387,6 +10511,9 @@ analyze: function( element ) {
 	else if ( this.analyzeType == 'Small' ) {
 		this.analyzeSmall( element );
 	}
+	else if ( this.analyzeType == 'JSON' ) {
+		this.analyzeJson( element );
+	}
 },
 
 //.. analyzeLarge
@@ -10605,6 +10732,172 @@ analyzeSmall: function( element ) {
 	else if ( this.gounit == '0' ) {
 		this.setStatus( Card.DISABLED );
 	}
+},
+
+//.. analyzeJson
+analyzeJson: function( element ) {
+	// var $elem = $( element ),
+	// 	elem = $elem.get( 0 ),
+	var $param, param, text, array, skilllist, attr;
+
+	//レア(祝雅化童は要調査)
+	this.rarity = JsonCard.getRarity( element.rarity.toInt() );
+	//コスト
+	this.cost = element.cost.toFloat();
+	//限界突破時はランク6レベル0
+	this.rank = element.rank.toInt();
+	this.lv = ( this.rank == 6 ) ? 20: element.level.toInt();
+
+	//名前
+	this.name = element.name;
+	//統率
+	this.commands = {};
+	this.commands['槍'] = JsonCard.getLead( element.lead_spear );
+	this.commands['馬'] = JsonCard.getLead( element.lead_cavalry );
+	this.commands['弓'] = JsonCard.getLead( element.lead_bow );
+	this.commands['器'] = JsonCard.getLead( element.lead_weapon );
+	//HP
+	this.hp = element.hp.toInt();
+	this.maxHp = element.hp_max.toInt();
+
+	//攻撃力・防御力
+	this.atk = element.attack.toInt();
+	this.def = element.defense.toInt();
+	this.int = element.intellect.toInt();
+	//card_no
+	this.cardNo = element.card_number.toInt();
+	//card_id
+	this.cardId = element.card_id.toInt();
+	//兵種
+	this.solName = element.unit_name;
+	this.solType = element.unit_id;
+	//指揮数
+	this.solNum = element.unit_count.toInt();
+	this.maxSolNum = element.lead_unit.toInt();
+
+	//職業
+	this.job = [ '将', '剣', '忍', '文', '姫', '覇' ][ element.job ] || element.job;
+	//経験値 ※限界突破の場合はnextExp=nullになる
+	this.exp = element.experience.toInt();
+	this.nextExp = element.next_exp != null ? element.next_exp.toInt() : NaN;
+
+	//スキル
+	skilllist = [];
+	$.each( element.skill, function() {
+		array = this.skill_name.match(/(.+)L[Vv](\d+)/);
+
+		//レベルのないもの（感謝の饗宴、東西無双など）
+		if( !array ) {
+			skilllist.push({ originName: this.skill_name, name:this.skill_name.trim(), lv: 0 });
+			return;
+		}
+
+		var [ all, name, lv ] = array;
+		name = name.trim().replace(/ +/g, ' ');
+
+		desk = this.skill_comment;
+		if ( desk.indexOf('速：') != -1 ) { type = '速'; }
+		else if ( desk.indexOf('攻：') != -1 ) { type = '攻'; }
+		else if ( desk.indexOf('防：') != -1 ) { type = '防'; }
+		else { type = '特'; }
+
+		dom = this.skill_comment.match(/<font.*>(.*)<\/font>/) || [];
+		targets1 = ( dom.length <= 1 ) ? '' : dom[ 1 ].replace('級', '');
+		array = desk.split('<br />');
+		desk = array.shift();
+		prob1 = ( desk.match(/確率：\+(\d+(?:\.\d+)?)%/) || [ , '0' ] )[ 1 ].toFloat();
+		effects = array.map(function( elem ) {
+			var [ all, type, effect, sw ] = elem.match(/(.)：(\d+(?:\.\d+)?)%(上昇|低下)/) || [],
+				prob2, targets2;
+
+			if ( !all ) { return; }
+
+			effect = effect.toFloat();
+			if ( sw == '低下' ) { effect *= -1; }
+
+			if ( prob1 > 0 ) {
+				prob2 = prob1;
+				targets2 = targets1;
+			}
+			else {
+				prob2 = ( elem.match(/確率：\+(\d+(?:\.\d+)?)%/) || [ , '0' ] )[ 1 ].toFloat();
+				targets2 = targets1;
+				if ( elem.indexOf('全速') != -1 ) { targets2 = '全'; }
+			}
+
+			return { targets: targets2, type: type, prob: prob2, effect: effect };
+		}).filter(function( elem ) { return elem; });
+
+		skilllist.push({ originName: this.skill_name, name: name, lv: lv.toInt(), type: type, effects: effects });
+	});
+
+	this.skillList = skilllist;
+	this.skillCount = element.skill.length;
+
+	// dom = elem.getElementsByClassName('ig_card_back');
+	// this.image = ( dom.length == 0 ) ? '' : dom[ 0 ].getAttribute('src').split('/').pop();
+	this.image = element.image_name;
+
+	this.lvup = element.status_up_point;
+	this.rankup = element.rank_up_point;
+	this.protect = element.protect_flg.toInt();
+
+	// if ( this.hp < this.maxHp ) {
+	// 	this.recoveryTime = Util.getServerTime() + this.getRecoveryTime();
+	// }
+
+	attr = Data.cardAttribute[ this.cardNo ];
+	if ( attr ) { $.extend( this, attr ); }
+
+	// //squad_id 部隊長or行動中はここでは取得できない
+	// source = $elem.find('.ig_cardarea_btn A').last().attr('onClick') || '';
+	// args = source.match(/confirmUnregist\('(\d+)', '(\d+)'/);
+	// if ( args ) { this.squadId = args[ 2 ]; }
+
+
+	// //組
+	this.brigade = element.card_group_type.toInt();
+
+	// //squad_id
+	// //「選択中の部隊へ」ボタンがある：部隊配置可
+	// text = $elem.find('#btn_gounit_' + this.cardId ).addClass('imc_assign_button').attr('onClick') || '';
+	// array = text.match(/confirmRegist2\('\d*', '(\d+)'/);
+	// if ( array != null ) { this.squadId = array[ 1 ]; }
+
+	//battle_gage
+	this.battleGage = element.beat_point;
+	//gounit(配置可能)
+	// this.gounit = $elem.find('#btn_gounit_flg_' + this.cardId ).val();
+
+	// //「兵士編成」ボタンがある：編成・合成可、ボタンがない：出品中
+	// if ( $elem.find('IMG[alt="兵士編成"]').length == 0 ) {
+	// 	this.setStatus( Card.EXHIBITED );
+	// }
+	// else if ( this.gounit == '0' ) {
+	// 	this.setStatus( Card.DISABLED );
+	// }
+	if( element.deck_type == 4 ) {
+		this.setStatus( Card.EXHIBITED );
+	}
+	// element.trade_flg 出品可否
+
+	// if( $.isNumeric( this.job ) ) {
+	// if( this.rank > 4 ) {
+		// console.log( element );
+		// console.log( this );
+	// }
+	// console.log( element );
+	// if( element.card_type != 1 ) { console.log( element.name, element.card_type ); }
+	// if( element.compound_count != 0 ) { console.log( element.name, element.compound_count ); }
+	// if( element.deck_type != 3 ) { console.log( element.name, element.deck_type ); } // deck_type = 4 is 出品中?
+	// if( element.mix_flg != 1 ) { console.log( element.name, element.mix_flg ); }
+	// mix_flg 堅将の饗宴5 迅将の饗宴5 のろし3 東西無双0 大殿の饗宴0 隠し玉6 あやめ雪之丞4
+	// if( element.need_not_reset_flg ) { console.log( element.name, element.need_not_reset_flg ); }
+	// ステ振り可?
+	// console.log( element.name, element.protect_flg );
+	// 保護
+	// console.log( element.name, element.status_up_point );
+	// 未振りステPt
 },
 
 //.. power
@@ -11468,6 +11761,81 @@ clone: function() {
 }
 
 });
+
+//■ JsonCard
+var JsonCard = function( element ) {
+	this.analyzeType = 'JSON';
+	this.layoutType  = 'Mini';
+
+	this.analyze( element );
+	this.power();
+
+	// this.element = ;
+	// this.element.attr({ card_id: this.cardId });
+	// this.layouter();
+}
+
+//. JsonCard
+$.extend( JsonCard, {
+
+//.. setup
+setup: function( $list ) {
+	var list = Deck.analyzedData;
+
+	$.each( $list, function() {
+		var card = new JsonCard( this );
+		if ( card.cardId ) {
+			if ( list[ card.cardId ] ) {
+				list[ card.cardId ].element.remove();
+			}
+			list[ card.cardId ] = card;
+		}
+	});
+},
+
+getRarity: function( number ) {
+
+	return {
+		1: '天', // '祝童'も1
+		2: '極',
+		3: '特',
+		4: '上',
+		5: '序',
+		// 6: '雅化',
+	}[ number ] || number;
+},
+
+getLead: function( number ) {
+	return {
+		1: 'SSS',
+		2: 'SS',
+		3: 'S',
+		4: 'A',
+		5: 'B',
+		6: 'C',
+		7: 'D',
+		8: 'E',
+		9: 'F',
+	}[ number ] || number;
+},
+
+});
+
+//. JsonCard.prototype
+$.extend( JsonCard.prototype, Card.prototype, {
+
+//.. clone
+clone: function() {
+	// var $clone = this.element.clone();
+
+	// $clone.show();
+	// $clone.find('.imc_sc_panel').remove();
+
+	// return $clone;
+}
+
+});
+
 
 //■ SideBar
 var SideBar = {
