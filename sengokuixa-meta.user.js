@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.6.0
+// @version        1.4.6.1
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @exclude        http://h*.sengokuixa.jp/*
@@ -4970,7 +4970,7 @@ countries: (function() {
 		//第８章
 		['dummy', '黒田家', '真田家', '宇喜多家', '上杉家', '徳川家', '毛利家', '伊達家', '加藤家', '福島家', '島津家', '豊臣家', '石田家'],
 		//第９章
-		['dummy', '織田家', '雑賀家', '武田家', '上杉家', '徳川家', '毛利家', '浅井家', '北条家', '長宗我部家', '佐竹家', '大友家', '最上家'],
+		['dummy', '織田家', '鈴木家', '武田家', '上杉家', '徳川家', '毛利家', '浅井家', '北条家', '長宗我部家', '佐竹家', '大友家', '最上家'],
 	][ Env.chapter ] || [];
 })(),
 
