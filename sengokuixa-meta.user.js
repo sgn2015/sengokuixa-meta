@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta
 // @description    戦国IXAを変態させるツール
-// @version        1.4.6.1
+// @version        1.4.6.2
 // @namespace      sengokuixa-meta
 // @include        http://*.sengokuixa.jp/*
 // @exclude        http://h*.sengokuixa.jp/*
@@ -15523,6 +15523,7 @@ style: '' +
 '#imi_bottom_container TABLE.imc_soldier_total { position: relative; font-size: 10px; background-color: #eed; margin: 7px 0px; }' +
 '#imi_bottom_container TABLE.imc_soldier_total TH { width: 45px; padding: 3px 3px; line-height: 1.2; }' +
 '.imc_set_value { color: #060; font-size: 12px; text-decoration: underline; cursor: pointer; }' +
+'.imc_max_solnum { color: #48d1cc; font-size: 12px; }' +
 
 '#deck_file .imc_command_selecter { margin-top: 10px; }' +
 '#deck_file .imc_command_selecter LI .imc_pulldown { position: absolute; margin: 1px -1px; width: 65px; background-color: #000; border: solid 1px #fff; z-index: 2000; display: none; }' +
@@ -16248,6 +16249,7 @@ analyze: function( $tr, deck, edit ) {
 
 		if ( !( deck && !edit ) ) {
 			$this.find('TABLE').eq( 1 ).find('TR').eq( 1 ).find('TD').eq( 0 ).prepend('<span class="font_purple imc_set_value">( <span>1</span> )</span> / ');
+			$this.find('TABLE').eq( 1 ).find('TR').eq( 0 ).find('TD').eq( 0 ).append('<span class="imc_max_solnum">/ <span>' + card.maxSolNum + '</span></span>');
 			$( '#unit_set_link' + idx ).removeAttr('onclick style').addClass('imc_set_value');
 		}
 	});
