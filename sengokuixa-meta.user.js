@@ -20205,7 +20205,6 @@ main: function() {
 	var storage = MetaStorage('UNION_CARD'),
 		search = location.search,
 		cid = search.match(/cid=(\d+)/)[ 1 ],
-		type = search.match(/ut=(\d)/)[ 1 ],
 		card = new Card( $('.cardslot_table') );
 
 	storage.set('slot1', Util.unionCardParam( card ) );
@@ -20213,7 +20212,7 @@ main: function() {
 	storage.remove('materials');
 
 	this.layouter();
-	if ( type == '4' ) {
+	if( $('body').text().indexOf('ランクアップ合成に成功') != -1 ) {
 		this.rankup( cid );
 	}
 },
