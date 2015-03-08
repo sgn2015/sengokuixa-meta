@@ -13443,10 +13443,10 @@ autoPager: function() {
 //. layouter
 layouter: function( $div ) {
 	$div.each(function() {
-		var $a = $(this).find('A[href^="/user/present.php"]');
-		if ( $a.length == 0 ) { return; }
+		var $input = $(this).find('INPUT[name="id"]');
+		if ( $input.length == 0 ) { return; }
 
-		var pid = $a.attr('href').match(/id=(\d+)/)[ 1 ],
+		var pid = $input.val(),
 			html = '';
 
 		html += '<label style="color: black; cursor: pointer;">';
@@ -13482,7 +13482,7 @@ receive: function() {
 		var pid = pid_list.shift();
 		if ( !pid ) { return; }
 
-		return $.get( '/user/present.php?id=' + pid )
+		return $.post( '/user/present.php', { id: pid } )
 		.pipe(function( html ) {
 			var match = html.match(/alert\([\x22\x27](.+)[\x22\x27]\)/);
 			if ( match ) {
