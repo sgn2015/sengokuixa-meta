@@ -13402,8 +13402,8 @@ main: function() {
 
 	$('#ig_boxInner')
 	.on('click', '.common_box3', function( event ) {
-		var $a = $( event.target ).closest('A'),
-			$input = $(this).find('INPUT'),
+		var $a = $( event.target ).closest('INPUT'),
+			$input = $(this).find('INPUT[type="checkbox"]'),
 			flag;
 
 		if ( $a.length == 1 ) { return; }
@@ -13452,7 +13452,7 @@ layouter: function( $div ) {
 		html += '<label style="color: black; cursor: pointer;">';
 		html += '<input type="checkbox" value="' + pid + '" /> 受け取る</label>';
 
-		$a.after( html );
+		$input.after( html );
 	});
 },
 
