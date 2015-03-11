@@ -20330,6 +20330,15 @@ autoPager: function() {
 
 //. layouter
 layouter: function() {
+	$('.skill_list_table TR')
+	.hover(
+		function() { $(this).children().addClass   ('imc_current'); },
+		function() { $(this).children().removeClass('imc_current'); }
+	)
+	.click(function() {
+		$(this).find('INPUT:radio:enabled').attr('checked', true);
+		unsafeWindow.union_checkSkillId();
+	});
 },
 
 });
