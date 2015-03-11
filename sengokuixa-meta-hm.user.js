@@ -13214,16 +13214,16 @@ autoPager: function() {
 //. layouter
 layouter: function( $div ) {
 	$div.each(function() {
-		var $a = $(this).find('A[href^="/user/present.php"]');
-		if ( $a.length == 0 ) { return; }
+		var $input = $(this).find('INPUT[name="id"]');
+		if ( $input.length == 0 ) { return; }
 
-		var pid = $a.attr('href').match(/id=(\d+)/)[ 1 ],
+		var pid = $input.val(),
 			html = '';
 
 		html += '<label style="color: black; cursor: pointer;">';
 		html += '<input type="checkbox" value="' + pid + '" /> 受け取る</label>';
 
-		$a.after( html );
+		$input.after( html );
 	});
 },
 
@@ -13253,7 +13253,7 @@ receive: function() {
 		var pid = pid_list.shift();
 		if ( !pid ) { return; }
 
-		return $.get( '/user/present.php?id=' + pid )
+		return $.post( '/user/present.php', { id: pid } )
 		.pipe(function( html ) {
 			var match = html.match(/alert\([\x22\x27](.+)[\x22\x27]\)/);
 			if ( match ) {
@@ -19958,9 +19958,9 @@ Page.registerAction( 'union', 'result', {
 //. main
 main: function() {
 	var storage = MetaStorage('UNION_CARD'),
-		search = location.search,
-		cid = search.match(/cid=(\d+)/)[ 1 ],
-		type = search.match(/ut=(\d)/)[ 1 ],
+		$form = $('FORM#union_data'),
+		cid = $form.find('#base_cid').val(),
+		type = $form.find('#union_type').val(),
 		card = new Card( $('.cardslot_table') );
 
 	storage.set('slot1', Util.unionCardParam( card ) );
@@ -19968,7 +19968,7 @@ main: function() {
 	storage.remove('materials');
 
 	this.layouter();
-	if ( type == '4' ) {
+	if( type == 4 ) {
 		this.rankup( cid );
 	}
 },
@@ -19981,6 +19981,7 @@ layouter: function() {
 	'<span>' +
 		'<span class="imc_senkuji" data-num="1">1枚</span>' +
 		'<span class="imc_senkuji" data-num="6">6枚</span>' +
+		'<span class="imc_senkuji" data-num="10">10枚</span>'+
 	'<span>';
 
 	$span = $( html )
@@ -19998,10 +19999,23 @@ layouter: function() {
 },
 
 rankup: function( cid ) {
-	if ( $('IMG[src$="st_success1.png"]').length == 0 ) { return; }
-
-	var html = '<span class="rankup_btn"><a href="/card/lead_info.php?cid=' + cid + '&p=1&ano=0&dmo=nomal">指揮力強化</a></span>';
+	var html;
+	// 成功
+	if ( $('IMG[src$="st_success1.png"]').length > 0 ) {
+		html = '' +
+		'<span class="rankup_btn">' +
+			'<a href="/card/lead_info.php?cid=' + cid + '&p=1&ano=0&dmo=nomal">指揮力強化</a>' +
+		'</span>';
 	$('.parameta_area').append( html );
+	}
+	// 失敗
+	else {
+		html = '' +
+		'<a href="javascript:void(0);">' +
+			'<img onclick="$(\'union_data\').submit(); return false;" title="もう一度合成" alt="もう一度合成" src="' + Env.externalFilePath + '/img/union/btn_again.png' + '">' +
+		'</a>&#12288';
+		$('#union_data P').prepend( html );
+	}
 }
 
 });
