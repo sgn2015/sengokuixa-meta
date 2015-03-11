@@ -20203,8 +20203,9 @@ Page.registerAction( 'union', 'result', {
 //. main
 main: function() {
 	var storage = MetaStorage('UNION_CARD'),
-		search = location.search,
-		cid = search.match(/cid=(\d+)/)[ 1 ],
+		$form = $('FORM#union_data'),
+		cid = $form.find('#base_cid').val(),
+		type = $form.find('#union_type').val(),
 		card = new Card( $('.cardslot_table') );
 
 	storage.set('slot1', Util.unionCardParam( card ) );
@@ -20212,7 +20213,7 @@ main: function() {
 	storage.remove('materials');
 
 	this.layouter();
-	if( $('body').text().indexOf('ランクアップ合成に成功') != -1 ) {
+	if( type == 4 ) {
 		this.rankup( cid );
 	}
 },
@@ -20243,10 +20244,23 @@ layouter: function() {
 },
 
 rankup: function( cid ) {
-	if ( $('IMG[src$="st_success1.png"]').length == 0 ) { return; }
-
-	var html = '<span class="rankup_btn"><a href="/card/lead_info.php?cid=' + cid + '&p=1&ano=0&dmo=nomal">指揮力強化</a></span>';
+	var html;
+	// 成功
+	if ( $('IMG[src$="st_success1.png"]').length > 0 ) {
+		html = '' +
+		'<span class="rankup_btn">' +
+			'<a href="/card/lead_info.php?cid=' + cid + '&p=1&ano=0&dmo=nomal">指揮力強化</a>' +
+		'</span>';
 	$('.parameta_area').append( html );
+	}
+	// 失敗
+	else {
+		html = '' +
+		'<a href="javascript:void(0);">' +
+			'<img onclick="$(\'union_data\').submit(); return false;" title="もう一度合成" alt="もう一度合成" src="' + Env.externalFilePath + '/img/union/btn_again.png' + '">' +
+		'</a>&#12288';
+		$('#union_data P').prepend( html );
+	}
 }
 
 });
