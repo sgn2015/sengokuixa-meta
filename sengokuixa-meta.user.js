@@ -2383,7 +2383,19 @@ return function() {
 	start();
 };
 
-})()
+})(),
+
+//. Content Script Injection
+//   ContentScriptとUserScriptの実行コンテキストが分離したため
+//   UserScriptをContentPageにスクリプトを埋め込む
+scriptInjection: function( source ) {
+	if( 'function' == typeof source ) {
+		source = '(' + source.toString() + ')()';
+	}
+
+	var $script = $('<script>').attr('type', 'application/javascript' ).text( source );
+	$('body').append( $script );
+}
 
 };
 
@@ -15539,28 +15551,30 @@ style: '' +
 '#busho_info .icon_protect { width: 24px; height: 20px; background-position: 3px 3px; background-repeat: no-repeat; }' +
 
 /* 兵種による色分け */
-'#busho_info .yari1 TD:nth-child(12) { background-color: #bd9; }' +
-'#busho_info .yari2 TD:nth-child(12) { background-color: #bd9; }' +
-'#busho_info .yari3 TD:nth-child(12) { background-color: #9b7; }' +
-'#busho_info .yari4 TD:nth-child(12) { background-color: #bd9; }' +
+'#busho_info .yari1 TD:nth-child(12) { background-color: #bd9; color:#000; font-size:12px; }' +
+'#busho_info .yari2 TD:nth-child(12) { background-color: #bd9; color:#000; font-size:12px; }' +
+'#busho_info .yari3 TD:nth-child(12) { background-color: #9b7; color:#000; font-size:12px; }' +
+'#busho_info .yari4 TD:nth-child(12) { background-color: #bd9; color:#000; font-size:12px; }' +
 
-'#busho_info .yumi1 TD:nth-child(12) { background-color: #fcb; }' +
-'#busho_info .yumi2 TD:nth-child(12) { background-color: #fcb; }' +
-'#busho_info .yumi3 TD:nth-child(12) { background-color: #da9; }' +
-'#busho_info .yumi4 TD:nth-child(12) { background-color: #fcb; }' +
+'#busho_info .yumi1 TD:nth-child(12) { background-color: #fcb; color:#000; font-size:12px; }' +
+'#busho_info .yumi2 TD:nth-child(12) { background-color: #fcb; color:#000; font-size:12px; }' +
+'#busho_info .yumi3 TD:nth-child(12) { background-color: #da9; color:#000; font-size:12px; }' +
+'#busho_info .yumi4 TD:nth-child(12) { background-color: #fcb; color:#000; font-size:12px; }' +
 
-'#busho_info .kiba1 TD:nth-child(12) { background-color: #fe8; }' +
-'#busho_info .kiba2 TD:nth-child(12) { background-color: #fe8; }' +
-'#busho_info .kiba3 TD:nth-child(12) { background-color: #dc6; }' +
-'#busho_info .kiba4 TD:nth-child(12) { background-color: #fe8; }' +
+'#busho_info .kiba1 TD:nth-child(12) { background-color: #fe8; color:#000; font-size:12px; }' +
+'#busho_info .kiba2 TD:nth-child(12) { background-color: #fe8; color:#000; font-size:12px; }' +
+'#busho_info .kiba3 TD:nth-child(12) { background-color: #dc6; color:#000; font-size:12px; }' +
+'#busho_info .kiba4 TD:nth-child(12) { background-color: #fe8; color:#000; font-size:12px; }' +
 
-'#busho_info .heiki1 TD:nth-child(12) { background-color: #c9c; }' +
-'#busho_info .heiki2 TD:nth-child(12) { background-color: #c9c; }' +
-'#busho_info .heiki3 TD:nth-child(12) { background-color: #c9c; }' +
-'#busho_info .heiki4 TD:nth-child(12) { background-color: #dbd; }' +
-'#busho_info .heiki5 TD:nth-child(12) { background-color: #b9b; }' +
-'#busho_info .heiki6 TD:nth-child(12) { background-color: #b9b; }' +
-'#busho_info .heiki7 TD:nth-child(12) { background-color: #b9b; }' +
+'#busho_info .heiki1 TD:nth-child(12) { background-color: #c9c; color:#000; font-size:12px; }' +
+'#busho_info .heiki2 TD:nth-child(12) { background-color: #c9c; color:#000; font-size:12px; }' +
+'#busho_info .heiki3 TD:nth-child(12) { background-color: #c9c; color:#000; font-size:12px; }' +
+'#busho_info .heiki4 TD:nth-child(12) { background-color: #dbd; color:#000; font-size:12px; }' +
+'#busho_info .heiki5 TD:nth-child(12) { background-color: #b9b; color:#000; font-size:12px; }' +
+'#busho_info .heiki6 TD:nth-child(12) { background-color: #b9b; color:#000; font-size:12px; }' +
+'#busho_info .heiki7 TD:nth-child(12) { background-color: #b9b; color:#000; font-size:12px; }' +
+
+'#busho_info .imc_none TD:nth-child(12) { font-size:12px; }' +
 
 /* 合成カード選択 */
 '#busho_info TR.imc_selected > TD { background-color: rgba( 0, 153, 204, 0.4 ); }' +
@@ -15595,10 +15609,13 @@ style: '' +
 main: function() {
 	var self = this,
 		deck = $('#deck_file IMG[src$="btn_deck.png"]').length,
-		edit = $('#deck_file IMG[src$="btn_max.png"]').length,
-		$tr = $('#busho_info .tr_gradient').slice( 1 );
+		edit = $('#deck_file IMG[src$="btn_max.png"]').length;
+		// $tr = $('#busho_info .tr_gradient').slice( 1 ); 
 
 	this.layouter();
+	// layouterでヘッダの.tr_gradientを削除しているので
+	var $tr = $('#busho_info .tr_gradient');
+
 	if ( deck ) {
 		if ( edit ) { this.layouter2(); }
 	}
@@ -15608,6 +15625,117 @@ main: function() {
 	this.cardOrderSelecter();
 	this.analyze( $tr, deck, edit );
 	this.autoPager( deck, edit );
+
+	// ScriptをPageScriptとして埋め込み
+	Util.scriptInjection( function() {
+		// 武将カード情報から兵士情報を拾う
+		function analyzeSoldier( element ) {
+			var $elem = j$( element ),
+				elem = $elem.get( 0 ),
+				$param, param, text, array, skilllist, attr;
+
+			$param = $elem.find('.parameta_area').children('SPAN');
+			if ( $param.length == 0 ) {
+			throw new Error('武将カード情報を取得できませんでした。');
+			}
+
+			// 限界突破の際はランク以降のparamの添え字を-1する必要あり
+			//   <span class="ig_card_level"/>が存在しないため
+			var fsub = 0;
+			param = $param.get();
+			//レア
+			// text = param[ fsub++ ].getAttribute('class');
+			fsub++;
+			//コスト ig_card_cost_overは大殿の饗宴用
+			fsub++;
+			//ランク・レベル level_starとig_card_level
+			//限界突破の場合はrank_over_limit
+			if( param[ fsub ].getAttribute('class') == 'level_star' ) {
+				fsub++;
+				fsub++;
+			}
+			else if( param[ fsub ].getAttribute('class') == 'rank_over_limit' ) {
+				fsub++;
+			}
+
+			//名前
+			fsub++;
+			//統率
+			fsub++;
+			fsub++;
+			fsub++;
+			fsub++;
+			//HP
+			fsub++;
+			fsub++; // ig_card_status_hp_barの分
+
+			//攻撃力・防御力
+			fsub++;
+			fsub++;
+			fsub++;
+
+			//card_no
+			fsub++;
+			//スタイルシート名から兵種を求める
+			text = param[ fsub++ ].getAttribute('class');
+			var solName = (text.split('_') || [])[1];
+			//指揮数 commandsol_no_overは大殿の饗宴用
+			var solNum    = param[ fsub ].firstChild.firstChild.nodeValue,
+				maxSolNum = param[ fsub ].childNodes[ 1 ].nodeValue.replace('/', '');
+
+			return [ solName, solNum, maxSolNum ];
+		}
+		// prototype.jsのAjaxComplete(兵数ボタンを押された時)
+		window.Ajax.Responders.register({
+			onComplete: function() {
+				if( window.Ajax.activeRequestCount < 1 ) {
+					// dynamicAnalyze()をPageContextで動かすため
+					j$('#busho_info .tr_gradient').each(function() {
+						var $this  = j$(this),
+							$input = $this.find('INPUT');
+
+						if ( $input.length == 0 ) { return; }
+
+						var $td  = $this.children('TD'),
+							idx  = $input.eq( 0 ).val(),
+							id   = $input.eq( 1 ).val(),
+							[ solName, solNum, maxSolNum ] = analyzeSoldier( j$( '#cardWindow_' + id ) )
+
+						//兵士数
+						if ( solNum == maxSolNum ) {
+							$this.find( '#unit_cnt_text_' + idx ).css({ backgroundColor: '#fbb' });
+						}
+						else {
+							$this.find( '#unit_cnt_text_' + idx ).css({ backgroundColor: '' });
+						}
+
+						//背景色設定
+						$this.removeClass('yari1 yari2 yari3 yari4');
+						$this.removeClass('yumi1 yumi2 yumi3 yumi4');
+						$this.removeClass('kiba1 kiba2 kiba3 kiba4 ');
+						$this.removeClass('heiki1 heiki2 heiki3 heiki4 heiki5 heiki6 heiki7');
+						$this.removeClass('imc_none');
+						if ( solName.length > 0 ) {
+							$this.addClass( solName );
+						}
+						else {
+							$this.addClass('imc_none');
+						}
+
+						// 兵種欄に現兵数と指揮力を表示
+						var $solNum = $td.eq( 10 ).clone();
+						$solNum.find('INPUT,DIV').remove();
+						$solNum.html( $solNum.html().replace(/\s*color:\s*#FFFFFF/, '') );
+
+						$td.eq( 11 ).find('DIV').remove();
+
+						j$( '<div style="margin-top:4px;">' )
+						.appendTo( $td.eq( 11 ) ).append( $solNum.contents() );
+					});
+				}
+			}
+		});
+	});
 },
 
 //. autoPager
@@ -16225,23 +16353,23 @@ analyze: function( $tr, deck, edit ) {
 		// 組
 		$this.addClass( $this.find('[id^=unit_group_type_]').attr('class').replace(/unit(_brigade\d)/, function( s, m ) { return 'imc'+m; } ) );
 
-		//兵士数
-		if ( card.solNum == card.maxSolNum ) {
-			$this.find( '#unit_cnt_text_' + idx ).css({ backgroundColor: '#fbb' });
-		}
+		// //兵士数
+		// if ( card.solNum == card.maxSolNum ) {
+		// 	$this.find( '#unit_cnt_text_' + idx ).css({ backgroundColor: '#fbb' });
+		// }
 
 		//Lv
 		if ( card.lv == 20 ) {
 			$this.addClass('imc_lv20');
 		}
 
-		if ( data ) {
-			//背景色設定
-			$this.addClass( data.class );
-		}
-		else {
-			$this.addClass('imc_none');
-		}
+		// if ( data ) {
+		// 	//背景色設定
+		// 	$this.addClass( data.class );
+		// }
+		// else {
+		// 	$this.addClass('imc_none');
+		// }
 
 		//HP
 		if ( card.hp < ( card.maxHp - 10 ) ) { $td.slice( 1, 3 ).css({ backgroundColor: '#955' }); }
@@ -16249,9 +16377,63 @@ analyze: function( $tr, deck, edit ) {
 
 		if ( !( deck && !edit ) ) {
 			$this.find('TABLE').eq( 1 ).find('TR').eq( 1 ).find('TD').eq( 0 ).prepend('<span class="font_purple imc_set_value">( <span>1</span> )</span> / ');
-			$this.find('TABLE').eq( 1 ).find('TR').eq( 0 ).find('TD').eq( 0 ).append('<span class="imc_max_solnum">/ <span>' + card.maxSolNum + '</span></span>');
+			// $this.find('TABLE').eq( 1 ).find('TR').eq( 0 ).find('TD').eq( 0 ).append('<span class="imc_max_solnum">/ <span>' + card.maxSolNum + '</span></span>');
 			$( '#unit_set_link' + idx ).removeAttr('onclick style').addClass('imc_set_value');
 		}
+	});
+	
+	// 現兵数と指揮力の表示
+	this.dynamicAnalyze( $tr );
+},
+
+//. dynamicAnalyze
+dynamicAnalyze: function( $tr ) {
+	$tr.each(function() {
+		// var $this = $(this),
+		// 	$td   = $this.children('TD');
+		var $this  = $(this),
+			$input = $this.find('INPUT');
+
+		if ( $input.length == 0 ) { return; }
+
+		var $td  = $this.children('TD'),
+			idx  = $input.eq( 0 ).val(),
+			id   = $input.eq( 1 ).val(),
+			card = new Card( $( '#cardWindow_' + id ) ),
+			data = Soldier.getByName( card.solName );
+
+		$this.data( card );
+
+		//兵士数
+		if ( card.solNum == card.maxSolNum ) {
+			$this.find( '#unit_cnt_text_' + idx ).css({ backgroundColor: '#fbb' });
+		}
+		else {
+			$this.find( '#unit_cnt_text_' + idx ).css({ backgroundColor: '' });
+		}
+
+		//背景色設定
+		$this.removeClass('yari1 yari2 yari3 yari4');
+		$this.removeClass('yumi1 yumi2 yumi3 yumi4');
+		$this.removeClass('kiba1 kiba2 kiba3 kiba4 ');
+		$this.removeClass('heiki1 heiki2 heiki3 heiki4 heiki5 heiki6 heiki7');
+		$this.removeClass('imc_none');
+		if ( data ) {
+			$this.addClass( data.class );
+		}
+		else {
+			$this.addClass('imc_none');
+		}
+
+		// 兵種欄に現兵数と指揮力を表示
+		var $solNum = $td.eq( 10 ).clone();
+		$solNum.find('INPUT,DIV').remove();
+		$solNum.html( $solNum.html().replace(/\s*color:\s*#FFFFFF/, '') );
+
+		$td.eq( 11 ).find('DIV').remove();
+
+		$( '<div style="margin-top:4px;">' )
+		.appendTo( $td.eq( 11 ) ).append( $solNum.contents() );
 	});
 },
 
