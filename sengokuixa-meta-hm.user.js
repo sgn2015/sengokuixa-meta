@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name           sengokuixa-meta-hm
 // @description    戦国IXAを変態させるツール for hm鯖
-// @version        1.4.6.4
+// @version        1.4.6.5
 // @namespace      sengokuixa-meta
 // @include        http://h*.sengokuixa.jp/*
 // @require        https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js
@@ -2610,7 +2610,6 @@ var Append = {
 					
 					Deck.filter.conditions = [];
 					Deck.filter.exceptions = {}; // ブラックリスト
-					// Deck.filter.exceptions[ card_id ] = true;
 
 					data = Deck.getConditionByTitle( '討伐：降',   Deck.sortList );
 					if ( data ) { conditions.push( data ); }
@@ -2618,13 +2617,7 @@ var Append = {
 					data = Deck.getConditionByTitle( 'コスト：昇', Deck.sortList );
 					if ( data ) { conditions.push( data ); }
 
-					data = Deck.getConditionByTitle( 'ランク：昇', Deck.sortList );
-					if ( data ) { conditions.push( data ); }
-
-					data = Deck.getConditionByTitle( 'レベル：昇', Deck.sortList );
-					if ( data ) { conditions.push( data ); }
-
-					data = Deck.getConditionByTitle( '指揮力：降', Deck.sortList );
+					data = Deck.getConditionByTitle( 'ランク：降', Deck.sortList );
 					if ( data ) { conditions.push( data ); }
 
 					Deck.sort.conditions = conditions;
@@ -20976,7 +20969,49 @@ Page.registerAction( 'quest', 'index', {
 //. style
 style: '' +
 'INPUT { ime-mode: disabled; }' +
-''
+'',
+
+main: function() {
+	// いざ合戦へ
+	if( $('INPUT[name=tuto_rank]').length > 0 ) {
+		$.get('/user/')
+		.done( function( html ) {
+			var rank = $(html).find('.family_nowrank').text().match(/全国(\d+)位/)[1];
+			$('INPUT[name=tuto_rank]').val( rank );
+		});
+	}
+},
+
+});
+		
+//■ /tutorial/
+Page.registerAction( 'tutorial', {
+
+//. style
+style: '' +
+'INPUT { ime-mode: disabled; }' +
+'',
+
+main: function() {
+	// 本城の座標を入力しよう
+	if( $('INPUT[name=tuto_x]').length > 0 && $('INPUT[name=tuto_y]').length > 0 ) {
+		$.get('/user/')
+		.done( function( html ) {
+			var href = $(html).find('TR:contains("本領") A[href*=land]').attr('href'),
+				[ dmy, x, y ] = href.match(/x=(-?\d+)&y=(-?\d+)/);
+			$('INPUT[name=tuto_x]').val( x );
+			$('INPUT[name=tuto_y]').val( y );
+		});
+	}
+	// 足軽の性能
+	if( $('INPUT[name=tuto_attack]').length > 0 &&
+		$('INPUT[name=tuto_defense]').length > 0 &&
+		$('INPUT[name=tuto_destroy]').length > 0 ) {
+		$('INPUT[name=tuto_attack]').val( 11 );
+		$('INPUT[name=tuto_defense]').val( 11 );
+		$('INPUT[name=tuto_destroy]').val( 2 );
+	}
+},
 
 });
 

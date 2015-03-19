@@ -2560,7 +2560,6 @@ var Append = {
 		});
 
 		$('#imi_info').hide();
-
 	},
 
 	// 秘境へ行く
@@ -14100,6 +14099,7 @@ training: function( name ) {
 			close = storage.get( key ),
 			$close, html, text;
 
+if( Env.chapter > 8 ) {
 		//兵種の説明
 		$this.find('.ig_tile_explain').hide();
 		// 訓練タイプ
@@ -14145,6 +14145,50 @@ training: function( name ) {
 		else {
 			$close.addClass('is_open');
 		}
+}
+else {
+		//兵種の説明
+		$this.find('.ig_tile_explain').hide();
+
+		//現在の兵士数表示位置変更
+		text = $this.find('DIV.ig_tilesection_iconarea > P').remove().text() || '';
+		text = ( text.match(/(\d+)/) || [,0] )[1];
+		$this.find('H3').append('<span style="margin: 0px 15px;">待機数 ： ' + text + '</span>');
+
+		//訓練中の兵士表示
+		if ( list[ name ] ) { $this.append( list[ name ] ); }
+
+		$close = $('<span class="imc_training_button"></span>');
+		$close.click(function() {
+			var $this = $(this),
+				$container = $this.closest('.ig_tilesection_innerborder');
+
+			if ( $this.hasClass('is_open') ) {
+				$this.removeClass('is_open').addClass('is_close');
+				$container.find('.ig_tilesection_iconarea').hide();
+				$container.find('.ig_tilesection_detailarea TABLE').hide();
+				storage.set( key, true );
+			}
+			else {
+				$this.addClass('is_open').removeClass('is_close');
+				$container.find('.ig_tilesection_iconarea').show();
+				$container.find('.ig_tilesection_detailarea TABLE').show();
+				storage.remove( key );
+			}
+		});
+
+		$this.find('H3').append( $close );
+
+		if ( close ) {
+			$close.addClass('is_close');
+			$this.find('.ig_tilesection_iconarea').hide();
+			$this.find('.ig_tilesection_detailarea TABLE').hide();
+		}
+		else {
+			$close.addClass('is_open');
+		}
+}
+
 	});
 
 	this.trainingPulldown( $innermid );
@@ -14204,6 +14248,7 @@ trainingPulldown: function( $div ) {
 
 	$('.ig_solder_commentarea').text( pool.soldier + ' / ' + pool.capacity );
 
+if( Env.chapter > 8 ) {
 	$div.each(function() {
 		var $this = $(this),
 			$tables = $this.find('TABLE').slice( 1 ),
@@ -14301,10 +14346,103 @@ trainingPulldown: function( $div ) {
 		.change( self.trainingDivide ).trigger('change');
 	});
 	});
+}
+else {
+	$div.each(function() {
+		var $this = $(this),
+			$table = $this.find('TABLE').eq( 1 ),
+			name = $this.find('H3 B').text().slice(1, -1),
+			data = Soldier.getByName( name ),
+			$tr, $select;
+
+		//各拠点の施設表示
+		$tr = $table.find('TR.noborder');
+		$tr.removeClass('noborder');
+		$tr.find('TH').first().remove();
+		$tr.find('TD').first().remove();
+		$tr.find('TD').attr('colspan', 3);
+
+		//資源不足等で訓練できない場合はプルダウン化処理をしない
+		var $input = $this.find('INPUT[type="text"]');
+		if ( $input.length == 0 ) { return; }
+
+		html = '（分割回数：<select id="create_count_' + data.type + '">' +
+			'<option value="1">1回</option>' +
+			'<option value="2">2回</option>' +
+			'<option value="3">3回</option>' +
+			'<option value="4">4回</option>' +
+			'<option value="5">5回</option>' +
+			'<option value="6">6回</option>' +
+			'<option value="7">7回</option>' +
+			'<option value="8">8回</option>' +
+			'<option value="9">9回</option>' +
+			'<option value="10">10回</option>' +
+		'</select>' +
+		'　<button>複数拠点で訓練する</button>）';
+
+		$tr.find('FORM').append( html );
+		$table
+		.append('<tr><th>拠点</th><th width="70">LV</th>' +
+			'<th width="120"><img alt="訓練する人数" src="' + Env.externalFilePath + '/img/tile/icon_training_num.png"></th>' +
+			'<th width="120"><img alt="訓練にかかる時間" src="' + Env.externalFilePath + '/img/tile/icon_training_time.png"></th>' +
+			'</tr>'
+		)
+		.append('<tbody id="imi_training_' + data.type + '"></tbody>');
+
+		//必要資源取得（金山効果は込）
+		$tr = $table.find('TR').eq( 0 );
+		materials = [
+			$tr.find('.icon_wood').text().match(/(\d+)/)[ 1 ].toInt(),
+			$tr.find('.icon_cotton').text().match(/(\d+)/)[ 1 ].toInt(),
+			$tr.find('.icon_iron').text().match(/(\d+)/)[ 1 ].toInt(),
+			$tr.find('.icon_food').text().match(/(\d+)/)[ 1 ].toInt()
+		];
+
+		var rate = ( market ) ? market.rate : 0,
+			freecapa = pool.capacity - pool.soldier,
+			maxnum = Util.getMaxTraining( resource, materials, 0, freecapa, 0 ),
+			overnum = Util.getMaxTraining( resource, materials, rate, freecapa, maxnum ),
+			val = 0, step = 100, color = '#390', options = [];
+
+		if ( overnum > 10 ) {
+			color = ( maxnum >= 10 ) ? '#390' : '#c30';
+			options.push('<option value="10" style="color: ' + color + '">10</option>');
+		}
+
+		while ( val < overnum ) {
+			val += step;
+			if ( val == maxnum ) { maxnum = Number.MAX_VALUE; }
+			if ( val > maxnum && maxnum != overnum ) {
+				options.push('<option value="' + maxnum + '" style="color: ' + color + '">' + maxnum + '</option>');
+				maxnum = Number.MAX_VALUE;
+			}
+			if ( val > overnum ) { val = overnum; }
+			if ( val >= 1000 ) { step = 500; }
+
+			let result = Util.checkExchange( resource, Util.getConsumption( materials, val ) );
+			if ( result == 0 ) { break; }
+			if ( result == 1 ) { color = '#c30'; }
+
+			options.push('<option value="' + val + '" style="color: ' + color + '">' + val + '</option>');
+		}
+
+		$select = $('<select/>');
+		$select.append( options.join('') );
+		$select.attr({ name: $input.attr('name'), value: unit_value });
+
+		//テキストボックスをプルダウンに置き換え
+		$input.parent().next().remove();
+		$input.replaceWith( $select );
+
+		$select.data({ type: data.type, materials: materials })
+		.change( self.trainingDivide ).trigger('change');
+	});
+}
 },
 
 //. trainingDivide
 trainingDivide: function( e ) {
+if( Env.chapter > 8 ) {
 	var $this = $(this),
 		solnum = $this.val().toInt(),
 		{ type, materials, idx, tm } = $this.data(),
@@ -14356,6 +14494,60 @@ trainingDivide: function( e ) {
 	$('#imi_training' + idx + '_' + type).html( html ).append( $tr );
 
 	$this.data({ facilities: facilities, total: [ total_wood, total_stone, total_iron, total_rice ] });
+}
+else {
+	var $this = $(this),
+		solnum = $this.val().toInt(),
+		{ type, materials } = $this.data(),
+		list = $(document).data('facilitylist'),
+		soldata = Soldier.getByType( type ),
+		html = '', total_wood = total_stone = total_iron = total_rice = 0,
+		facilities;
+
+	soldata.materials = materials;
+	facilities = Util.divide( list, soldata, solnum ),
+
+	$.each( facilities, function() {
+		var [ wood, stone, iron, rice ] = this.materials;
+
+		total_wood  += wood;
+		total_stone += stone;
+		total_iron  += iron;
+		total_rice  += rice;
+
+		html += '<tr class="imc_facility">' +
+			'<th>' + this.name + '</th>' +
+			'<td>' + this.lv + '</td>' +
+			'<td>' + this.solnum + '</td>' +
+			'<td>' + this.trainingtime.toFormatTime(); + '</td>' +
+		'</tr>';
+	});
+
+	//消費資源表示
+	var resource = Util.getResource(),
+		$tr = $this.closest('TBODY').find('TR').eq( 0 ).clone(),
+		surplus;
+
+	surplus = ( total_wood <= resource[ 0 ] );
+	$tr.find('.icon_wood').text( '木 ' + total_wood.toFormatNumber() )
+		.toggleClass('imc_surplus', surplus ).toggleClass('imc_shortage', !surplus );
+
+	surplus = ( total_stone <= resource[ 1 ] );
+	$tr.find('.icon_cotton').text( '綿 ' + total_stone.toFormatNumber() )
+		.toggleClass('imc_surplus', surplus ).toggleClass('imc_shortage', !surplus );
+
+	surplus = ( total_iron <= resource[ 2 ] );
+	$tr.find('.icon_iron').text( '鉄 ' + total_iron.toFormatNumber() )
+		.toggleClass('imc_surplus', surplus ).toggleClass('imc_shortage', !surplus );
+
+	surplus = ( total_rice <= resource[ 3 ] );
+	$tr.find('.icon_food').text( '糧 ' + total_rice.toFormatNumber() )
+		.toggleClass('imc_surplus', surplus ).toggleClass('imc_shortage', !surplus );
+
+	$('#imi_training_' + type).html( html ).append( $tr );
+
+	$this.data({ facilities: facilities, total: [ total_wood, total_stone, total_iron, total_rice ] });
+}
 },
 
 //. trainingExecute
@@ -20778,7 +20970,49 @@ Page.registerAction( 'quest', 'index', {
 //. style
 style: '' +
 'INPUT { ime-mode: disabled; }' +
-''
+'',
+
+main: function() {
+	// いざ合戦へ
+	if( $('INPUT[name=tuto_rank]').length > 0 ) {
+		$.get('/user/')
+		.done( function( html ) {
+			var rank = $(html).find('.family_nowrank').text().match(/全国(\d+)位/)[1];
+			$('INPUT[name=tuto_rank]').val( rank );
+		});
+	}
+},
+
+});
+
+//■ /tutorial/
+Page.registerAction( 'tutorial', {
+
+//. style
+style: '' +
+'INPUT { ime-mode: disabled; }' +
+'',
+		
+main: function() {
+	// 本城の座標を入力しよう
+	if( $('INPUT[name=tuto_x]').length > 0 && $('INPUT[name=tuto_y]').length > 0 ) {
+		$.get('/user/')
+		.done( function( html ) {
+			var href = $(html).find('TR:contains("本領") A[href*=land]').attr('href'),
+				[ dmy, x, y ] = href.match(/x=(-?\d+)&y=(-?\d+)/);
+			$('INPUT[name=tuto_x]').val( x );
+			$('INPUT[name=tuto_y]').val( y );
+		});
+	}
+	// 足軽の性能
+	if( $('INPUT[name=tuto_attack]').length > 0 &&
+		$('INPUT[name=tuto_defense]').length > 0 &&
+		$('INPUT[name=tuto_destroy]').length > 0 ) {
+		$('INPUT[name=tuto_attack]').val( 11 );
+		$('INPUT[name=tuto_defense]').val( 11 );
+		$('INPUT[name=tuto_destroy]').val( 2 );
+	}
+},
 
 });
 
