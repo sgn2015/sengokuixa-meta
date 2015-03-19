@@ -1799,7 +1799,8 @@ unionCardParam: function( card ) {
 		skilllvup: card.canSkillLvup(),
 		skilladd: card.canSkillAdd(),
 		skillslot2: card.useSkillSlot2(),
-		rankupslot2: card.useRankupSlot2()
+		rankupslot2: card.useRankupSlot2(),
+		skillCount: card.skillCount
 	};
 },
 
@@ -4251,7 +4252,7 @@ panelUnionSlot: function( $panel ) {
 		Card.skillLevelup( slot1.id, slot2.id, cid_list );
 	})
 	.one('click', '.imc_skill_add', function() {
-		Card.skillAdd( slot1.id, slot2.id, [] );
+		Card.skillAdd( slot1.id, slot2.id, slot1.skillCount + 1 );
 	})
 	.one('click', '.imc_rankup', function() {
 		var cid_list = materials.map(function( elem ) { return elem.id });
