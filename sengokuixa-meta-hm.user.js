@@ -2744,6 +2744,275 @@ var Append = {
 			},
 		});
 	},
+
+	// まとめて隠し玉
+	sequencialUnionExp: function() {
+		var ol = Display.dialog({
+			title: 'まとめて隠し玉',
+			width: 770, height:600, top: 50,
+			buttons: {
+				'決定': function() {
+					var pages = [], cards = [],
+						dialog = this;
+
+					$('#imi_pagelist :checked').each( function() {
+						pages.push( $(this).val() );
+					});
+					$('#imi_cardlist :checked').each( function() {
+						cards.push( $(this).val() );
+					});
+					
+					var msg = Display.dialog();
+
+					$.Deferred().resolve()
+					.pipe( function() {
+						msg.message('小姓の隠し玉を使用します');
+					})
+					.pipe( function() {
+						var self = arguments.callee;
+
+						// カード情報を読み込んで存在確認
+						$.ajax('/card/deck.php', {
+							beforeSend: function(xhr) {
+								xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+							}
+						})
+						.pipe( function( responseJson ) {
+							var remain_page =
+							$.grep( responseJson.card_data, function( card ) {
+								return !($.inArray( card.card_id, pages ) < 0 );
+							});
+							var remain_card =
+							$.grep( responseJson.card_data, function( card ) {
+								if( $.inArray( card.card_id, cards ) >= 0 ) {
+									return card.level < 20;
+								}
+								else {
+									return false;
+								}
+							});
+							return [ remain_page, remain_card ];
+						})
+						.pipe( function( list ) {
+							[ remain_page, remain_card ] = list;
+							if( remain_page.length == 0 || remain_card == 0 ) {
+								msg.close();
+								dialog.close();
+								return;
+		}
+
+							var postData = {
+								base_cid    : remain_page[0].card_id.toInt(),
+								added_cid   : remain_card[0].card_id.toInt(),
+								exec_btn    : 1,
+								union_type  : 5,
+								use_cp_flg  : 0,
+								'material_cid[]': [],
+							};
+							for( var i = 1; i < remain_page.length && i < 5; i++ ) {
+								postData['material_cid[]'].push( remain_page[i].card_id.toInt() );
+							}
+
+							$.post('/union/union_levelup.php', postData )
+							.pipe( function( html ) {
+								var $html = $(html);
+								msg.message( $html.find('.common_box3bottom P:first').text() );
+								self();
+							});
+						});
+					});
+				},
+				'キャンセル': function() { this.close(); }
+			}
+		});
+
+		//. step1 .. カード読み込み
+		$.ajax('/card/deck.php', {
+			beforeSend: function(xhr) {
+				xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+			}
+		})
+		//. step2 .. データ読み込み
+		.pipe( function( responseJSON ) {
+			JsonCard.setup( responseJSON.card_data );
+
+			// ブラックリスト
+			Deck.filter.exceptions = {};
+
+			// 小姓の隠し玉
+			Deck.filter.conditions = [ { condition: ['cardNo', 6702] } ];
+			Deck.sort.conditions = [ ];
+
+			var pagelist = Deck.targetList();
+
+			Deck.filter.conditions = [];
+			Deck.filter.conditions.push( { condition: ['lv', 19, 'lt' ] } );
+			Deck.filter.conditions.push( { condition: ['cost', 4.5, 'lt' ] } );
+
+			Deck.filter.exceptions = {}; // ブラックリスト
+			Deck.sort.conditions = [];
+			Deck.sort.conditions.push( { condition: ['cardNo', 'asc'] } );
+			Deck.sort.conditions.push( { condition: ['rank', 'desc'] } );
+			Deck.sort.conditions.push( { condition: ['lv', 'desc'] } );
+
+			var cardlist = Deck.targetList();
+
+			return [ pagelist, cardlist ];
+		})
+		//. step3 .. 合成対象選択画面作成
+		.pipe( function( list ) {
+			var self = arguments.callee,
+				[pagelist, cardlist] = list;
+
+			var contents = '' +
+			'<table class="common_table1 center mt10">' +
+				'<tbody>' +
+					'<tr>' +
+						'<th>選択</th><th>名前</th><th>ランク/LV</th><th>スキル</th><th>統率</th>' +
+						'<th>攻撃</th><th>防御</th><th>兵法</th><th>指揮力</th>' +
+					'</tr>' +
+				'</tbody>' +
+			'</table>';
+
+			var $contents1 = $(contents),
+				$contents2 = $(contents);
+
+			// 隠し玉一覧
+			$.each( pagelist, function() {
+				var icon, ranklv, skills, commands;
+
+				ranklv = ( this.rank > 5 ) ? 
+					'<img alt="限界突破" src="' + Env.externalFilePath + '/img/card/icon/icon_rank6_pattern4.png">' :
+					'★'.repeat( this.rank ) + '☆'.repeat( 5 - this.rank ) + '<br>' + this.lv;
+
+				skills = '';
+				$.each( this.skillList, function() {
+					skills += this.type + ':' + this.originName + '<br>';
+				});
+				commands = '' +
+				'槍:<strong style="' + lead_unit_class( this.commands['槍'] ) + '">' + this.commands['槍'] + '</strong>' +
+				'&#12288;/&#12288;' +
+				'馬:<strong style="' + lead_unit_class( this.commands['馬'] ) + '" "="">' + this.commands['馬'] + '</strong><br>' +
+				'弓:<strong style="' + lead_unit_class( this.commands['弓'] ) + '">' + this.commands['弓'] + '</strong>' +
+				'&#12288;/&#12288;' +
+				'器:<strong style="' + lead_unit_class( this.commands['器'] ) + '">' + this.commands['器'] + '</strong>';
+
+				var row = '' +
+				'<tr>' +
+				'<td>' + '<input type="checkbox" name="page_card_arr[]" value="' + this.cardId+ '" checked>' + '</td>' +
+				'<td class=left>' +
+					'<img width="30" height="30" class="middle mr5" alt="化" src="' + Env.externalFilePath + '/img/card/icon/icon_bake.png">' +
+					this.name +
+				'</td>' +
+				'<td>' + ranklv + '</td>' +
+				'<td>' + skills + '</td>' +
+				'<td>' + commands + '</td>' +
+				'<td class="left">' + this.atk + '</td>' +
+				'<td class="left">' + this.def + '</td>' +
+				'<td class="left">' + this.int + '</td>' +
+				'<td class="left">' + this.maxSolNum + '</td>' +
+				'</tr>';
+				$contents1.find('TBODY').append( row );
+			});
+
+			// 合成対象一覧
+			$.each( cardlist, function() {
+				var icon, skills, commands;
+
+				switch( this.rarity ) {
+					case '天': icon = 'icon_ten.png'; break;
+					case '極': icon = 'icon_goku.png'; break;
+					case '特': icon = 'icon_toku.png'; break;
+					case '上': icon = 'icon_jou.png'; break;
+					case '序': icon = 'icon_jo.png'; break;
+					case '童': icon = 'icon_warabe.png'; break;
+					default: return true;
+				}
+
+				skills = '';
+				$.each( this.skillList, function() {
+					skills += this.type + ':' + this.originName + '<br>';
+				});
+
+				commands = '' +
+				'槍:<strong style="' + lead_unit_class( this.commands['槍'] ) + '">' + this.commands['槍'] + '</strong>' +
+				'&#12288;/&#12288;' +
+				'馬:<strong style="' + lead_unit_class( this.commands['馬'] ) + '" "="">' + this.commands['馬'] + '</strong><br>' +
+				'弓:<strong style="' + lead_unit_class( this.commands['弓'] ) + '">' + this.commands['弓'] + '</strong>' +
+				'&#12288;/&#12288;' +
+				'器:<strong style="' + lead_unit_class( this.commands['器'] ) + '">' + this.commands['器'] + '</strong>';
+
+				var row = '' +
+				'<tr>' +
+				'<td>' + '<input type="checkbox" name="union_card_arr[]"  value="' + this.cardId + '">' + '</td>' +
+				'<td class=left>' +
+					'<img width="30" height="30" class="middle mr5" alt="' + this.rarity + '" src="' + Env.externalFilePath + '/img/card/icon/' + icon + '">' +
+					this.name +
+				'</td>' +
+				'<td>' + '★'.repeat( this.rank ) + '☆'.repeat( 5 - this.rank ) + '<br>' + this.lv + '</td>' +
+				'<td>' + skills + '</td>' +
+				'<td>' + commands + '</td>' +
+				'<td class="left">' + this.atk + '</td>' +
+				'<td class="left">' + this.def + '</td>' +
+				'<td class="left">' + this.int + '</td>' +
+				'<td class="left">' + this.maxSolNum + '</td>' +
+				'</tr>';
+				$contents2.find('TBODY').append( row );
+			});
+
+			$contents1.first().attr('id', 'imi_pagelist');
+			$contents2.first().attr('id', 'imi_cardlist');
+
+			ol.append( $contents1 );
+			ol.append( $contents2 );
+
+			$('TABLE.common_table1')
+			.on('mouseenter', 'TR', Util.enter )
+			.on('mouseleave', 'TR', Util.leave )
+			.on('click', 'TR', function( e ) {
+				var tagName = e.target.tagName.toUpperCase(),
+					$tr = $(this).closest('TR'),
+					$input = $tr.find('INPUT:visible'),
+					checked = $input.attr('checked');
+
+				if ( $input.length == 0 ) { return; }
+
+				if ( tagName == 'INPUT' || tagName == 'A' ) {
+					if ( checked ) {
+						$tr.addClass('imc_selected');
+					}
+					else {
+						$tr.removeClass('imc_selected');
+					}
+					return;
+					}
+
+				if ( checked ) {
+					$input.attr('checked', false);
+					$tr.removeClass('imc_selected');
+				}
+				else {
+					$input.attr('checked', true);
+					$tr.addClass('imc_selected');
+				}
+			});
+
+			function lead_unit_class( command ) {
+				switch( command ) {
+					case 'SSS':
+					case 'SS' :
+					case 'S'  : return 'color: #f44'; break;
+					case 'A'  : 
+					case 'B'  : return 'color: #c22'; break;
+					case 'C'  : 
+					case 'D'  : 
+					case 'E'  : 
+					case 'F'  : return 'color: #000'; break;
+					default: return '';
+			}
+			}
+		});
+	},
 };
 
 // 精鋭部隊
@@ -11775,13 +12044,13 @@ clone: function() {
 //■ JsonCard
 var JsonCard = function( element ) {
 	this.analyzeType = 'JSON';
-	this.layoutType  = 'Mini';
+	this.layoutType  = '';
 
 	this.analyze( element );
 	this.power();
 
-	// this.element = ;
-	// this.element.attr({ card_id: this.cardId });
+	this.element = $('');
+	this.element.attr({ card_id: this.cardId });
 	// this.layouter();
 }
 
@@ -13055,6 +13324,7 @@ createPulldownMenu: function() {
 		{ title: 'スキル強化', action: function() { Page.form( '/union/levelup.php', { union_type: 1 }, true ); } },
 		{ title: 'スキル追加', action: function() { Page.form( '/union/levelup.php', { union_type: 2 }, true ); } },
 		{ title: 'スキル削除', action: function() { Page.form( '/union/remove.php', { union_type: 3 }, true ); } },
+		{ title: '【まとめて隠し玉】', action: function() { Append.sequencialUnionExp(); } },
 		{ title: '合成履歴', action: '/union/union_history.php' },
 		{ title: '【合成表更新】', action: function() { Data.skillTableUpdate(); } },
 	]);
