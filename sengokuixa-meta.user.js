@@ -2025,8 +2025,8 @@ keyBindCommon: function() {
 					'<br/>' +
 					'<span class="kbd">ページャー</span>' +
 					'<dl>' +
-						'<dt class="kbd">e</dt>' + '<dd class="kbd">前のページを表示する</dd>' +
-						'<dt class="kbd">q</dt>' + '<dd class="kbd">次のページを表示する</dd>' +
+						'<dt class="kbd">a</dt>' + '<dd class="kbd">前のページを表示する</dd>' +
+						'<dt class="kbd">d</dt>' + '<dd class="kbd">次のページを表示する</dd>' +
 					'</dl>' +
 					'<br/>' +
 					'<span class="kbd">件名選択</span>' +
@@ -2036,7 +2036,7 @@ keyBindCommon: function() {
 					'</dl>' +
 					'</div>';
 				$('<div id="keyboardHelp" class="keyboardHelp" style="display:none">' + html + '</div>').appendTo('body');
-				$('<a id="keyboardHelpAnchor" href="#TB_inline?inlineId=keyboardHelp&width=940&height=595&top=5" class="thickbox"></a>').appendTo('body');
+				$('<a id="keyboardHelpAnchor" href="#TB_inline?inlineId=keyboardHelp&width=940&height=595&top=5" class="metabox"></a>').appendTo('body');
 			}
 			$('#keyboardHelpAnchor').click();
 		}),
@@ -2840,9 +2840,11 @@ var Append = {
 			// ブラックリスト
 			Deck.filter.exceptions = {};
 
-			// 小姓の隠し玉
-			Deck.filter.conditions = [ { condition: ['cardNo', 6702] } ];
-			Deck.sort.conditions = [ ];
+			// 小姓の隠し玉(6702)/小姓の応援(6703)
+			Deck.filter.conditions = [];
+			Deck.filter.conditions.push( { condition: ['cardNo', 6701, 'gt'] } );
+			Deck.filter.conditions.push( { condition: ['cardNo', 6704, 'lt'] } );
+			Deck.sort.conditions = [];
 
 			var pagelist = Deck.targetList();
 
