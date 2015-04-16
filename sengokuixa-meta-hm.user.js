@@ -2457,8 +2457,6 @@ var Append = {
 		.pipe(function (html) {
 			var $html = $(html),
 				$unit = $html.find('select[id^=unit_id_select_]:first option'),   // 兵種と兵数
-				$lead_unit = $html.find('span[id^="lead_unit"]'), // 編成可能数
-				$id = $html.find('div[id^="unit_group_type_"]'),  // カードID
 				unit = [], postData = [];
 			
 			$unit.each(function (idx, elm) {
@@ -2468,17 +2466,25 @@ var Append = {
 					unit.push([key, parseInt(cnt, 10)]);
 				}
 			});
-			$lead_unit.each(function (idx, elm) {
+
+			return $.ajax('/card/deck.php', { beforeSend: function(xhr) { xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest'); } } )
+			.pipe( function( responseJSON ) {
+				$.each( responseJSON.card_data, function( idx, card ) {
+					var id   = card.card_id.toInt(),
+						lead = card.lead_unit.toInt();
+					
+					// 兵数順にソートして無くなったら終了
 				unit.sort(function (a, b) {
 					return b[1] - a[1]
 				});
 				if (unit[0][1] === 0) return false;
+
 				postData.push({
-					card_id: $id.eq(idx).prop('id').replace(/[^\d]/g, ""),
-					unit_type: unit[0][0],
-					unit_count: unit[0][1] < $(elm).text() ? unit[0][1] : $(elm).text()
+						card_id   : id,
+						unit_type : unit[0][0],
+						unit_count: Math.min( unit[0][1], lead ),
 				});
-				unit[0][1] -= postData[idx].unit_count;
+					unit[0][1] -= postData[postData.length-1].unit_count;
 			});
 
 			let tasks = [];
@@ -2488,6 +2494,7 @@ var Append = {
 			});
 
 			return $.when.apply( $, tasks );
+			});
 		})
 	},
 	
