@@ -2877,7 +2877,7 @@ var Append = {
 			'<table class="common_table1 center mt10">' +
 				'<tbody>' +
 					'<tr>' +
-						'<th>選択</th><th>名前</th><th>ランク/LV</th><th>スキル</th><th>統率</th>' +
+						'<th>選択</th><th>名前</th><th>ランク/LV</th><th>cost</th><th>スキル</th><th>統率</th>' +
 						'<th>攻撃</th><th>防御</th><th>兵法</th><th>指揮力</th>' +
 					'</tr>' +
 				'</tbody>' +
@@ -2914,6 +2914,7 @@ var Append = {
 					this.name +
 				'</td>' +
 				'<td>' + ranklv + '</td>' +
+				'<td>' + this.cost + '</td>' +
 				'<td>' + skills + '</td>' +
 				'<td>' + commands + '</td>' +
 				'<td class="left">' + this.atk + '</td>' +
@@ -2959,6 +2960,7 @@ var Append = {
 					this.name +
 				'</td>' +
 				'<td>' + '★'.repeat( this.rank ) + '☆'.repeat( 5 - this.rank ) + '<br>' + this.lv + '</td>' +
+				'<td>' + this.cost + '</td>' +
 				'<td>' + skills + '</td>' +
 				'<td>' + commands + '</td>' +
 				'<td class="left">' + this.atk + '</td>' +
@@ -13237,41 +13239,11 @@ createPulldownMenu: function() {
 		{ title: '【精鋭部隊】', action: '/card/deck.php?select_card_group=6&select_assign_no=4' },
 		{ title: '【兵士退避】', action: function() {
 			var ol = Display.dialog().message('兵士退避中...');
-			$.get('/card/deck.php')
-			.done( function( html ) {
-				// 現在のソート順を保持
-				var param = $(html).find('#deck_file').serializeArray();
-				// 指揮力降順でソートし直し
-				var p = [], q = [];
-				$.each( param, function() {
-					if( !/sort_order/.test( this.name ) && !/btn_change_flg/.test( this.name ) ) {
-						q.push( { name: this.name, value: this.value } );
-					}
-					else if( !/btn_change_flg/.test( this.name ) ) {
-						p.push( { name: this.name, value: this.value } );
-					}
-				});
-				p.push( { name: 'btn_change_flg', value: 1 } );
-				q.push( { name: 'btn_change_flg', value: 1 } );
-				q.push( { name: 'sort_order[]', value: 12 } );
-				q.push( { name: 'sort_order_type[]', value: 1 } );
-				q.push( { name: 'sort_order[]', value: 0 } );
-				q.push( { name: 'sort_order_type[]', value: 0 } );
-				q.push( { name: 'sort_order[]', value: 0 } );
-				q.push( { name: 'sort_order_type[]', value: 0 } );
-				$.post('/card/deck.php', $.param( q ) )
-				.done( function() {
 					Append.gatherSoldierAll( ol )
 					.pipe( ol.close )
 					.done( function() {
-						// ソート順を元に戻す
-						$.post('/card/deck.php', $.param( p ) )
-						.done( function() {
 							// 最後は待機兵士一覧を表示
 							location.href = '/facility/unit_list.php';
-						} );
-					});
-				} );
 			});
 		} },
 		{ title: '【一括レベルアップ】', action: function() { Append.togetherLevelup(); } },
