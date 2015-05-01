@@ -2810,6 +2810,7 @@ var Append = {
 		}
 
 							var postData = {
+								ad_id       : 13,
 								base_cid    : remain_page[0].card_id.toInt(),
 								added_cid   : remain_card[0].card_id.toInt(),
 								exec_btn    : 1,
@@ -15557,7 +15558,7 @@ arrivalCopy: function() {
 		var text = '';
 		text += $('#ig_gofightconfirmboxtitle TR:first TD:first SPAN').text().replace(/\t/g, '').trim().match(/\(-?\d+,-?\d+\)$/);
 		text += ' ';
-		text += $('#imi_arrival').text().match(/\d+:\d+:\d+/);
+		text += $('#imi_arrival').text().match(/\d+:(\d+:\d+)/)[1];
 		GM_setClipboard( text );
 
 		return false;
